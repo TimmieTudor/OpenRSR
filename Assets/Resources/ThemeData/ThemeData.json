@@ -1,0 +1,18 @@
+[
+  {
+    "obstacle1_color": [75, 75, 75, 255],
+    "obstacle2_color": [75, 255, 255, 255],
+    "balus_color": [255, 80, 30, 255],
+    "tile_color": [255, 194, 0, 255],
+	"jumptile_color": [255, 133, 0, 255],
+	"background_path": "Backgrounds/Background1"
+  },
+  {
+	"obstacle1_color": [100, 100, 100, 255],
+    "obstacle2_color": [75, 192, 255, 255],
+    "balus_color": [136, 24, 255, 255],
+    "tile_color": [245, 245, 245, 255],
+	"jumptile_color": [245, 68, 255, 255],
+	"background_path": "Backgrounds/Background2"
+  }
+]
