@@ -5,13 +5,11 @@ public class SphereDragger : MonoBehaviour
     private bool isDragging = false;
     private Rigidbody rb;
     private float screenWidth;
-    public SphereJumper spherej;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
         screenWidth = Screen.width;
-        spherej = GetComponent<SphereJumper>();
     }
 
     private void OnMouseDown()

@@ -1402,7 +1402,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.75, y: 0.3, z: 0.75}
+  m_Size: {x: 0.7, y: 0.3, z: 0.7}
   m_Center: {x: 0, y: -0.35, z: 0}
 --- !u!23 &1465583705
 MeshRenderer:
@@ -1469,7 +1469,6 @@ GameObject:
   - component: {fileID: 1512909151}
   - component: {fileID: 1512909150}
   - component: {fileID: 1512909156}
-  - component: {fileID: 1512909157}
   - component: {fileID: 1512909158}
   m_Layer: 0
   m_Name: Balus
@@ -1598,20 +1597,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9eb25eac6f58b4243b35a2f81c43f361, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spherej: {fileID: 1512909157}
---- !u!114 &1512909157
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1512909149}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34b57f2445400f947805c7d234719e93, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  jumpForce: 2
 --- !u!114 &1512909158
 MonoBehaviour:
   m_ObjectHideFlags: 0
