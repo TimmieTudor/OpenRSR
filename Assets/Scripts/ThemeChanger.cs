@@ -1,8 +1,10 @@
 using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine.Networking;
 
 public class ThemeChanger : MonoBehaviour
 {
@@ -12,10 +14,35 @@ public class ThemeChanger : MonoBehaviour
     private List<Dictionary<string, string>> backgroundList;
     private Dictionary<string, Color> colorDict;
     private Dictionary<string, string> backgroundDict;
+    private GameManager gameManager;
+    private string jsonString;
+    private GameObject balus;
+    private Texture2D backgroundFile;
+    private List<Texture2D> files = new List<Texture2D>();
+    private bool loadedImages = false;
     
     private void Start()
     {
-        string jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
+        string[] filePaths = Directory.GetFiles(Path.Combine(Application.persistentDataPath, "Backgrounds"));
+        foreach (string filePath in filePaths)
+        {
+            if (filePath.Contains(".png"))
+            {
+                StartCoroutine(LoadImage(filePath, files));
+            }
+        }
+        loadedImages = true;
+
+        balus = GameObject.FindGameObjectWithTag("Balus");
+        gameManager = balus.GetComponent<GameManager>();
+        if (gameManager.isDataDownloaded)
+        {
+            jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
+        }
+        else
+        {
+            jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
+        }
         JArray jArray = JArray.Parse(jsonString);
 
         themeList = new List<Dictionary<string, Color>>();
@@ -69,7 +96,6 @@ public class ThemeChanger : MonoBehaviour
             themeList.Add(new Dictionary<string, Color>(colorDict));
         }
 
-
         Dictionary<string, Color> currentTheme = themeList[themeID];
 
         GameObject[] obstacle1s = GameObject.FindGameObjectsWithTag("obstacle1");
@@ -119,7 +145,14 @@ public class ThemeChanger : MonoBehaviour
         }
         
         Dictionary<string, string> backgroundFilePath = backgroundList[themeID];
-        Texture2D backgroundFile = Resources.Load<Texture2D>(backgroundFilePath["background_path"]);
+        if (gameManager.isDataDownloaded && !loadedImages)
+        {
+            backgroundFile = files[themeID];
+        }
+        else
+        {
+            backgroundFile = Resources.Load<Texture2D>(backgroundFilePath["background_path"]);
+        }
         GameObject background = GameObject.FindGameObjectWithTag("Background");
         if (backgroundFile != null)
         {
@@ -127,6 +160,32 @@ public class ThemeChanger : MonoBehaviour
             if (renderer != null)
             {
                 renderer.material.mainTexture = backgroundFile;
+            }
+        }
+    }
+
+    IEnumerator LoadImage(string url, List<Texture2D> images)
+    {
+        using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(url))
+        {
+            webRequest.SendWebRequest();
+ 
+            while (!webRequest.isDone)
+            {
+                // Do other stuff while the image is loading
+                Debug.Log("Loading...");
+                yield return new WaitForEndOfFrame();
+            }
+ 
+            if (webRequest.result == UnityWebRequest.Result.ConnectionError || 
+                webRequest.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError("Error: " + webRequest.error);
+            }
+            else
+            {
+                Texture2D texture = DownloadHandlerTexture.GetContent(webRequest);
+                images.Add(texture);
             }
         }
     }
@@ -182,7 +241,16 @@ public class ThemeChanger : MonoBehaviour
         }
 
         Dictionary<string, string> backgroundFilePath = backgroundList[themeID];
-        Texture2D backgroundFile = Resources.Load<Texture2D>(backgroundFilePath["background_path"]);
+
+        if (gameManager.isDataDownloaded && !loadedImages)
+        {
+            backgroundFile = files[themeID];
+        }
+        else
+        {
+            backgroundFile = Resources.Load<Texture2D>(backgroundFilePath["background_path"]);
+        }
+
         GameObject background = GameObject.FindGameObjectWithTag("Background");
         if (backgroundFile != null)
         {

@@ -22,16 +22,25 @@ public class EnemyRenderer : MonoBehaviour
     public string jsonFilePath;
     public float prefabSpacing = 1f;
     public float destroyDistance = 10f; // maximum distance between Balus and prefab to destroy it
-    public string xmlFilePath;
 
     private List<GameObject> spawnedPrefabs = new List<GameObject>();
     private GameObject balus;
     private Dictionary<Vector3, GameObject> prefabPositions = new Dictionary<Vector3, GameObject>();
+    private GameManager gameManager;
+    private string jsonString;
 
     private void Start()
     {
         balus = GameObject.FindGameObjectWithTag("Balus");
-        string jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
+        gameManager = balus.GetComponent<GameManager>();
+        if (gameManager.isDataDownloaded)
+        {
+            jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
+        }
+        else 
+        {
+            jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
+        }
         EnemyPositionsData data = JsonConvert.DeserializeObject<EnemyPositionsData>(jsonString);
         List<List<int>> positions = data.positions;
         for (int i = 0; i < positions.Count; i++)
@@ -58,7 +67,6 @@ public class EnemyRenderer : MonoBehaviour
 
     private void Update()
     {
-        string jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
         EnemyPositionsData data = JsonConvert.DeserializeObject<EnemyPositionsData>(jsonString);
         List<List<int>> positions = data.positions;
         for (int i = 0; i < positions.Count; i++)

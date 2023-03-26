@@ -5,11 +5,13 @@ using UnityEngine;
 public class GameFreeze : MonoBehaviour
 {
     bool gamePaused = true;
+    GameObject pausedText;
     float timer = 0f;
 
     void Start()
     {
         gamePaused = true;
+        pausedText = GameObject.Find("PausedText");
     }
     
     void Update()
@@ -17,10 +19,12 @@ public class GameFreeze : MonoBehaviour
         if (gamePaused)
         {
             Time.timeScale = 0f;
+            pausedText.SetActive(true);
         }
         else
         {
             Time.timeScale = 1f;
+            pausedText.SetActive(false);
         }
 
         if (Input.GetMouseButton(0))

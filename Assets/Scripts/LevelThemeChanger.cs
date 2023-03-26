@@ -6,19 +6,30 @@ public class LevelThemeChanger : MonoBehaviour
 {
     public GameObject ball;
     public ThemeChanger themeChanger;
+    public string jsonFilePath;
     private int themeID = 0;
     private float[] themeZPositions;
     private int[] themeIds;
+    private GameManager gameManager;
+    private string jsonString;
 
     private void Start()
     {
-        themeChanger = FindObjectOfType<ThemeChanger>();
-        
-        // Load JSON file from Resources folder
-        TextAsset jsonFile = Resources.Load<TextAsset>("LevelData/Themes1");
+        ball = GameObject.FindGameObjectWithTag("Balus");
+        themeChanger = GetComponent<ThemeChanger>();
+        gameManager = ball.GetComponent<GameManager>();
+
+        if (gameManager.isDataDownloaded)
+        {
+            jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
+        }
+        else 
+        {
+            jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
+        }
         
         // Parse JSON file to get themeZPositions and themeIds arrays
-        LevelThemeData jsonData = JsonConvert.DeserializeObject<LevelThemeData>(jsonFile.text);
+        LevelThemeData jsonData = JsonConvert.DeserializeObject<LevelThemeData>(jsonString);
         themeZPositions = jsonData.themeZPositions;
         themeIds = jsonData.themeIds;
 

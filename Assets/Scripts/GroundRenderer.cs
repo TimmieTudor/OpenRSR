@@ -25,11 +25,21 @@ public class GroundRenderer : MonoBehaviour
     private List<GameObject> spawnedPrefabs = new List<GameObject>();
     private GameObject balus;
     private Dictionary<Vector3, GameObject> prefabPositions = new Dictionary<Vector3, GameObject>();
+    private GameManager gameManager;
+    private string jsonString;
 
     private void Start()
     {
         balus = GameObject.FindGameObjectWithTag("Balus");
-        string jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
+        gameManager = balus.GetComponent<GameManager>();
+        if (gameManager.isDataDownloaded)
+        {
+            jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
+        }
+        else 
+        {
+            jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
+        }
         PositionsData data = JsonConvert.DeserializeObject<PositionsData>(jsonString);
         List<List<int>> positions = data.positions;
         positionsCount = positions.Count;
@@ -69,7 +79,6 @@ public class GroundRenderer : MonoBehaviour
 
     private void Update()
     {
-        string jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
         PositionsData data = JsonConvert.DeserializeObject<PositionsData>(jsonString);
         List<List<int>> positions = data.positions;
         for (int i = 0; i < positions.Count; i++)
