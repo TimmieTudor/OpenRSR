@@ -24,7 +24,7 @@ public class SphereMovement : MonoBehaviour
         rb.MovePosition(rb.position + movement * Time.fixedDeltaTime);
         if (jumpTile != null)
         {
-            Jump(4.25f, jumpTile);
+            Jump(4f, jumpTile);
         }
     }
 
