@@ -19,14 +19,18 @@ public class ThemeChanger : MonoBehaviour
     private GameObject balus;
     private Texture2D backgroundFile;
     private List<Texture2D> files = new List<Texture2D>();
+    List<string> filePaths = new List<string>();
+    List<string> fixedFilePaths = new List<string>();
     private bool loadedImages = false;
     
     private void Start()
     {
-        string[] filePaths = Directory.GetFiles(Path.Combine(Application.persistentDataPath, "Backgrounds"));
+        filePaths = new List<string>(Directory.GetFiles(Path.Combine(Application.persistentDataPath, "Backgrounds")));
         foreach (string filePath in filePaths)
         {
-            if (filePath.Contains(".png"))
+            string fixedFilePath = Path.Combine(filePath.Split('/', '\\'));
+            fixedFilePaths.Add(fixedFilePath);
+            if (fixedFilePath.Contains(".png"))
             {
                 StartCoroutine(LoadImage(filePath, files));
             }
@@ -145,9 +149,11 @@ public class ThemeChanger : MonoBehaviour
         }
         
         Dictionary<string, string> backgroundFilePath = backgroundList[themeID];
-        if (gameManager.isDataDownloaded && !loadedImages)
+        if (gameManager.isDataDownloaded && loadedImages)
         {
-            backgroundFile = files[themeID];
+            string fixedBackgroundPath = Path.Combine(Application.persistentDataPath, backgroundFilePath["background_path"] + ".png");
+            fixedBackgroundPath = Path.Combine(fixedBackgroundPath.Split('/', '\\'));
+            backgroundFile = files[fixedFilePaths.IndexOf(fixedBackgroundPath)];
         }
         else
         {
@@ -242,9 +248,11 @@ public class ThemeChanger : MonoBehaviour
 
         Dictionary<string, string> backgroundFilePath = backgroundList[themeID];
 
-        if (gameManager.isDataDownloaded && !loadedImages)
+        if (gameManager.isDataDownloaded && loadedImages)
         {
-            backgroundFile = files[themeID];
+            string fixedBackgroundPath = Path.Combine(Application.persistentDataPath, backgroundFilePath["background_path"] + ".png");
+            fixedBackgroundPath = Path.Combine(fixedBackgroundPath.Split('/', '\\'));
+            backgroundFile = files[fixedFilePaths.IndexOf(fixedBackgroundPath)];
         }
         else
         {

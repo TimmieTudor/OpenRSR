@@ -3,12 +3,13 @@ using MethFunctions;
 
 public class SphereMovement : MonoBehaviour
 {
-    public float speed = 5f;
+    public float speed = 8f;
     private Rigidbody rb;
     public float pepsiSpeed;
 
     private bool isJumping = false;
     private GameObject jumpTile;
+    private float collisionZ;
 
     private void Start()
     {
@@ -35,10 +36,7 @@ public class SphereMovement : MonoBehaviour
             isJumping = true;
             rb.useGravity = false;
             jumpTile = collision.gameObject;
-        }
-        else if (collision.gameObject.tag == "NormalTile")
-        {
-            rb.useGravity = true;
+            collisionZ = transform.position.z;
         }
     }
 
@@ -47,6 +45,10 @@ public class SphereMovement : MonoBehaviour
         Vector3 movement2 = transform.up * pepsiSpeed;
         Vector3 movement3 = Vector3.down * pepsiSpeed;
         float zDiff = transform.position.z - jumpTile.transform.position.z;
+        float zDiff2 = Mathf.Clamp(collisionZ - jumpTile.transform.position.z + 0.666f, -0.05f, 0.31f);
+        float jumpBoost = pepsiSpeed + zDiff2 * 1.5f;
+        Debug.Log(zDiff2);
+        movement2 = transform.up * jumpBoost;
         if (isJumping && zDiff < distance / 3f)
         {
             rb.MovePosition(rb.position + movement2 * Time.fixedDeltaTime);
@@ -64,13 +66,14 @@ public class SphereMovement : MonoBehaviour
             rb.MovePosition(rb.position + movement3 * Time.fixedDeltaTime);
             isJumping = false;
         }
-        if (!isJumping)
+        if (!isJumping && zDiff > distance / 1.5f && zDiff < distance)
         {
             rb.MovePosition(rb.position + movement3 * Time.fixedDeltaTime);
         }
         if (zDiff > distance)
         {
             jumpTile = null;
+            rb.useGravity = true;
         }
     }
 }
