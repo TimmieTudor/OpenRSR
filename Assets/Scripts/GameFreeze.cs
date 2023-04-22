@@ -7,9 +7,14 @@ public class GameFreeze : MonoBehaviour
     bool gamePaused = true;
     GameObject pausedText;
     float timer = 0f;
+    public GameObject balus;
+    private SphereMovement sphm;
+    private SphereDragger sphd;
 
     void Start()
     {
+        sphm = balus.GetComponent<SphereMovement>();
+        sphd = balus.GetComponent<SphereDragger>();
         gamePaused = true;
         pausedText = GameObject.Find("PausedText");
     }
@@ -18,18 +23,15 @@ public class GameFreeze : MonoBehaviour
     {
         if (gamePaused)
         {
-            Time.timeScale = 0f;
+            sphm.enabled = false;
+            sphd.enabled = false;
             pausedText.SetActive(true);
         }
         else
         {
-            Time.timeScale = 1f;
+            sphm.enabled = true;
+            sphd.enabled = true;
             pausedText.SetActive(false);
-        }
-
-        if (Input.GetMouseButton(0))
-        {
-            timer += Time.deltaTime;
         }
 
         if (Input.GetMouseButtonDown(0))

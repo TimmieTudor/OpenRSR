@@ -53,14 +53,13 @@ public class GameManager : MonoBehaviour
             gre.enabled = true;
             ere.enabled = true;
             themeChanger.enabled = true;
-            sphm.enabled = true;
+            sphm.enabled = false;
             sphd.enabled = true;
             themeChanger2.enabled = true;
         }
         else 
         {
             rb.useGravity = false;
-            GFreeze.enabled = false;
             gre.enabled = false;
             ere.enabled = false;
             themeChanger.enabled = false;
@@ -88,7 +87,8 @@ public class GameManager : MonoBehaviour
             gre.enabled = true;
             ere.enabled = true;
             themeChanger.enabled = true;
-            sphm.enabled = true;
+            sphm.enabled = false;
+            GFreeze.enabled = true;
             sphd.enabled = true;
             themeChanger2.enabled = true;
         }

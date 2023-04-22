@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine.Networking;
 
 public class ThemeChanger : MonoBehaviour
@@ -163,7 +164,7 @@ public class ThemeChanger : MonoBehaviour
             fixedBackgroundPath = Path.Combine(fixedBackgroundPath.Split('/', '\\'));
             backgroundFile = files[themeID];
             #else
-            string fixedBackgroundPath = Application.persistentDataPath + "/" + backgroundFilePath["background_path"] + ".png";
+            string fixedBackgroundPath = Path.Combine(Application.persistentDataPath, backgroundFilePath["background_path"] + ".png");
             backgroundFile = files[themeID];
             #endif
         }
@@ -192,7 +193,7 @@ public class ThemeChanger : MonoBehaviour
             {
                 // Do other stuff while the image is loading
                 Debug.Log("Loading...");
-                yield return new WaitForEndOfFrame();
+                yield return new WaitForChangedResult();
             }
  
             if (webRequest.result == UnityWebRequest.Result.ConnectionError || 
@@ -204,6 +205,7 @@ public class ThemeChanger : MonoBehaviour
             {
                 Texture2D texture = DownloadHandlerTexture.GetContent(webRequest);
                 images.Add(texture);
+                Debug.Log("Number of Textures: " + images.Count);
             }
         }
     }
@@ -267,7 +269,7 @@ public class ThemeChanger : MonoBehaviour
             fixedBackgroundPath = Path.Combine(fixedBackgroundPath.Split('/', '\\'));
             backgroundFile = files[themeID];
             #else
-            string fixedBackgroundPath = Application.persistentDataPath + "/" + backgroundFilePath["background_path"] + ".png";
+            string fixedBackgroundPath = Path.Combine(Application.persistentDataPath, backgroundFilePath["background_path"] + ".png");
             backgroundFile = files[themeID];
             #endif
         }
