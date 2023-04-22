@@ -57,17 +57,17 @@ public class RiserAnim : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Math.Floor((balus.transform.position.z - gameObject.transform.position.z + 4f) * 10f) < 0)
+        if (Math.Floor((balus.transform.position.z - gameObject.transform.position.z + 4.5f) * 10f) < 0)
         {
             currentFrame = 0;
         }
-        else if (Math.Floor((balus.transform.position.z - gameObject.transform.position.z + 4f) * 10f) >= frames.Count - 2 && Math.Floor((balus.transform.position.z - gameObject.transform.position.z + 4f) * 10f) < 27)
+        else if (Math.Floor((balus.transform.position.z - gameObject.transform.position.z + 4.5f) * 10f) >= frames.Count - 2 && Math.Floor((balus.transform.position.z - gameObject.transform.position.z + 4.5f) * 10f) < 27)
         {
             animator.SetFrame(frames.Count - 2);
-            currentFrame = (int)Math.Floor((balus.transform.position.z - gameObject.transform.position.z + 4f) * 10f);
+            currentFrame = (int)Math.Floor((balus.transform.position.z - gameObject.transform.position.z + 4.5f) * 10f);
             animator2.SetFrame(currentFrame - 15);
         }
-        else if (Math.Floor((balus.transform.position.z - gameObject.transform.position.z + 4f) * 10f) >= (frames.Count - 3) + (frames2.Count - 3))
+        else if (Math.Floor((balus.transform.position.z - gameObject.transform.position.z + 4.5f) * 10f) >= (frames.Count - 3) + (frames2.Count - 3))
         {
             
             animator.SetFrame(frames.Count - 2);
@@ -75,7 +75,7 @@ public class RiserAnim : MonoBehaviour
         }
         else
         {
-            currentFrame = (int)Math.Floor((balus.transform.position.z - gameObject.transform.position.z + 4f) * 10f);
+            currentFrame = (int)Math.Floor((balus.transform.position.z - gameObject.transform.position.z + 4.5f) * 10f);
             animator.SetFrame(currentFrame);
         }
     }
