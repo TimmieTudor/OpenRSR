@@ -161,10 +161,10 @@ public class ThemeChanger : MonoBehaviour
             #if UNITY_EDITOR
             string fixedBackgroundPath = Path.Combine(Application.persistentDataPath, backgroundFilePath["background_path"] + ".png");
             fixedBackgroundPath = Path.Combine(fixedBackgroundPath.Split('/', '\\'));
-            backgroundFile = files[fixedFilePaths.IndexOf(fixedBackgroundPath)];
+            backgroundFile = files[themeID];
             #else
             string fixedBackgroundPath = Application.persistentDataPath + "/" + backgroundFilePath["background_path"] + ".png";
-            backgroundFile = files[filePaths.IndexOf(fixedBackgroundPath)];
+            backgroundFile = files[themeID];
             #endif
         }
         else
