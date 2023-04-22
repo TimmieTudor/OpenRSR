@@ -84,7 +84,6 @@ public class GameManager : MonoBehaviour
         
         if (isDataDownloaded)
         {
-            rb.useGravity = true;
             gre.enabled = true;
             ere.enabled = true;
             themeChanger.enabled = true;

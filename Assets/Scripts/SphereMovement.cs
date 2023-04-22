@@ -25,6 +25,7 @@ public class SphereMovement : MonoBehaviour
          // Modify the speed of the sphere using the MethFunction
         pepsiSpeed = meth.piEpsilon(speed);
         rb.MovePosition(rb.position + Vector3.back * pepsiSpeed * 0.025f);
+        rb.useGravity = true;
          // Freeze the rotation of the sphere
         rb.constraints = RigidbodyConstraints.FreezeRotation;
     }
