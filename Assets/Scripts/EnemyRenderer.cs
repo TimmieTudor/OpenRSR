@@ -54,7 +54,7 @@ public class EnemyRenderer : MonoBehaviour
                     float x = j - 2;
                     float z = i * prefabSpacing;
                     Vector3 spawnPosition = new Vector3(x, 0.55f, z);
-                    if (spawnPosition.z - balus.transform.position.z < 20 && !prefabPositions.ContainsKey(spawnPosition))
+                    if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition))
                     {
                         GameObject spawnedPrefab = Instantiate(prefab, spawnPosition, Quaternion.identity);
                         spawnedPrefabs.Add(spawnedPrefab);
@@ -80,7 +80,7 @@ public class EnemyRenderer : MonoBehaviour
                     float x = j - 2;
                     float z = i * prefabSpacing;
                     Vector3 spawnPosition = new Vector3(x, 0.55f, z);
-                    if (spawnPosition.z - balus.transform.position.z < 20 && !prefabPositions.ContainsKey(spawnPosition))
+                    if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition))
                     {
                         GameObject spawnedPrefab = Instantiate(prefab, spawnPosition, Quaternion.identity);
                         spawnedPrefabs.Add(spawnedPrefab);
