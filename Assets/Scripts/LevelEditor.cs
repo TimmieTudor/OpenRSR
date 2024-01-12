@@ -177,6 +177,7 @@ public class LevelEditor : MonoBehaviour
         // TODO: where the heck is Mihnea???
     }
 
+    // scrolls sus
     public void ScrollUp() {
         float camPosZ = m_camera.transform.position.z;
         camPosZ += 0.15f;
@@ -184,6 +185,7 @@ public class LevelEditor : MonoBehaviour
         m_camera.transform.position = camPos;
     }
 
+    // scrolls jos
     public void ScrollDown() {
         float camPosZ = m_camera.transform.position.z;
         camPosZ -= 0.15f;
