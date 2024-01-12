@@ -1,0 +1,24 @@
+[
+	{
+		"background_path": "Backgrounds/Background1",
+		"enemy_path": "Enemy1",
+		"general_path": "General1",
+		"ball_color": {
+			"r": 240,
+			"g": 72,
+			"b": 50,
+			"a": 256
+		}
+	},
+	{
+		"background_path": "Backgrounds/Background2",
+		"enemy_path": "Enemy2",
+		"general_path": "General2",
+		"ball_color": {
+			"r": 164,
+			"g": 50,
+			"b": 240,
+			"a": 256
+		}
+	}
+]

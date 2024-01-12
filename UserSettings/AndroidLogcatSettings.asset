@@ -1,0 +1,157 @@
+{
+    "m_SelectedDeviceId": "RF8N72PYSMJ",
+    "m_SelectedPackage": {
+        "deviceId": "RF8N72PYSMJ",
+        "name": "com.ComradeCat.DeceBalus",
+        "processId": 31458,
+        "exited": false
+    },
+    "m_SelectedPriority": 0,
+    "m_KnownPackagesForSerialization": [
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.ComradeCat.DeceBalus",
+            "processId": 24845,
+            "exited": true
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.ComradeCat.DeceBalus",
+            "processId": 25894,
+            "exited": true
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.ComradeCat.DeceBalus",
+            "processId": 11199,
+            "exited": true
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.ComradeCat.DeceBalus",
+            "processId": 24872,
+            "exited": true
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.ComradeCat.DeceBalus",
+            "processId": 23310,
+            "exited": false
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.ComradeCat.DeceBalus",
+            "processId": 26305,
+            "exited": false
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.ComradeCat.DeceBalus",
+            "processId": 27118,
+            "exited": false
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.ComradeCat.DeceBalus",
+            "processId": 28945,
+            "exited": false
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.ComradeCat.DeceBalus",
+            "processId": 29991,
+            "exited": false
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.ComradeCat.DeceBalus",
+            "processId": 30759,
+            "exited": false
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.ComradeCat.DeceBalus",
+            "processId": 2474,
+            "exited": false
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.ComradeCat.DeceBalus",
+            "processId": 30367,
+            "exited": false
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.ComradeCat.DeceBalus",
+            "processId": 31458,
+            "exited": false
+        }
+    ],
+    "m_Tags": {
+        "m_Entries": [
+            {
+                "m_Name": "Filter by all listed tags",
+                "m_Selected": false
+            },
+            {
+                "m_Name": "No Filter",
+                "m_Selected": true
+            },
+            {
+                "m_Name": "",
+                "m_Selected": false
+            },
+            {
+                "m_Name": "Tag Control...",
+                "m_Selected": false
+            },
+            {
+                "m_Name": "",
+                "m_Selected": false
+            },
+            {
+                "m_Name": "Unity",
+                "m_Selected": false
+            },
+            {
+                "m_Name": "CRASH",
+                "m_Selected": false
+            }
+        ]
+    },
+    "m_MemoryViewerState": {
+        "MemoryWindowHeight": 300.0,
+        "MemoryWindowWidth": 170.0,
+        "MemoryTypeEnabled": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+        ],
+        "MemoryGroup": 2,
+        "Behavior": 0
+    },
+    "m_FilterOptions": {
+        "m_Filter": "",
+        "m_UseRegularExpressions": false,
+        "m_MatchCase": false
+    },
+    "m_SymbolPaths": [],
+    "m_CaptureVideoSettings": {
+        "TimeLimitEnabled": false,
+        "TimeLimit": 180,
+        "VideoSizeEnabled": false,
+        "VideoSizeX": 1280,
+        "VideoSizeY": 720,
+        "BitRateEnabled": false,
+        "BitRateK": 20000,
+        "DisplayIdEnabled": false,
+        "DisplayId": ""
+    }
+}
