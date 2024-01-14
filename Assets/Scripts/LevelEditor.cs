@@ -243,7 +243,7 @@ public class LevelEditor : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (m_camera.transform.position.z + 6f >= gridSize && isInEditor) {
+        if (m_camera.transform.position.z + 6.9f >= gridSize && isInEditor) {
             for (int i = 0; i < 5; i++) {
                 float x = i - 2;
                 float z = gridSize * gre.prefabSpacing;
