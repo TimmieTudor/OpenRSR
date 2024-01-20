@@ -57,6 +57,10 @@ public class LevelThemeChanger : MonoBehaviour
             themeID++;
         }
     }
+    
+    public void UpdateData() {
+        jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
+    }
 }
 
 [System.Serializable]

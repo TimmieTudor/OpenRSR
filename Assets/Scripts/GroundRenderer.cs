@@ -127,6 +127,10 @@ public class GroundRenderer : MonoBehaviour
         }
     }
 
+    public void UpdateData() {
+        jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
+    }
+
     public void clearPrefabPositions() {
         prefabPositions.Clear();
         spawnedPrefabs.Clear();

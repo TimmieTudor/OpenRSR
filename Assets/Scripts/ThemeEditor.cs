@@ -18,11 +18,15 @@ public class ThemeEditor : MonoBehaviour
         themeIDInputField.text = themeID.ToString();
         closeButton = closeButtonObj.GetComponent<Button>();
         closeButton.onClick.AddListener(CloseEditThemePanel);
+        LevelEditor le = GameObject.Find("Balus").GetComponent<LevelEditor>();
+        le.SetPopupOpen(true);
     }
     public void CloseEditThemePanel()
     {
         themeID = int.Parse(themeIDInputField.text);
         editThemePanel.SetActive(false);
+        LevelEditor le = GameObject.Find("Balus").GetComponent<LevelEditor>();
+        le.SetPopupOpen(false);
     }
     
     // Start is called before the first frame update

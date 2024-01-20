@@ -46,6 +46,9 @@ public class GameFreeze : MonoBehaviour
             // gamePaused = false;
             timer += 0.01f;
         }
+        if (!Input.GetMouseButton(0)) {
+            timer = 0f;
+        }
         if (timer >= 1f) {
             gamePaused = false;
             audioPlayer.PlayAudio();

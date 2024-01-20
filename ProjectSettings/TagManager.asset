@@ -16,6 +16,7 @@ TagManager:
   - ColoredPart
   - JumpCollision
   - Theme
+  - Grid
   layers:
   - Default
   - TransparentFX

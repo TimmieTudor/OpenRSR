@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 
 [System.Serializable]
@@ -43,6 +44,7 @@ public class LevelEditor : MonoBehaviour
     public EnemyRenderer ere;
     public int gridSize = 10;
     private bool isInEditor = false;
+    private bool isPopupOpen = false;
     private GameObject themeText;
     private LevelThemeChanger themeChanger;
     private SphereMovement sphm;
@@ -62,6 +64,7 @@ public class LevelEditor : MonoBehaviour
     public GameObject tilesPanel;
     public GameObject obstaclesPanel;
     public GameObject themesPanel;
+    private LevelConfigurator levelConfig;
     // Start is called before the first frame update
     void Start()
     {
@@ -74,10 +77,17 @@ public class LevelEditor : MonoBehaviour
         themeChanger = levelRenderer.GetComponent<LevelThemeChanger>();
         sphm = GetComponent<SphereMovement>();
         themeChanger2 = levelRenderer.GetComponent<ThemeChanger>();
+        levelConfig = levelRenderer.GetComponent<LevelConfigurator>();
         manager = balus.GetComponent<GameManager>();
-        groundJsonString = Resources.Load<TextAsset>("LevelData/Ground1").text;
-        enemyJsonString = Resources.Load<TextAsset>("LevelData/Enemies1").text;
-        themeJsonString = Resources.Load<TextAsset>("LevelData/Themes1").text;
+        if (!manager.isDataDownloaded) {
+            groundJsonString = Resources.Load<TextAsset>("LevelData/Ground1").text;
+            enemyJsonString = Resources.Load<TextAsset>("LevelData/Enemies1").text;
+            themeJsonString = Resources.Load<TextAsset>("LevelData/Themes1").text;
+        } else {
+            groundJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, gre.jsonFilePath + ".json"));
+            enemyJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, ere.jsonFilePath + ".json"));
+            themeJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, themeChanger.jsonFilePath + ".json"));
+        }
         gdata = JsonConvert.DeserializeObject<GroundPositionsData>(groundJsonString);
         edata = JsonConvert.DeserializeObject<EnemyPositionsData2>(enemyJsonString);
         ltdata = JsonConvert.DeserializeObject<LevelThemeData>(themeJsonString);
@@ -158,6 +168,8 @@ public class LevelEditor : MonoBehaviour
             float z = themeZPositions[i];
             Vector3 spawnPosition = new Vector3(-1.4f, 0.1f, z - 0.4f);
             GameObject spawnedPrefab = Instantiate(themeText, spawnPosition, themetextRotation);
+            ThemeEditor te = spawnedPrefab.GetComponent<ThemeEditor>();
+            te.themeID = ltdata.themeIds[i];
         }
 
         for (int i = 0; i < gridSize; i++) {
@@ -171,10 +183,67 @@ public class LevelEditor : MonoBehaviour
         isInEditor = true;
     }
 
-    private void saveLevelData() {
+    public void saveLevelData() {
+        for (int i = gdata.positions.Count - 1; i >= 0; i--) {
+            List<bool> isZero = new List<bool>();
+            for (int j = gdata.positions[i].Count - 1; j >= 0; j--) {
+                if (gdata.positions[i][j] == 0) {
+                    isZero.Add(true);
+                } else {
+                    isZero.Add(false);
+                }
+            }
+            if (isZero.All(x => x == true)) {
+                gdata.positions.RemoveAt(i);
+                edata.positions.RemoveAt(i);
+            }
+        }
         string groundJsonString = JsonConvert.SerializeObject(gdata);
         string enemyJsonString = JsonConvert.SerializeObject(edata);
-        // TODO: where the heck is Mihnea???
+        List<int> m_themeIDs = new List<int>();
+        List<float> m_themeZPositions = new List<float>();
+        GameObject[] m_themes = GameObject.FindGameObjectsWithTag("Theme");
+        Vector3 m_themePos = new Vector3(-37f, 0f, 0f);
+        foreach (GameObject m_theme in m_themes) {
+            if (m_theme.transform.position == m_themePos) {
+                continue;
+            }
+            ThemeEditor te = m_theme.GetComponent<ThemeEditor>();
+            m_themeIDs.Add(te.themeID);
+            m_themeZPositions.Add(m_theme.transform.position.z + 0.4f);
+            Destroy(m_theme);
+        }
+        ltdata.themeIds = m_themeIDs;
+        ltdata.themeZPositions = m_themeZPositions;
+        string themeJsonString = JsonConvert.SerializeObject(ltdata);
+        LevelConfigJson m_config = levelConfig.SaveConfig();
+        string configJsonString = JsonConvert.SerializeObject(m_config);
+        string SaveFileFolder = Application.persistentDataPath;
+        File.WriteAllText(Path.Combine(SaveFileFolder, gre.jsonFilePath + ".json"), groundJsonString);
+        File.WriteAllText(Path.Combine(SaveFileFolder, ere.jsonFilePath + ".json"), enemyJsonString);
+        File.WriteAllText(Path.Combine(SaveFileFolder, levelConfig.jsonFilePath + ".json"), configJsonString);
+        File.WriteAllText(Path.Combine(SaveFileFolder, themeChanger.jsonFilePath + ".json"), themeJsonString);
+        Quaternion defaultCameraRotation = Quaternion.Euler(40f, 0f, 0f);
+        m_camera.transform.rotation = defaultCameraRotation;
+        gre.enabled = true;
+        ere.enabled = true;
+        themeChanger.enabled = true;
+        gre.UpdateData();
+        ere.UpdateData();
+        themeChanger.UpdateData();
+        Vector3 gridPosition = grid.transform.position;
+        GameObject[] Grids = GameObject.FindGameObjectsWithTag("Grid");
+        foreach (GameObject m_grid in Grids) {
+            if (m_grid.transform.position == gridPosition) {
+                continue;
+            }
+            Destroy(m_grid);
+        }
+        manager.enabled = true;
+        manager.RestartGame();
+        isInEditor = false;
+        gameEditCanvas.SetActive(false);
+        // TODO: Find Mihnea so we can finish this code together
     }
 
     // scrolls sus
@@ -240,6 +309,10 @@ public class LevelEditor : MonoBehaviour
         }
     }
 
+    public void SetPopupOpen(bool open) {
+        isPopupOpen = open;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -251,7 +324,7 @@ public class LevelEditor : MonoBehaviour
                 GameObject spawnedPrefab = Instantiate(grid, spawnPosition, Quaternion.identity);
             }
             gridSize++;
-        } else if (Input.GetMouseButtonDown(0) && isInEditor) {
+        } else if (Input.GetMouseButtonDown(0) && isInEditor && !isPopupOpen) {
             Vector3 mousePos = Input.mousePosition;
             Vector3 worldPos = m_camera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 9.5f));
             //Debug.Log(worldPos);
