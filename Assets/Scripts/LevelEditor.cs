@@ -196,6 +196,8 @@ public class LevelEditor : MonoBehaviour
             if (isZero.All(x => x == true)) {
                 gdata.positions.RemoveAt(i);
                 edata.positions.RemoveAt(i);
+            } else {
+                break;
             }
         }
         string groundJsonString = JsonConvert.SerializeObject(gdata);
@@ -212,6 +214,18 @@ public class LevelEditor : MonoBehaviour
             m_themeIDs.Add(te.themeID);
             m_themeZPositions.Add(m_theme.transform.position.z + 0.4f);
             Destroy(m_theme);
+        }
+        float previousZ = 0f;
+        int previousID = 0;
+        for (int i = 0; i < m_themeZPositions.Count; i++) {
+            if (m_themeZPositions[i] < previousZ) {
+                m_themeZPositions[i-1] = m_themeZPositions[i];
+                m_themeZPositions[i] = previousZ;
+                m_themeIDs[i-1] = m_themeIDs[i];
+                m_themeIDs[i] = previousID;
+            }
+            previousZ = m_themeZPositions[i];
+            previousID = m_themeIDs[i];
         }
         ltdata.themeIds = m_themeIDs;
         ltdata.themeZPositions = m_themeZPositions;
@@ -243,7 +257,6 @@ public class LevelEditor : MonoBehaviour
         manager.RestartGame();
         isInEditor = false;
         gameEditCanvas.SetActive(false);
-        // TODO: Find Mihnea so we can finish this code together
     }
 
     // scrolls sus
