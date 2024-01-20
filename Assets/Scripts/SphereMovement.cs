@@ -14,7 +14,6 @@ public class SphereMovement : MonoBehaviour
     private bool isJumping = true;
      // The GameObject that the sphere is jumping on
     private GameObject jumpTile;
-
     private GameObject normalTile;
      // The z-position of the sphere when it collides with the jumpTile
     private float collisionZ;
@@ -39,6 +38,11 @@ public class SphereMovement : MonoBehaviour
         Debug.Log("Done!");
         enabled = true;
     }
+
+    public void SetSpeed(float newSpeed) {
+        speed = newSpeed;
+    }
+
     private void FixedUpdate()
     {
         // Create a Vector3 for the movement of the sphere
@@ -55,6 +59,7 @@ public class SphereMovement : MonoBehaviour
         {
             exponential_falus();
         }
+
     }
     private void OnCollisionEnter(Collision collision)
     {

@@ -28,7 +28,6 @@ public class GameManager : MonoBehaviour
     public bool isDataDownloaded = false;
     private Rigidbody rb;
     private AudioPlayer audioPlayer;
-
     void Start()
     {
         percentTextLabel = GameObject.Find("Percent");
@@ -41,7 +40,10 @@ public class GameManager : MonoBehaviour
         sphm = GetComponent<SphereMovement>();
         themeChanger2 = levelRenderer.GetComponent<ThemeChanger>();
         levelConfig = levelRenderer.GetComponent<LevelConfigurator>();
-        audioPlayer = balus.GetComponent<AudioPlayer>();    
+        audioPlayer = balus.GetComponent<AudioPlayer>();
+        sphm.speed = levelConfig.levelSpeed;
+        audioPlayer.audioPath = levelConfig.musicPath;
+        audioPlayer.LoadAudioClip();
 
         Application.targetFrameRate = 60;
 
@@ -112,6 +114,8 @@ public class GameManager : MonoBehaviour
             sphd.enabled = false;
             themeChanger2.enabled = false;
         }
+
+        sphm.speed = levelConfig.levelSpeed;
 
         float balusPercent = (balus.transform.position.z / (float)gre.positionsCount) * 100f;
         balusPercent = Mathf.Clamp(balusPercent, 0f, 100f);

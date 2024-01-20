@@ -45,8 +45,10 @@ public class LevelConfigurator : MonoBehaviour
         gameManager = balus.GetComponent<GameManager>();
         if (gameManager.isDataDownloaded) {
             jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
+            Debug.Log("Data downloaded");
         } else {
             jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
+            Debug.Log("Data not downloaded");
         }
         LevelConfigJson config = JsonConvert.DeserializeObject<LevelConfigJson>(jsonString);
         levelName = config.level_name;
