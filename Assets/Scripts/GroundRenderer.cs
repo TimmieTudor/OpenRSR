@@ -78,6 +78,7 @@ public class GroundRenderer : MonoBehaviour
     {
         PositionsData data = JsonConvert.DeserializeObject<PositionsData>(jsonString);
         List<List<int>> positions = data.positions;
+        positionsCount = positions.Count;
         for (int i = 0; i < positions.Count; i++)
         {
             List<int> row = positions[i];
