@@ -23,14 +23,14 @@ You can't download the game yet, because it's still not finished. However, anyon
 ## To do list:
 - [ ] Add more obstacles
 - [ ] Make a demo level
-- [ ] Add a music player that plays music from a file path
+- [x] Add a music player that plays music from a file path
 - [ ] Optimize the game
 - [ ] Add sound effects
 - [ ] Add glass tiles
 - [x] Add a game over screen
-- [ ] Add a pause screen
+- [x] Add a pause screen
 - [x] Basic gameplay
-- [ ] Improve the touch input for mobile devices
-- [ ] Fix the jump script code entirely
+- [x] Improve the touch input for mobile devices
+- [x] Fix the jump script code entirely
 - [x] Add animations to obstacles
 - [ ] Add the option to save and load levels from zip files
