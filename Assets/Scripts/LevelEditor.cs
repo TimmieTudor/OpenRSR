@@ -257,6 +257,7 @@ public class LevelEditor : MonoBehaviour
         manager.RestartGame();
         isInEditor = false;
         gameEditCanvas.SetActive(false);
+        balus.transform.position = new Vector3(0f, 0.5f, 0f);
     }
 
     // scrolls sus

@@ -9,7 +9,7 @@ public class LevelThemeChanger : MonoBehaviour
     public GameObject ball;
     public ThemeChanger themeChanger;
     public string jsonFilePath;
-    private int themeID = 0;
+    public int themeID = 0;
     private List<float> themeZPositions;
     private List<int> themeIds;
     private GameManager gameManager;
@@ -60,6 +60,14 @@ public class LevelThemeChanger : MonoBehaviour
     
     public void UpdateData() {
         jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
+
+        // Parse JSON file to get themeZPositions and themeIds arrays
+        LevelThemeData jsonData = JsonConvert.DeserializeObject<LevelThemeData>(jsonString);
+        themeZPositions = jsonData.themeZPositions;
+        themeIds = jsonData.themeIds;
+
+        // Set initial theme ID for ThemeChanger script
+        themeChanger.themeID = themeIds[0];
     }
 }
 

@@ -202,6 +202,7 @@ public class GameManager : MonoBehaviour
         sphd.enabled = true;
         CFollow.enabled = true;
         audioPlayer.SeekToZero();
+        themeChanger.themeID = 0;
         
         isGameOver = false;
     }
