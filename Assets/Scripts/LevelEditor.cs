@@ -523,5 +523,14 @@ public class LevelEditor : MonoBehaviour
             obstaclesPanel.SetActive(false);
             themesPanel.SetActive(true);
         }
+        if (isInEditor) {
+            GameObject[] mhn_themes = GameObject.FindGameObjectsWithTag("Theme");
+            for (int i = 1; i < mhn_themes.Length; i++) {
+                if (mhn_themes[i].transform.position.z < m_camera.transform.position.z && m_camera.transform.position.z > mhn_themes[i-1].transform.position.z) {
+                    ThemeEditor te = mhn_themes[i].GetComponent<ThemeEditor>();
+                    themeChanger2.themeID = te.themeID;
+                }
+            }
+        }
     }
 }
