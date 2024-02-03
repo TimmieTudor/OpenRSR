@@ -681,6 +681,17 @@ namespace NAudio.Lame.DLL
 
 #if UNITY_EDITOR_OSX
             const string libname = @"__Internal";
+#elif UNITY_EDITOR_WIN
+            const string libname = @"libmp3lame.dll";
+#else
+            const string libname = @"libmp3lame.dll";
+#endif
+#elif UNITY_STANDALONE
+
+#if UNITY_STANDALONE_WIN
+            const string libname = @"libmp3lame.dll";
+#elif UNITY_STANDALONE_OSX
+            const string libname = @"__Internal";
 #else
             const string libname = @"libmp3lame.dll";
 #endif
