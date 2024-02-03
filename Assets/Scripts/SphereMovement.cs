@@ -12,7 +12,7 @@ public class SphereMovement : MonoBehaviour
      // The speed of the sphere after being modified by the MethFunction
     // public float pepsiSpeed;
      // A boolean to check if the sphere is jumping
-    private bool isJumping = true;
+    public bool isJumping = true;
      // The GameObject that the sphere is jumping on
     private GameObject jumpTile;
     private GameObject normalTile;
@@ -56,13 +56,15 @@ public class SphereMovement : MonoBehaviour
          // If the sphere is jumping, call the Jump() method
         if (jumpTile != null && isJumping)
         {
-            Jump(4f, jumpTile);
+            Jump(3.95f, jumpTile);
         }
         else if (normalTile != null && glassTile != null)
         {
             exponential_falus();
         } else if (glassTiles.Count > 0) {
             FallingGlass();
+        } else if (normalTile != null && glassTile == null) {
+            exponential_falus();
         }
 
     }

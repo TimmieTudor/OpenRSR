@@ -150,6 +150,7 @@ public class GameManager : MonoBehaviour
         TextMeshProUGUI levelNameTextMesh = levelNameTextLabel.GetComponent<TextMeshProUGUI>();
         levelNameTextMesh.SetText(levelConfig.levelName);
         gamePlayCanvas.SetActive(false);
+        sphm.isJumping = false;
         sphd.enabled = false;
         sphm.enabled = false;
         CFollow.enabled = false;
@@ -159,6 +160,7 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
+        sphm.isJumping = false;
         sphm.enabled = false;
         sphd.enabled = false;
         CFollow.enabled = false;

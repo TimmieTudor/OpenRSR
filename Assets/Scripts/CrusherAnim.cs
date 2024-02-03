@@ -40,7 +40,7 @@ public class CrusherAnim : MonoBehaviour
             //scaleY += 0.05f;
             frames.Add(new Frame(new Vector3(baseObject.transform.position.x, y, baseObject.transform.position.z), Quaternion.identity, new Vector3(0.8f, scaleY, 0.8f), baseTransform.gameObject));
         }
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 8; i++) {
             frames.Add(new Frame(new Vector3(baseObject.transform.position.x, y, baseObject.transform.position.z), Quaternion.identity, new Vector3(0.8f, scaleY, 0.8f), baseTransform.gameObject));
         }
         for (int i = 0; i < 6; i++) {
@@ -65,7 +65,7 @@ public class CrusherAnim : MonoBehaviour
             propellerRotationY += propellerRotationYChange;
             frames2.Add(new Frame(new Vector3(propellerPart.transform.position.x, propellerY, propellerPart.transform.position.z), Quaternion.Euler(0f, propellerRotationY, 0f), new Vector3(0.8f, 0.8f, 0.8f), propellerTransform.gameObject));
         }
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 8; i++) {
             propellerRotationY += propellerRotationYChange;
             frames2.Add(new Frame(new Vector3(propellerPart.transform.position.x, propellerY, propellerPart.transform.position.z), Quaternion.Euler(0f, propellerRotationY, 0f), new Vector3(0.8f, 0.8f, 0.8f), propellerTransform.gameObject));
         }
@@ -93,10 +93,10 @@ public class CrusherAnim : MonoBehaviour
             animator.SetFrame(1, 0f);
             animator2.SetFrame(1, 0f);
         }
-        else if (currentFrame >= 74)
+        else if (currentFrame >= 76)
         {
-            animator.SetFrame(74, 0f);
-            animator2.SetFrame(74, 0f);
+            animator.SetFrame(76, 0f);
+            animator2.SetFrame(76, 0f);
         }
         else
         {
