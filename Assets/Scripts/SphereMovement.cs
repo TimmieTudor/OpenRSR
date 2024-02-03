@@ -128,6 +128,7 @@ public class SphereMovement : MonoBehaviour
         if (collision.gameObject.tag == "NormalTile")
         {
             normalTile = collision.gameObject;
+            glassTile = collision.gameObject;
             rb.useGravity = false;
             collisionZ = collision.gameObject.transform.position.z + 0.1f;
         } else if (collision.gameObject.tag == "GlassCollision") {
