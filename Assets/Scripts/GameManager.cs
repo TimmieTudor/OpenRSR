@@ -5,6 +5,7 @@ using System.IO;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 public class GameManager : MonoBehaviour
 {
@@ -171,10 +172,15 @@ public class GameManager : MonoBehaviour
         ere.enabled = true;
         GameObject[] normalTiles = GameObject.FindGameObjectsWithTag("NormalTile");
         GameObject[] jumpTiles = GameObject.FindGameObjectsWithTag("JumpTile");
+        GameObject[] glassTiles = GameObject.FindGameObjectsWithTag("GlassTile");
         GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
         Vector3 jumpTilePos = new Vector3(-32f, 0.2f, -2f);
+        Vector3 glassTilePos = new Vector3(-46f, 0f, 0f);
         Vector3 normalTilePos = new Vector3(-35f, 0.2f, 0.08f);
-        Vector3 riserPos = new Vector3(-33f, 0f, 0f);
+        List<Vector3> ObstaclePoses = new List<Vector3>();
+        ObstaclePoses.Add(new Vector3(-33f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-40f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-42f, 0f, 0f));
         foreach (GameObject tile in normalTiles) {
             if (tile.transform.position == normalTilePos) {
                 continue;
@@ -187,9 +193,15 @@ public class GameManager : MonoBehaviour
             }
             Destroy(tile);
         }
+        foreach (GameObject tile in glassTiles) {
+            if (tile.transform.position == glassTilePos) {
+                continue;
+            }
+            Destroy(tile);
+        }
         gre.clearPrefabPositions();
         foreach (GameObject tile in risers) {
-            if (tile.transform.position == riserPos) {
+            if (ObstaclePoses.Contains(tile.transform.position)) {
                 continue;
             }
             Destroy(tile);
@@ -252,7 +264,8 @@ public class GameManager : MonoBehaviour
         byte[] generalData2 = general2.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "General2.png"), generalData2);
         AudioClip music1 = Resources.Load<AudioClip>("Music/Music1");
-        EncodeMP3.convert(music1, Path.Combine(Application.persistentDataPath, "Music/Music1.mp3"), 32);
+        byte[] mp3 = WavToMp3.ConvertWavToMp3(music1, 128);
+        File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Music/Music1.mp3"), mp3);
         isDataDownloaded = true;
     }
 }

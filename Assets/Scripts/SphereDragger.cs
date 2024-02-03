@@ -26,7 +26,7 @@ public class SphereDragger : MonoBehaviour
     {
         if (isDragging)
         {
-            
+            screenWidth = Screen.width;
             // Get the current mouse position and convert it to world coordinates
             Vector3 mousePos = Input.mousePosition;
             mousePos.z = this.transform.position.z;

@@ -17,6 +17,8 @@ TagManager:
   - JumpCollision
   - Theme
   - Grid
+  - GlassCollision
+  - GlassTile
   layers:
   - Default
   - TransparentFX

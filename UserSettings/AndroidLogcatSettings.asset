@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "RF8N72PYSMJ",
         "name": "com.ComradeCat.DeceBalus",
-        "processId": 31458,
+        "processId": 13187,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -11,79 +11,43 @@
         {
             "deviceId": "RF8N72PYSMJ",
             "name": "com.ComradeCat.DeceBalus",
-            "processId": 24845,
+            "processId": 3277,
             "exited": true
         },
         {
             "deviceId": "RF8N72PYSMJ",
             "name": "com.ComradeCat.DeceBalus",
-            "processId": 25894,
+            "processId": 4186,
             "exited": true
         },
         {
             "deviceId": "RF8N72PYSMJ",
             "name": "com.ComradeCat.DeceBalus",
-            "processId": 11199,
+            "processId": 6772,
             "exited": true
         },
         {
             "deviceId": "RF8N72PYSMJ",
             "name": "com.ComradeCat.DeceBalus",
-            "processId": 24872,
+            "processId": 7674,
             "exited": true
         },
         {
             "deviceId": "RF8N72PYSMJ",
-            "name": "com.ComradeCat.DeceBalus",
-            "processId": 23310,
+            "name": "com.alphainventor.filemanager",
+            "processId": 18542,
             "exited": false
         },
         {
             "deviceId": "RF8N72PYSMJ",
             "name": "com.ComradeCat.DeceBalus",
-            "processId": 26305,
+            "processId": 8376,
             "exited": false
         },
         {
             "deviceId": "RF8N72PYSMJ",
             "name": "com.ComradeCat.DeceBalus",
-            "processId": 27118,
-            "exited": false
-        },
-        {
-            "deviceId": "RF8N72PYSMJ",
-            "name": "com.ComradeCat.DeceBalus",
-            "processId": 28945,
-            "exited": false
-        },
-        {
-            "deviceId": "RF8N72PYSMJ",
-            "name": "com.ComradeCat.DeceBalus",
-            "processId": 29991,
-            "exited": false
-        },
-        {
-            "deviceId": "RF8N72PYSMJ",
-            "name": "com.ComradeCat.DeceBalus",
-            "processId": 30759,
-            "exited": false
-        },
-        {
-            "deviceId": "RF8N72PYSMJ",
-            "name": "com.ComradeCat.DeceBalus",
-            "processId": 2474,
-            "exited": false
-        },
-        {
-            "deviceId": "RF8N72PYSMJ",
-            "name": "com.ComradeCat.DeceBalus",
-            "processId": 30367,
-            "exited": false
-        },
-        {
-            "deviceId": "RF8N72PYSMJ",
-            "name": "com.ComradeCat.DeceBalus",
-            "processId": 31458,
+            "processId": 13187,
             "exited": false
         }
     ],

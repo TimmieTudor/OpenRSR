@@ -15,12 +15,12 @@ public class FrameAnim
         this.name = frames[0].name;
     }
 
-    public void SetFrame(int index)
+    public void SetFrame(int index, float t)
     {
         this.currentFrame = index;
-        name.transform.position = Vector3.Lerp(frames[currentFrame].position, frames[(currentFrame + 1)].position, 0.5f);
-        name.transform.localScale = Vector3.Lerp(frames[currentFrame].scale, frames[(currentFrame + 1)].scale, 0.5f);
-        name.transform.rotation = Quaternion.Lerp(frames[currentFrame].rotation, frames[(currentFrame + 1)].rotation, 0.5f);
+        name.transform.position = Vector3.Lerp(frames[currentFrame - 1].position, frames[currentFrame].position, t);
+        name.transform.localScale = Vector3.Lerp(frames[currentFrame - 1].scale, frames[currentFrame].scale, t);
+        name.transform.rotation = Quaternion.Lerp(frames[currentFrame - 1].rotation, frames[currentFrame].rotation, t);
         currentFrame++;
     }
 }

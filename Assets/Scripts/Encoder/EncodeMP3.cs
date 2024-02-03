@@ -10,35 +10,39 @@
 /*---------------------- BeatUp (C) 2016-------------------- */
 
 
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using System;
-using NAudio.Wave;
+using System.IO;
+using System.Collections;
+using System.Threading;
+using UnityEngine;
 using NAudio.Lame;
+using NAudio.Wave.WZT;
+using NAudio.Wave;
 
-public static class EncodeMP3
-{
-
-
-	public static void convert (AudioClip clip, string path, int bitRate)
-	{
-
-		if (!path.EndsWith (".mp3"))
+public static class EncodeMP3 {
+	/// <summary>
+	/// Save clip as mp3
+	/// </summary>
+	/// <param name="clip">Unity AudioClip</param>
+	/// <param name="path">Path to save it</param>
+	/// <param name="bitRate">Mp3 bitrate. Recommend to set it to 128</param>
+	public static void SaveMp3(AudioClip clip, string path, int bitRate) {
+		if (!path.EndsWith(".mp3"))
 			path = path + ".mp3";
-		
-		ConvertAndWrite (clip, path, bitRate);
 
+		ConvertAndWrite(clip, path, bitRate);
 	}
 
-
-	//  derived from Gregorio Zanon's script
-	private static void ConvertAndWrite (AudioClip clip, string path, int bitRate)
-	{
+	/// <summary>
+	/// Save clip as wav
+	/// </summary>
+	/// <param name="clip">Unity AudioClip</param>
+	/// <param name="path">Path to save it</param>
+	/// <param name="bitRate">Mp3 bitrate. Recommend to set it to 128</param>
+	private static void ConvertAndWrite(AudioClip clip, string path, int bitRate) {
 		var samples = new float[clip.samples * clip.channels];
 
-		clip.GetData (samples, 0);
+		clip.GetData(samples, 0);
 
 		Int16[] intData = new Int16[samples.Length];
 		//converting in 2 float[] steps to Int16[], //then Int16[] to Byte[]
@@ -50,34 +54,30 @@ public static class EncodeMP3
 		float rescaleFactor = 32767; //to convert float to Int16
 
 		for (int i = 0; i < samples.Length; i++) {
-			intData [i] = (short)(samples [i] * rescaleFactor);
+			intData[i] = (short)(samples[i] * rescaleFactor);
 			Byte[] byteArr = new Byte[2];
-			byteArr = BitConverter.GetBytes (intData [i]);
-			byteArr.CopyTo (bytesData, i * 2);
+			byteArr = BitConverter.GetBytes(intData[i]);
+			byteArr.CopyTo(bytesData, i * 2);
 		}
 
-		File.WriteAllBytes (path, ConvertWavToMp3 (bytesData,bitRate));
+		File.WriteAllBytes(path, ConvertWavToMp3(bytesData, bitRate));
 	}
 
+	/// <summary>
+	/// Convert wav bytes to mp3 bytes
+	/// derived from Gregorio Zanon's script
+	/// </summary>
+	/// <param name="wavFile">Wav file readed as array</param>
+	/// <param name="bitRate">Mp3 bitrate. Recommend to set it to 128</param>
+	/// <returns></returns>
+	private static byte[] ConvertWavToMp3(byte[] wavFile, int bitRate) {
 
+		var retMs = new MemoryStream();
+		var ms = new MemoryStream(wavFile);
+		var rdr = new WaveFileReader(ms);
+		var wtr = new LameMP3FileWriter(retMs, rdr.WaveFormat, bitRate);
 
-	private static byte[] ConvertWavToMp3 (byte[] wavFile, int bitRate)
-	{
-
-		var retMs = new MemoryStream ();
-		var ms = new MemoryStream (wavFile);
-		var rdr = new RawSourceWaveStream (ms, new WaveFormat ());
-		var wtr = new LameMP3FileWriter (retMs, rdr.WaveFormat, bitRate);
-
-		rdr.CopyTo (wtr);
-		return retMs.ToArray ();
-
-
-
+		rdr.CopyTo(wtr);
+		return retMs.ToArray();
 	}
-	
-	
-
-
-
 }

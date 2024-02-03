@@ -17,6 +17,7 @@ public class GroundRenderer : MonoBehaviour
 {
     public GameObject prefab;
     public GameObject prefab2;
+    public GameObject prefab3;
     public string jsonFilePath;
     public float prefabSpacing = 1f;
     public float destroyDistance = 10f; // maximum distance between Balus and prefab to destroy it
@@ -69,6 +70,16 @@ public class GroundRenderer : MonoBehaviour
                         spawnedPrefabs.Add(spawnedPrefab);
                         prefabPositions.Add(spawnPosition, spawnedPrefab);
                     }
+                } else if (hasPrefab == 3) {
+                    float x = j - 2;
+                    float z = i * prefabSpacing;
+                    Vector3 spawnPosition = new Vector3(x, 0f, z);
+                    if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition))
+                    {
+                        GameObject spawnedPrefab = Instantiate(prefab3, spawnPosition, Quaternion.identity);
+                        spawnedPrefabs.Add(spawnedPrefab);
+                        prefabPositions.Add(spawnPosition, spawnedPrefab);
+                    }
                 }
             }
         }
@@ -104,6 +115,15 @@ public class GroundRenderer : MonoBehaviour
                     if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition))
                     {
                         GameObject spawnedPrefab = Instantiate(prefab2, spawnPosition, Quaternion.identity);
+                        spawnedPrefabs.Add(spawnedPrefab);
+                        prefabPositions.Add(spawnPosition, spawnedPrefab);
+                    }
+                } else if (hasPrefab == 3) {
+                    float x = j - 2;
+                    Vector3 spawnPosition = new Vector3(x, 0f, z);
+                    if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition))
+                    {
+                        GameObject spawnedPrefab = Instantiate(prefab3, spawnPosition, Quaternion.identity);
                         spawnedPrefabs.Add(spawnedPrefab);
                         prefabPositions.Add(spawnPosition, spawnedPrefab);
                     }

@@ -2,6 +2,7 @@ using UnityEngine;
 using MethFunctions;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 public class SphereMovement : MonoBehaviour
 {
     // The speed of the sphere
@@ -15,6 +16,8 @@ public class SphereMovement : MonoBehaviour
      // The GameObject that the sphere is jumping on
     private GameObject jumpTile;
     private GameObject normalTile;
+    private GameObject glassTile;
+    private List<GameObject> glassTiles = new List<GameObject>();
      // The z-position of the sphere when it collides with the jumpTile
     private float collisionZ;
     private void Start()
@@ -55,9 +58,11 @@ public class SphereMovement : MonoBehaviour
         {
             Jump(4f, jumpTile);
         }
-        else if (normalTile != null)
+        else if (normalTile != null && glassTile != null)
         {
             exponential_falus();
+        } else if (glassTiles.Count > 0) {
+            FallingGlass();
         }
 
     }
@@ -79,6 +84,18 @@ public class SphereMovement : MonoBehaviour
             else if (collision.gameObject.tag == "NormalTile")
             {
                 normalTile = null;
+                glassTile = null;
+                collisionZ = 0f;
+                isJumping = false;
+                jumpTile = null;
+            } else if (collision.gameObject.tag == "GlassCollision") {
+                GameObject glassTileParent = collision.gameObject.transform.parent.gameObject;
+                GameObject glassTileNormal = glassTileParent.transform.GetChild(1).gameObject;
+                GameObject glassTileActive = glassTileParent.transform.GetChild(2).gameObject;
+                glassTileActive.SetActive(true);
+                glassTileNormal.SetActive(false);
+                normalTile = null;
+                glassTile = null;
                 collisionZ = 0f;
                 isJumping = false;
                 jumpTile = null;
@@ -95,6 +112,11 @@ public class SphereMovement : MonoBehaviour
         if (collision.gameObject.tag == "NormalTile")
         {
             normalTile = null;
+            glassTile = null;
+            collisionZ = 0f;
+        } else if (collision.gameObject.tag == "GlassCollision") {
+            normalTile = null;
+            glassTile = null;
             collisionZ = 0f;
         }
     }
@@ -106,6 +128,23 @@ public class SphereMovement : MonoBehaviour
             normalTile = collision.gameObject;
             rb.useGravity = false;
             collisionZ = collision.gameObject.transform.position.z + 0.1f;
+        } else if (collision.gameObject.tag == "GlassCollision") {
+            glassTile = collision.gameObject;
+            glassTiles.Add(collision.gameObject);
+            normalTile = collision.gameObject;
+            rb.useGravity = false;
+            collisionZ = collision.gameObject.transform.position.z + 0.1f;
+        }
+    }
+
+    public void FallingGlass() {
+        foreach (GameObject m_glassTile in glassTiles) {
+            if (m_glassTile == null) continue;
+            GameObject glassTileParent = m_glassTile.transform.parent.gameObject;
+            GameObject glassTileNormal = glassTileParent.transform.GetChild(1).gameObject;
+            GameObject glassTileActive = glassTileParent.transform.GetChild(2).gameObject;
+            Vector3 newPosition = new Vector3(glassTileParent.transform.position.x, glassTileParent.transform.position.y - 0.125f, glassTileParent.transform.position.z);
+            glassTileParent.transform.position = newPosition;
         }
     }
 
@@ -116,8 +155,11 @@ public class SphereMovement : MonoBehaviour
     public void Jump(float distance, GameObject jumpTile) 
     { 
         if (jumpTile == null) return;
-        Vector3 newPosition = new Vector3(jumpTile.transform.position.x, jumpTile.transform.position.y + 0.09f, jumpTile.transform.position.z);
-        GameObject jumpTileParent = jumpTile.transform.parent.gameObject;
+        Vector3 newPosition = new Vector3(jumpTile.transform.position.x, jumpTile.transform.position.y + 0.1f, jumpTile.transform.position.z);
+        GameObject jumpTileParent = jumpTile.transform.parent.parent.gameObject;
+        GameObject jumpTileNormal = jumpTileParent.transform.GetChild(0).gameObject;
+        GameObject jumpTileActive = jumpTileParent.transform.GetChild(1).gameObject;
+        jumpTile = jumpTileParent;
         /* float p = distance / 3.025f * (-1f); */
         float z = transform.position.z - jumpTile.transform.position.z;
         /*float h = 0f;
@@ -128,23 +170,28 @@ public class SphereMovement : MonoBehaviour
             jumpCalc = 0f;
         }
         isJumping = true;
+        if (!jumpTileActive.activeSelf) {
+            jumpTileActive.SetActive(true);
+            jumpTileNormal.SetActive(false);
+        }
         // Create a Vector3 for the upward movement of the sphere 
         Vector3 movement2 = Vector3.up * jumpCalc;
         try 
         { 
-            if (z > 0.69f && z < 1.15f && isJumping) {
-                jumpTileParent.transform.position = newPosition;
+            if (z > 0.2f && z < 1.2f && isJumping) {
+                newPosition = new Vector3(jumpTile.transform.position.x, jumpTileActive.transform.position.y + 0.1f, jumpTile.transform.position.z);
+                jumpTileActive.transform.position = newPosition;
             }
             if (isJumping)
             {
                 rb.MovePosition(rb.position + movement2 * Time.fixedDeltaTime);
-                collisionZ += 0.075f;
+                //collisionZ += 0.075f;
             }
             // If the zDiff is greater than the distance, set the jumpTile to null and enable gravity for the sphere 
             if (z > distance) 
             { 
                 newPosition = new Vector3(jumpTile.transform.position.x, 0f, jumpTile.transform.position.z);
-                jumpTileParent.transform.position = newPosition;
+                //jumpTileActive.transform.position = newPosition;
                 // jumpTile = null;
                 // jumpCalc = 0f;
                 // isJumping = false;
@@ -160,7 +207,7 @@ public class SphereMovement : MonoBehaviour
     public void exponential_falus() 
     {
         float z = transform.position.z - collisionZ;
-        float downY = Mathf.Pow(2f, z + 3f);
+        float downY = jumpFunction(z + 4f, 1f) * -1f;
         Vector3 downVector = Vector3.down * downY;
         rb.MovePosition(rb.position + downVector * Time.fixedDeltaTime);
     }

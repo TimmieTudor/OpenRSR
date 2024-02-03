@@ -70,7 +70,7 @@ public class ThemeChanger : MonoBehaviour
                 byte[] backgroundData = File.ReadAllBytes(backgroundPath);
                 byte[] enemyData = File.ReadAllBytes(enemyPath);
                 byte[] generalData = File.ReadAllBytes(generalPath);
-                Texture2D background = new Texture2D(768, 768);
+                Texture2D background = new Texture2D(1024, 1024);
                 Texture2D enemy = new Texture2D(1024, 1024);
                 Texture2D general = new Texture2D(1024, 1024);
                 background.LoadImage(backgroundData);

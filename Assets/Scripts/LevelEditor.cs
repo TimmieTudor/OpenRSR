@@ -94,6 +94,44 @@ public class LevelEditor : MonoBehaviour
         themeText = GameObject.Find("DeceBalus_Theme_Text");
     }
 
+    public void ClearEverything() {
+        GameObject[] normalTiles = GameObject.FindGameObjectsWithTag("NormalTile");
+        GameObject[] jumpTiles = GameObject.FindGameObjectsWithTag("JumpTile");
+        GameObject[] glassTiles = GameObject.FindGameObjectsWithTag("GlassTile");
+        GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
+        Vector3 jumpTilePos = new Vector3(-32f, 0.2f, -2f);
+        Vector3 glassTilePos = new Vector3(-46f, 0f, 0f);
+        Vector3 normalTilePos = new Vector3(-35f, 0.2f, 0.08f);
+        List<Vector3> ObstaclePoses = new List<Vector3>();
+        ObstaclePoses.Add(new Vector3(-33f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-40f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-42f, 0f, 0f));
+        foreach (GameObject tile in normalTiles) {
+            if (tile.transform.position == normalTilePos) {
+                continue;
+            }
+            Destroy(tile);
+        }
+        foreach (GameObject tile in jumpTiles) {
+            if (tile.transform.position == jumpTilePos) {
+                continue;
+            }
+            Destroy(tile);
+        }
+        foreach (GameObject tile in glassTiles) {
+            if (tile.transform.position == glassTilePos) {
+                continue;
+            }
+            Destroy(tile);
+        }
+        foreach (GameObject tile in risers) {
+            if (ObstaclePoses.Contains(tile.transform.position)) {
+                continue;
+            }
+            Destroy(tile);
+        }
+    }
+
     // This is what replaced Mihnea with Workspace
     public void editorTransition() {
         gre.enabled = false;
@@ -110,30 +148,7 @@ public class LevelEditor : MonoBehaviour
         Quaternion q = Quaternion.Euler(90f, 0f, 0f);
         m_camera.transform.position = camPos;
         m_camera.transform.rotation = q;
-        GameObject[] normalTiles = GameObject.FindGameObjectsWithTag("NormalTile");
-        GameObject[] jumpTiles = GameObject.FindGameObjectsWithTag("JumpTile");
-        GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
-        Vector3 jumpTilePos = new Vector3(-32f, 0.2f, -2f);
-        Vector3 normalTilePos = new Vector3(-35f, 0.2f, 0.08f);
-        Vector3 riserPos = new Vector3(-33f, 0f, 0f);
-        foreach (GameObject tile in normalTiles) {
-            if (tile.transform.position == normalTilePos) {
-                continue;
-            }
-            Destroy(tile);
-        }
-        foreach (GameObject tile in jumpTiles) {
-            if (tile.transform.position == jumpTilePos) {
-                continue;
-            }
-            Destroy(tile);
-        }
-        foreach (GameObject tile in risers) {
-            if (tile.transform.position == riserPos) {
-                continue;
-            }
-            Destroy(tile);
-        }
+        ClearEverything();
         List<List<int>> gpositions = gdata.positions;
         List<List<int>> epositions = edata.positions;
         for (int i = 0; i < gpositions.Count; i++) {
@@ -149,6 +164,11 @@ public class LevelEditor : MonoBehaviour
                     float z = i * gre.prefabSpacing;
                     Vector3 spawnPosition = new Vector3(x, 0f, z);
                     GameObject spawnedPrefab = Instantiate(gre.prefab2, spawnPosition, Quaternion.identity);
+                } else if (gpositions[i][j] == 3) {
+                    float x = j - 2;
+                    float z = i * gre.prefabSpacing;
+                    Vector3 spawnPosition = new Vector3(x, 0f, z);
+                    GameObject spawnedPrefab = Instantiate(gre.prefab3, spawnPosition, Quaternion.identity);
                 }
             }
         }
@@ -159,6 +179,31 @@ public class LevelEditor : MonoBehaviour
                     float z = i * ere.prefabSpacing;
                     Vector3 spawnPosition = new Vector3(x, 0.55f, z);
                     GameObject spawnedPrefab = Instantiate(ere.prefab, spawnPosition, Quaternion.identity);
+                } else if (epositions[i][j] == 2) {
+                    float x = j - 2;
+                    float z = i * ere.prefabSpacing;
+                    Vector3 spawnPosition = new Vector3(x, 0.55f, z);
+                    GameObject spawnedPrefab = Instantiate(ere.prefab2, spawnPosition, Quaternion.identity);
+                } else if (epositions[i][j] == 3) {
+                    float x = j - 2;
+                    float z = i * ere.prefabSpacing;
+                    Vector3 spawnPosition = new Vector3(x, 0.55f, z);
+                    GameObject spawnedPrefab = Instantiate(ere.prefab3, spawnPosition, Quaternion.identity);
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "SUS";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 2f, z);
                 }
             }
         }
@@ -291,6 +336,7 @@ public class LevelEditor : MonoBehaviour
         float z = i * gre.prefabSpacing;
         GameObject[] normalTiles = GameObject.FindGameObjectsWithTag("NormalTile");
         GameObject[] jumpTiles = GameObject.FindGameObjectsWithTag("JumpTile");
+        GameObject[] glassTiles = GameObject.FindGameObjectsWithTag("GlassTile");
         GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
         if (objectLayer == 0) {
             foreach (GameObject tile in normalTiles) {
@@ -305,10 +351,18 @@ public class LevelEditor : MonoBehaviour
                     break;
                 }
             }
+            foreach (GameObject tile in glassTiles) {
+                if (tile.transform.position == new Vector3(x, 0f, z)) {
+                    Destroy(tile);
+                    break;
+                }
+            }
             if (gdata.positions[i][j] == 1) {
                 Instantiate(gre.prefab, new Vector3(x, 0f, z), Quaternion.identity);
             } else if (gdata.positions[i][j] == 2) {
                 Instantiate(gre.prefab2, new Vector3(x, 0f, z), Quaternion.identity);
+            } else if (gdata.positions[i][j] == 3) {
+                Instantiate(gre.prefab3, new Vector3(x, 0f, z), Quaternion.identity);
             }
         } else if (objectLayer == 1) {
             foreach (GameObject tile in risers) {
@@ -319,12 +373,54 @@ public class LevelEditor : MonoBehaviour
             }
             if (edata.positions[i][j] == 1) {
                 Instantiate(ere.prefab, new Vector3(x, 0.55f, z), Quaternion.identity);
+            } else if (edata.positions[i][j] == 2) {
+                Instantiate(ere.prefab2, new Vector3(x, 0.55f, z), Quaternion.identity);
+            } else if (edata.positions[i][j] == 3) {
+                GameObject spawnedPrefab = Instantiate(ere.prefab3, new Vector3(x, 0.55f, z), Quaternion.identity);
+                GameObject canvasObject = new GameObject("Text_Canvas");
+                Canvas canvas = canvasObject.AddComponent<Canvas>();
+                GameObject textObject = new GameObject("Text");
+                TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                textComponent.text = "SUS";
+                textComponent.alignment = TextAlignmentOptions.Center;
+                canvas.renderMode = RenderMode.WorldSpace;
+                textComponent.fontStyle = FontStyles.Bold;
+                textComponent.fontSize = 0.4f;
+                canvasObject.transform.SetParent(spawnedPrefab.transform);
+                textObject.transform.SetParent(canvasObject.transform);
+                RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                canvasObject.transform.position = new Vector3(x, 2f, z);
             }
         }
     }
 
     public void SetPopupOpen(bool open) {
         isPopupOpen = open;
+    }
+
+    public void ClearThemes() {
+        GameObject[] m_themes = GameObject.FindGameObjectsWithTag("Theme");
+        Vector3 m_themePos = new Vector3(-37f, 0f, 0f);
+        foreach (GameObject m_theme in m_themes) {
+            if (m_theme.transform.position == m_themePos) {
+                continue;
+            }
+            Destroy(m_theme);
+        }
+        GameObject first_theme = Instantiate(themeText, new Vector3(-1.4f, 0.1f, -0.4f), Quaternion.Euler(90f, 0f, 0f));
+    }
+
+    public void ClearLevel() {
+        List<List<int>> newPositions = new List<List<int>>();
+        for (int i = 0; i < 10; i++) {
+            newPositions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
+        }
+        gdata.positions = newPositions;
+        edata.positions = newPositions;
+        ClearEverything();
+        ClearThemes();
     }
 
     // Update is called once per frame
@@ -338,7 +434,7 @@ public class LevelEditor : MonoBehaviour
                 GameObject spawnedPrefab = Instantiate(grid, spawnPosition, Quaternion.identity);
             }
             gridSize++;
-        } else if (Input.GetMouseButtonDown(0) && isInEditor && !isPopupOpen) {
+        } else if (Input.GetMouseButton(0) && isInEditor && !isPopupOpen) {
             Vector3 mousePos = Input.mousePosition;
             Vector3 worldPos = m_camera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 9.5f));
             //Debug.Log(worldPos);
@@ -349,8 +445,10 @@ public class LevelEditor : MonoBehaviour
             //Debug.Log(i + " " + j);
             if (objectLayer == 0) {
                 if (i >= gdata.positions.Count) {
-                    gdata.positions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
-                    edata.positions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
+                    for (int k = 0; k <= i - gdata.positions.Count; k++) {
+                        gdata.positions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
+                        edata.positions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
+                    }
                 }
                 if (i >= 0 && i < gdata.positions.Count && j >= 0 && j < 5) {
                     gdata.positions[i][j] = objectID;
@@ -358,8 +456,10 @@ public class LevelEditor : MonoBehaviour
                 }
             } else if (objectLayer == 1) {
                 if (i >= edata.positions.Count) {
-                    edata.positions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
-                    gdata.positions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
+                    for (int k = 0; k <= i - gdata.positions.Count; k++) {
+                        gdata.positions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
+                        edata.positions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
+                    }
                 }
                 if (i >= 0 && i < edata.positions.Count && j >= 0 && j < 5) {
                     edata.positions[i][j] = objectID;
