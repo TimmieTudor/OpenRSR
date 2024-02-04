@@ -413,12 +413,16 @@ public class LevelEditor : MonoBehaviour
     }
 
     public void ClearLevel() {
-        List<List<int>> newPositions = new List<List<int>>();
+        List<List<int>> groundNewPositions = new List<List<int>>();
         for (int i = 0; i < 10; i++) {
-            newPositions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
+            groundNewPositions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
         }
-        gdata.positions = newPositions;
-        edata.positions = newPositions;
+        List<List<int>> enemyNewPositions = new List<List<int>>();
+        for (int i = 0; i < 10; i++) {
+            enemyNewPositions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
+        }
+        gdata.positions = groundNewPositions;
+        edata.positions = enemyNewPositions;
         ClearEverything();
         ClearThemes();
     }
