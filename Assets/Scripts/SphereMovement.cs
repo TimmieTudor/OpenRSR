@@ -64,7 +64,7 @@ public class SphereMovement : MonoBehaviour
         //Debug.Log(manager.isGamePaused);
         //Debug.Log(manager.isGameOver);
         if (!manager.isGamePaused && !manager.isGameOver) {
-            Debug.Log("Running");
+            //Debug.Log("Running");
             // Create a Vector3 for the movement of the sphere
             Vector3 direction = Vector3.forward;
             Vector3 movement = direction.normalized * speed;
@@ -115,9 +115,10 @@ public class SphereMovement : MonoBehaviour
         List<GameObject> c_glassTiles = GameObject.FindGameObjectsWithTag("GlassCollisionGroup1").ToList();
         foreach (GameObject c_glassTile in c_glassTiles) {
             if (!glassGroup1.Contains(c_glassTile)) {
-                if (Mathf.Abs(c_glassTile.transform.position.z - currentGlassTileParent.transform.position.z) <= 1f) {
-                    ActivateGlassTilesG1(c_glassTile);
-                } else if (Mathf.Abs(c_glassTile.transform.position.x - currentGlassTileParent.transform.position.x) <= 1f) {
+                if (Mathf.Abs(c_glassTile.transform.position.z - currentGlassTileParent.transform.position.z) == 1f && Mathf.Abs(c_glassTile.transform.position.x - currentGlassTileParent.transform.position.x) == 1f) {
+                    continue;
+                }
+                if (Mathf.Abs(c_glassTile.transform.position.z - currentGlassTileParent.transform.position.z) <= 1f && Mathf.Abs(c_glassTile.transform.position.x - currentGlassTileParent.transform.position.x) <= 1f) {
                     ActivateGlassTilesG1(c_glassTile);
                 }
             }
@@ -149,9 +150,10 @@ public class SphereMovement : MonoBehaviour
         List<GameObject> c_glassTiles = GameObject.FindGameObjectsWithTag("GlassCollisionGroup2").ToList();
         foreach (GameObject c_glassTile in c_glassTiles) {
             if (!glassGroup2.Contains(c_glassTile)) {
-                if (Mathf.Abs(c_glassTile.transform.position.z - currentGlassTileParent.transform.position.z) <= 1f) {
-                    ActivateGlassTilesG2(c_glassTile);
-                } else if (Mathf.Abs(c_glassTile.transform.position.x - currentGlassTileParent.transform.position.x) <= 1f) {
+                if (Mathf.Abs(c_glassTile.transform.position.z - currentGlassTileParent.transform.position.z) == 1f && Mathf.Abs(c_glassTile.transform.position.x - currentGlassTileParent.transform.position.x) == 1f) {
+                    continue;
+                }
+                if (Mathf.Abs(c_glassTile.transform.position.z - currentGlassTileParent.transform.position.z) <= 1f && Mathf.Abs(c_glassTile.transform.position.x - currentGlassTileParent.transform.position.x) <= 1f) {
                     ActivateGlassTilesG2(c_glassTile);
                 }
             }
@@ -183,9 +185,10 @@ public class SphereMovement : MonoBehaviour
         List<GameObject> c_glassTiles = GameObject.FindGameObjectsWithTag("GlassCollisionGroup3").ToList();
         foreach (GameObject c_glassTile in c_glassTiles) {
             if (!glassGroup3.Contains(c_glassTile)) {
-                if (Mathf.Abs(c_glassTile.transform.position.z - currentGlassTileParent.transform.position.z) <= 1f) {
-                    ActivateGlassTilesG3(c_glassTile);
-                } else if (Mathf.Abs(c_glassTile.transform.position.x - currentGlassTileParent.transform.position.x) <= 1f) {
+                if (Mathf.Abs(c_glassTile.transform.position.z - currentGlassTileParent.transform.position.z) == 1f && Mathf.Abs(c_glassTile.transform.position.x - currentGlassTileParent.transform.position.x) == 1f) {
+                    continue;
+                }
+                if (Mathf.Abs(c_glassTile.transform.position.z - currentGlassTileParent.transform.position.z) <= 1f && Mathf.Abs(c_glassTile.transform.position.x - currentGlassTileParent.transform.position.x) <= 1f) {
                     ActivateGlassTilesG3(c_glassTile);
                 }
             }

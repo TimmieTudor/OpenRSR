@@ -28,7 +28,7 @@ public class SphereDragger : MonoBehaviour
     {
         if (isDragging && !manager.isGamePaused && !manager.isGameOver)
         {
-            Debug.Log("Dragging");
+            //Debug.Log("Dragging");
             screenWidth = Screen.width;
             // Get the current mouse position and convert it to world coordinates
             Vector3 mousePos = Input.mousePosition;
