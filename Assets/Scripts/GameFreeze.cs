@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameFreeze : MonoBehaviour
 {
-    bool gamePaused = true;
+    public bool gamePaused = true;
     GameObject pausedText;
     GameObject editButton;
     float timer;
@@ -12,6 +12,7 @@ public class GameFreeze : MonoBehaviour
     private SphereMovement sphm;
     private SphereDragger sphd;
     private AudioPlayer audioPlayer;
+    private GameManager manager;
 
     void Start()
     {
@@ -19,6 +20,7 @@ public class GameFreeze : MonoBehaviour
         sphm = balus.GetComponent<SphereMovement>();
         sphd = balus.GetComponent<SphereDragger>();
         audioPlayer = balus.GetComponent<AudioPlayer>();
+        manager = balus.GetComponent<GameManager>();
         gamePaused = true;
         pausedText = GameObject.Find("PausedText");
         editButton = GameObject.Find("EditButton");
@@ -52,6 +54,8 @@ public class GameFreeze : MonoBehaviour
         if (timer >= 1f) {
             gamePaused = false;
             audioPlayer.PlayAudio();
+            sphm.enabled = true;
+            sphd.enabled = true;
         }
     }
 

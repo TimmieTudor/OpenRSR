@@ -19,6 +19,12 @@ TagManager:
   - Grid
   - GlassCollision
   - GlassTile
+  - GlassGroup1
+  - GlassCollisionGroup1
+  - GlassGroup2
+  - GlassCollisionGroup2
+  - GlassGroup3
+  - GlassCollisionGroup3
   layers:
   - Default
   - TransparentFX

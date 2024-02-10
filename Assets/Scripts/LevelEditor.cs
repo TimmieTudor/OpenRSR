@@ -98,9 +98,15 @@ public class LevelEditor : MonoBehaviour
         GameObject[] normalTiles = GameObject.FindGameObjectsWithTag("NormalTile");
         GameObject[] jumpTiles = GameObject.FindGameObjectsWithTag("JumpTile");
         GameObject[] glassTiles = GameObject.FindGameObjectsWithTag("GlassTile");
+        GameObject[] glassTilesGroup1 = GameObject.FindGameObjectsWithTag("GlassGroup1");
+        GameObject[] glassTilesGroup2 = GameObject.FindGameObjectsWithTag("GlassGroup2");
+        GameObject[] glassTilesGroup3 = GameObject.FindGameObjectsWithTag("GlassGroup3");
         GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
         Vector3 jumpTilePos = new Vector3(-32f, 0.2f, -2f);
         Vector3 glassTilePos = new Vector3(-46f, 0f, 0f);
+        Vector3 glassGroup1Pos = new Vector3(-49f, 0f, 0f);
+        Vector3 glassGroup2Pos = new Vector3(-50f, 0f, 0f);
+        Vector3 glassGroup3Pos = new Vector3(-51f, 0f, 0f);
         Vector3 normalTilePos = new Vector3(-35f, 0.2f, 0.08f);
         List<Vector3> ObstaclePoses = new List<Vector3>();
         ObstaclePoses.Add(new Vector3(-33f, 0f, 0f));
@@ -120,6 +126,24 @@ public class LevelEditor : MonoBehaviour
         }
         foreach (GameObject tile in glassTiles) {
             if (tile.transform.position == glassTilePos) {
+                continue;
+            }
+            Destroy(tile);
+        }
+        foreach (GameObject tile in glassTilesGroup1) {
+            if (tile.transform.position == glassGroup1Pos) {
+                continue;
+            }
+            Destroy(tile);
+        }
+        foreach (GameObject tile in glassTilesGroup2) {
+            if (tile.transform.position == glassGroup2Pos) {
+                continue;
+            }
+            Destroy(tile);
+        }
+        foreach (GameObject tile in glassTilesGroup3) {
+            if (tile.transform.position == glassGroup3Pos) {
                 continue;
             }
             Destroy(tile);
@@ -153,6 +177,62 @@ public class LevelEditor : MonoBehaviour
         List<List<int>> epositions = edata.positions;
         for (int i = 0; i < gpositions.Count; i++) {
             for (int j = 0; j < gpositions[i].Count; j++) {
+                int hasPrefab = gpositions[i][j];
+                float x = j - 2;
+                float z = i * gre.prefabSpacing;
+                Vector3 spawnPosition = new Vector3(x, 0f, z);
+                GameObject spawnedPrefab = Instantiate(gre.prefabs[hasPrefab], spawnPosition, Quaternion.identity);
+                if (hasPrefab == 4) {
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "1";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 1f, z);
+                } else if (hasPrefab == 5) {
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "2";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 1f, z);
+                } else if (hasPrefab == 6) {
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "3";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 1f, z);
+                }
+                // Obsolete code. Will remove later
+                /*
                 if (gpositions[i][j] == 1) {
                     float x = j - 2;
                     float z = i * gre.prefabSpacing;
@@ -169,26 +249,19 @@ public class LevelEditor : MonoBehaviour
                     float z = i * gre.prefabSpacing;
                     Vector3 spawnPosition = new Vector3(x, 0f, z);
                     GameObject spawnedPrefab = Instantiate(gre.prefab3, spawnPosition, Quaternion.identity);
-                }
+                } */
             }
         }
         for (int i = 0; i < epositions.Count; i++) {
             for (int j = 0; j < epositions[i].Count; j++) {
-                if (epositions[i][j] == 1) {
-                    float x = j - 2;
-                    float z = i * ere.prefabSpacing;
-                    Vector3 spawnPosition = new Vector3(x, 0.55f, z);
-                    GameObject spawnedPrefab = Instantiate(ere.prefab, spawnPosition, Quaternion.identity);
-                } else if (epositions[i][j] == 2) {
-                    float x = j - 2;
-                    float z = i * ere.prefabSpacing;
-                    Vector3 spawnPosition = new Vector3(x, 0.55f, z);
-                    GameObject spawnedPrefab = Instantiate(ere.prefab2, spawnPosition, Quaternion.identity);
-                } else if (epositions[i][j] == 3) {
-                    float x = j - 2;
-                    float z = i * ere.prefabSpacing;
-                    Vector3 spawnPosition = new Vector3(x, 0.55f, z);
-                    GameObject spawnedPrefab = Instantiate(ere.prefab3, spawnPosition, Quaternion.identity);
+                int hasPrefab = epositions[i][j];
+                float x = j - 2;
+                float z = i * ere.prefabSpacing;
+                Vector3 spawnPosition = new Vector3(x, 0.55f, z);
+                GameObject spawnedPrefab = Instantiate(ere.prefabs[hasPrefab], spawnPosition, Quaternion.identity);
+                // Obsolete code. Will remove later
+                
+                if (hasPrefab == 3) {
                     GameObject canvasObject = new GameObject("Text_Canvas");
                     Canvas canvas = canvasObject.AddComponent<Canvas>();
                     GameObject textObject = new GameObject("Text");
@@ -338,6 +411,9 @@ public class LevelEditor : MonoBehaviour
         GameObject[] jumpTiles = GameObject.FindGameObjectsWithTag("JumpTile");
         GameObject[] glassTiles = GameObject.FindGameObjectsWithTag("GlassTile");
         GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
+        GameObject[] glassTilesGroup1 = GameObject.FindGameObjectsWithTag("GlassGroup1");
+        GameObject[] glassTilesGroup2 = GameObject.FindGameObjectsWithTag("GlassGroup2");
+        GameObject[] glassTilesGroup3 = GameObject.FindGameObjectsWithTag("GlassGroup3");
         if (objectLayer == 0) {
             foreach (GameObject tile in normalTiles) {
                 if (tile.transform.position == new Vector3(x, 0f, z)) {
@@ -357,13 +433,83 @@ public class LevelEditor : MonoBehaviour
                     break;
                 }
             }
+            foreach (GameObject tile in glassTilesGroup1) {
+                if (tile.transform.position == new Vector3(x, 0f, z)) {
+                    Destroy(tile);
+                    break;
+                }
+            }
+            foreach (GameObject tile in glassTilesGroup2) {
+                if (tile.transform.position == new Vector3(x, 0f, z)) {
+                    Destroy(tile);
+                    break;
+                }
+            }
+            foreach (GameObject tile in glassTilesGroup3) {
+                if (tile.transform.position == new Vector3(x, 0f, z)) {
+                    Destroy(tile);
+                    break;
+                }
+            }
+            int hasPrefab = gdata.positions[i][j];
+            GameObject spawnedPrefab = Instantiate(gre.prefabs[hasPrefab], new Vector3(x, 0f, z), Quaternion.identity);
+            if (hasPrefab == 4) {
+                GameObject canvasObject = new GameObject("Text_Canvas");
+                Canvas canvas = canvasObject.AddComponent<Canvas>();
+                GameObject textObject = new GameObject("Text");
+                TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                textComponent.text = "1";
+                textComponent.alignment = TextAlignmentOptions.Center;
+                canvas.renderMode = RenderMode.WorldSpace;
+                textComponent.fontStyle = FontStyles.Bold;
+                textComponent.fontSize = 0.4f;
+                canvasObject.transform.SetParent(spawnedPrefab.transform);
+                textObject.transform.SetParent(canvasObject.transform);
+                RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                canvasObject.transform.position = new Vector3(x, 1f, z);
+            } else if (hasPrefab == 5) {
+                GameObject canvasObject = new GameObject("Text_Canvas");
+                Canvas canvas = canvasObject.AddComponent<Canvas>();
+                GameObject textObject = new GameObject("Text");
+                TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                textComponent.text = "2";
+                textComponent.alignment = TextAlignmentOptions.Center;
+                canvas.renderMode = RenderMode.WorldSpace;
+                textComponent.fontStyle = FontStyles.Bold;
+                textComponent.fontSize = 0.4f;
+                canvasObject.transform.SetParent(spawnedPrefab.transform);
+                textObject.transform.SetParent(canvasObject.transform);
+                RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                canvasObject.transform.position = new Vector3(x, 1f, z);
+            } else if (hasPrefab == 6) {
+                GameObject canvasObject = new GameObject("Text_Canvas");
+                Canvas canvas = canvasObject.AddComponent<Canvas>();
+                GameObject textObject = new GameObject("Text");
+                TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                textComponent.text = "3";
+                textComponent.alignment = TextAlignmentOptions.Center;
+                canvas.renderMode = RenderMode.WorldSpace;
+                textComponent.fontStyle = FontStyles.Bold;
+                textComponent.fontSize = 0.4f;
+                canvasObject.transform.SetParent(spawnedPrefab.transform);
+                textObject.transform.SetParent(canvasObject.transform);
+                RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                canvasObject.transform.position = new Vector3(x, 1f, z);
+            }
+            /*
             if (gdata.positions[i][j] == 1) {
                 Instantiate(gre.prefab, new Vector3(x, 0f, z), Quaternion.identity);
             } else if (gdata.positions[i][j] == 2) {
                 Instantiate(gre.prefab2, new Vector3(x, 0f, z), Quaternion.identity);
             } else if (gdata.positions[i][j] == 3) {
                 Instantiate(gre.prefab3, new Vector3(x, 0f, z), Quaternion.identity);
-            }
+            } */
         } else if (objectLayer == 1) {
             foreach (GameObject tile in risers) {
                 if (tile.transform.position == new Vector3(x, 0.55f, z)) {
@@ -371,12 +517,9 @@ public class LevelEditor : MonoBehaviour
                     break;
                 }
             }
-            if (edata.positions[i][j] == 1) {
-                Instantiate(ere.prefab, new Vector3(x, 0.55f, z), Quaternion.identity);
-            } else if (edata.positions[i][j] == 2) {
-                Instantiate(ere.prefab2, new Vector3(x, 0.55f, z), Quaternion.identity);
-            } else if (edata.positions[i][j] == 3) {
-                GameObject spawnedPrefab = Instantiate(ere.prefab3, new Vector3(x, 0.55f, z), Quaternion.identity);
+            int hasPrefab = edata.positions[i][j];
+            GameObject spawnedPrefab = Instantiate(ere.prefabs[hasPrefab], new Vector3(x, 0.55f, z), Quaternion.identity);
+            if (hasPrefab == 3) {
                 GameObject canvasObject = new GameObject("Text_Canvas");
                 Canvas canvas = canvasObject.AddComponent<Canvas>();
                 GameObject textObject = new GameObject("Text");

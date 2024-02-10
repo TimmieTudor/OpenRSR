@@ -25,8 +25,10 @@ public class GameManager : MonoBehaviour
     private ThemeChanger themeChanger2;
     private GameObject levelRenderer;
     private LevelConfigurator levelConfig;
-    private bool isGameOver = false;
+    private LevelEditor levelEdit;
+    public bool isGameOver = false;
     public bool isDataDownloaded = false;
+    public bool isGamePaused = true;
     private Rigidbody rb;
     private AudioPlayer audioPlayer;
     void Start()
@@ -45,6 +47,7 @@ public class GameManager : MonoBehaviour
         sphm.speed = levelConfig.levelSpeed;
         audioPlayer.audioPath = levelConfig.musicPath;
         audioPlayer.LoadAudioClip();
+        levelEdit = GetComponent<LevelEditor>();
 
         Application.targetFrameRate = 60;
 
@@ -61,6 +64,7 @@ public class GameManager : MonoBehaviour
         {
             // rb.useGravity = true;
             GFreeze.enabled = true;
+            isGamePaused = GFreeze.gamePaused;
             gre.enabled = true;
             ere.enabled = true;
             themeChanger.enabled = true;
@@ -95,19 +99,29 @@ public class GameManager : MonoBehaviour
         {
             isDataDownloaded = false;
         }
+        isGamePaused = GFreeze.gamePaused;
         
         if (isDataDownloaded && !isGameOver)
         {
             gre.enabled = true;
             ere.enabled = true;
             themeChanger.enabled = true;
-            sphm.enabled = false;
+            sphm.enabled = true;
             GFreeze.enabled = true;
+            isGamePaused = GFreeze.gamePaused;
             sphd.enabled = true;
             themeChanger2.enabled = true;
         }
         else
         {
+            gre.enabled = false;
+            ere.enabled = false;
+            themeChanger.enabled = false;
+            sphm.enabled = false;
+            sphd.enabled = false;
+            themeChanger2.enabled = false;
+        }
+        if (isGameOver) {
             gre.enabled = false;
             ere.enabled = false;
             themeChanger.enabled = false;
@@ -149,13 +163,18 @@ public class GameManager : MonoBehaviour
         GameObject levelNameTextLabel = GameObject.Find("LevelName");
         TextMeshProUGUI levelNameTextMesh = levelNameTextLabel.GetComponent<TextMeshProUGUI>();
         levelNameTextMesh.SetText(levelConfig.levelName);
+        GameObject levelAuthorTextLabel = GameObject.Find("LevelAuthor");
+        TextMeshProUGUI levelAuthorTextMesh = levelAuthorTextLabel.GetComponent<TextMeshProUGUI>();
+        levelAuthorTextMesh.SetText(levelConfig.levelAuthor);
         gamePlayCanvas.SetActive(false);
         sphm.isJumping = false;
         sphd.enabled = false;
         sphm.enabled = false;
         CFollow.enabled = false;
+        GFreeze.PauseGame();
         GFreeze.enabled = false;
         audioPlayer.PauseAudio();
+        rb.isKinematic = true;
     }
 
     public void RestartGame()
@@ -172,53 +191,22 @@ public class GameManager : MonoBehaviour
         balus.transform.position = balusPos;
         gre.enabled = true;
         ere.enabled = true;
-        GameObject[] normalTiles = GameObject.FindGameObjectsWithTag("NormalTile");
-        GameObject[] jumpTiles = GameObject.FindGameObjectsWithTag("JumpTile");
-        GameObject[] glassTiles = GameObject.FindGameObjectsWithTag("GlassTile");
-        GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
-        Vector3 jumpTilePos = new Vector3(-32f, 0.2f, -2f);
-        Vector3 glassTilePos = new Vector3(-46f, 0f, 0f);
-        Vector3 normalTilePos = new Vector3(-35f, 0.2f, 0.08f);
-        List<Vector3> ObstaclePoses = new List<Vector3>();
-        ObstaclePoses.Add(new Vector3(-33f, 0f, 0f));
-        ObstaclePoses.Add(new Vector3(-40f, 0f, 0f));
-        ObstaclePoses.Add(new Vector3(-42f, 0f, 0f));
-        foreach (GameObject tile in normalTiles) {
-            if (tile.transform.position == normalTilePos) {
-                continue;
-            }
-            Destroy(tile);
-        }
-        foreach (GameObject tile in jumpTiles) {
-            if (tile.transform.position == jumpTilePos) {
-                continue;
-            }
-            Destroy(tile);
-        }
-        foreach (GameObject tile in glassTiles) {
-            if (tile.transform.position == glassTilePos) {
-                continue;
-            }
-            Destroy(tile);
-        }
+        levelEdit.ClearEverything();
         gre.clearPrefabPositions();
-        foreach (GameObject tile in risers) {
-            if (ObstaclePoses.Contains(tile.transform.position)) {
-                continue;
-            }
-            Destroy(tile);
-        }
         ere.clearPrefabPositions();
         GFreeze.enabled = true;
         Time.timeScale = 1f;
-        GFreeze.PauseGame();
-        sphm.enabled = true;
         sphd.enabled = true;
         CFollow.enabled = true;
         audioPlayer.SeekToZero();
         themeChanger.themeID = 0;
         
+        sphm.enabled = true;
+        sphm.ClearFallingObstacles();
+        //rb.velocity = Vector3.zero;
+        balus.transform.position = new Vector3(0f, 0.5f, 0f);
         isGameOver = false;
+        rb.isKinematic = false;
     }
 
     private void LoadData()

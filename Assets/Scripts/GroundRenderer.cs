@@ -15,9 +15,7 @@ public class PositionsData
 
 public class GroundRenderer : MonoBehaviour
 {
-    public GameObject prefab;
-    public GameObject prefab2;
-    public GameObject prefab3;
+    public List<GameObject> prefabs = new List<GameObject>();
     public string jsonFilePath;
     public float prefabSpacing = 1f;
     public float destroyDistance = 10f; // maximum distance between Balus and prefab to destroy it
@@ -28,10 +26,145 @@ public class GroundRenderer : MonoBehaviour
     private Dictionary<Vector3, GameObject> prefabPositions = new Dictionary<Vector3, GameObject>();
     private GameManager gameManager;
     private string jsonString;
+    private GameObject edgePrefab;
+
+    private void HandleAllCases(GameObject spawnedPrefab, Vector3 spawnPosition, List<List<int>> positions, int checknum, int i, int j, float x, float z) {
+        if (i > 0 && i < positions.Count - 1 && j > 0 && j < positions[i].Count - 1) {
+            if (!(positions[i+1][j] == checknum)) {
+                GameObject edge1 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                edge1.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i-1][j] == checknum)) {
+                GameObject edge2 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                edge2.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i][j+1] == checknum)) {
+                GameObject edge3 = Instantiate(edgePrefab, new Vector3(x + 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+                edge3.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i][j-1] == checknum)) {
+                GameObject edge4 = Instantiate(edgePrefab, new Vector3(x - 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+                edge4.transform.parent = spawnedPrefab.transform;
+            }
+        } else if (i == 0 && j > 0 && j < positions[i].Count - 1) {
+            GameObject edge1 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+            edge1.transform.parent = spawnedPrefab.transform;
+            if (!(positions[i+1][j] == checknum)) {
+                GameObject edge2 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                edge2.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i][j+1] == checknum)) {
+                GameObject edge3 = Instantiate(edgePrefab, new Vector3(x + 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+                edge3.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i][j-1] == checknum)) {
+                GameObject edge4 = Instantiate(edgePrefab, new Vector3(x - 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+                edge4.transform.parent = spawnedPrefab.transform;
+            }
+        } else if (i == positions.Count - 1 && j > 0 && j < positions[i].Count - 1) {
+            GameObject edge1 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+            edge1.transform.parent = spawnedPrefab.transform;
+            if (!(positions[i-1][j] == checknum)) {
+                GameObject edge2 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                edge2.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i][j+1] == checknum)) {
+                GameObject edge3 = Instantiate(edgePrefab, new Vector3(x + 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+                edge3.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i][j-1] == checknum)) {
+                GameObject edge4 = Instantiate(edgePrefab, new Vector3(x - 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+                edge4.transform.parent = spawnedPrefab.transform;
+            }
+        } else if (i > 0 && i < positions.Count - 1 && j == 0) {
+            GameObject edge1 = Instantiate(edgePrefab, new Vector3(x - 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+            edge1.transform.parent = spawnedPrefab.transform;
+            if (!(positions[i+1][j] == checknum)) {
+                GameObject edge2 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                edge2.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i-1][j] == checknum)) {
+                GameObject edge3 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                edge3.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i][j+1] == checknum)) {
+                GameObject edge4 = Instantiate(edgePrefab, new Vector3(x + 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+                edge4.transform.parent = spawnedPrefab.transform;
+            }
+        } else if (i > 0 && i < positions.Count - 1 && j == positions[i].Count - 1) {
+            GameObject edge1 = Instantiate(edgePrefab, new Vector3(x + 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+            edge1.transform.parent = spawnedPrefab.transform;
+            if (!(positions[i+1][j] == checknum)) {
+                GameObject edge2 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                edge2.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i-1][j] == checknum)) {
+                GameObject edge3 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                edge3.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i][j-1] == checknum)) {
+                GameObject edge4 = Instantiate(edgePrefab, new Vector3(x - 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+                edge4.transform.parent = spawnedPrefab.transform;
+            }
+        } else if (i == 0 && j == 0) {
+            GameObject edge1 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+            edge1.transform.parent = spawnedPrefab.transform;
+            GameObject edge2 = Instantiate(edgePrefab, new Vector3(x - 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+            edge2.transform.parent = spawnedPrefab.transform;
+            if (!(positions[i+1][j] == checknum)) {
+                GameObject edge3 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                edge3.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i][j+1] == checknum)) {
+                GameObject edge4 = Instantiate(edgePrefab, new Vector3(x + 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+                edge4.transform.parent = spawnedPrefab.transform;
+            }
+        } else if (i == positions.Count - 1 && j == positions[i].Count - 1) {
+            GameObject edge1 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+            edge1.transform.parent = spawnedPrefab.transform;
+            GameObject edge2 = Instantiate(edgePrefab, new Vector3(x + 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+            edge2.transform.parent = spawnedPrefab.transform;
+            if (!(positions[i-1][j] == checknum)) {
+                GameObject edge3 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                edge3.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i][j-1] == checknum)) {
+                GameObject edge4 = Instantiate(edgePrefab, new Vector3(x - 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+                edge4.transform.parent = spawnedPrefab.transform;
+            }
+        } else if (i == 0 && j == positions[i].Count - 1) {
+            GameObject edge1 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+            edge1.transform.parent = spawnedPrefab.transform;
+            GameObject edge2 = Instantiate(edgePrefab, new Vector3(x + 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+            edge2.transform.parent = spawnedPrefab.transform;
+            if (!(positions[i+1][j] == checknum)) {
+                GameObject edge3 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                edge3.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i][j-1] == checknum)) {
+                GameObject edge4 = Instantiate(edgePrefab, new Vector3(x - 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+                edge4.transform.parent = spawnedPrefab.transform;
+            }
+        } else if (i == positions.Count - 1 && j == 0) {
+            GameObject edge1 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+            edge1.transform.parent = spawnedPrefab.transform;
+            GameObject edge2 = Instantiate(edgePrefab, new Vector3(x - 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+            edge2.transform.parent = spawnedPrefab.transform;
+            if (!(positions[i-1][j] == checknum)) {
+                GameObject edge3 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                edge3.transform.parent = spawnedPrefab.transform;
+            }
+            if (!(positions[i][j+1] == checknum)) {
+                GameObject edge4 = Instantiate(edgePrefab, new Vector3(x + 0.45f, 0.1f, z), Quaternion.Euler(0f, 90f, 0f));
+                edge4.transform.parent = spawnedPrefab.transform;
+            }
+        }
+    }
 
     private void Start()
     {
         balus = GameObject.FindGameObjectWithTag("Balus");
+        edgePrefab = GameObject.Find("DeceBalus_Grouped_Glass_Edge");
         gameManager = balus.GetComponent<GameManager>();
         if (gameManager.isDataDownloaded) {
             jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
@@ -47,7 +180,23 @@ public class GroundRenderer : MonoBehaviour
             for (int j = 0; j < row.Count; j++)
             {
                 int hasPrefab = row[j];
-                if (hasPrefab == 1)
+                float x = j - 2;
+                float z = i * prefabSpacing;
+                Vector3 spawnPosition = new Vector3(x, 0f, z);
+                if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition)) {
+                    GameObject spawnedPrefab = Instantiate(prefabs[hasPrefab], spawnPosition, Quaternion.identity);
+                    spawnedPrefabs.Add(spawnedPrefab);
+                    prefabPositions.Add(spawnPosition, spawnedPrefab);
+                    if (hasPrefab == 4) {
+                        HandleAllCases(spawnedPrefab, spawnPosition, positions, 4, i, j, x, z);
+                    } else if (hasPrefab == 5) {
+                        HandleAllCases(spawnedPrefab, spawnPosition, positions, 5, i, j, x, z);
+                    } else if (hasPrefab == 6) {
+                        HandleAllCases(spawnedPrefab, spawnPosition, positions, 6, i, j, x, z);
+                    }
+                }
+
+                /* if (hasPrefab == 1)
                 {
                     float x = j - 2;
                     float z = i * prefabSpacing;
@@ -80,7 +229,7 @@ public class GroundRenderer : MonoBehaviour
                         spawnedPrefabs.Add(spawnedPrefab);
                         prefabPositions.Add(spawnPosition, spawnedPrefab);
                     }
-                }
+                } */
             }
         }
     }
@@ -97,7 +246,21 @@ public class GroundRenderer : MonoBehaviour
             for (int j = 0; j < row.Count; j++)
             {
                 int hasPrefab = row[j];
-                if (hasPrefab == 1)
+                float x = j - 2;
+                Vector3 spawnPosition = new Vector3(x, 0f, z);
+                if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition)) {
+                    GameObject spawnedPrefab = Instantiate(prefabs[hasPrefab], spawnPosition, Quaternion.identity);
+                    spawnedPrefabs.Add(spawnedPrefab);
+                    prefabPositions.Add(spawnPosition, spawnedPrefab);
+                    if (hasPrefab == 4) {
+                        HandleAllCases(spawnedPrefab, spawnPosition, positions, 4, i, j, x, z);
+                    } else if (hasPrefab == 5) {
+                        HandleAllCases(spawnedPrefab, spawnPosition, positions, 5, i, j, x, z);
+                    } else if (hasPrefab == 6) {
+                        HandleAllCases(spawnedPrefab, spawnPosition, positions, 6, i, j, x, z);
+                    }
+                }
+                /* if (hasPrefab == 1)
                 {
                     float x = j - 2;
                     Vector3 spawnPosition = new Vector3(x, 0f, z);
@@ -127,7 +290,7 @@ public class GroundRenderer : MonoBehaviour
                         spawnedPrefabs.Add(spawnedPrefab);
                         prefabPositions.Add(spawnPosition, spawnedPrefab);
                     }
-                }
+                } */
             }
         }
 

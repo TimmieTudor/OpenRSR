@@ -18,9 +18,7 @@ public class EnemyPositionsData
 
 public class EnemyRenderer : MonoBehaviour
 {
-    public GameObject prefab;
-    public GameObject prefab2;
-    public GameObject prefab3;
+    public List<GameObject> prefabs = new List<GameObject>();
     public string jsonFilePath;
     public float prefabSpacing = 1f;
     public float destroyDistance = 10f; // maximum distance between Balus and prefab to destroy it
@@ -48,6 +46,16 @@ public class EnemyRenderer : MonoBehaviour
             for (int j = 0; j < row.Count; j++)
             {
                 int hasPrefab = row[j];
+                float x = j - 2;
+                float z = i * prefabSpacing;
+                Vector3 spawnPosition = new Vector3(x, 0.55f, z);
+                if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition))
+                {
+                    GameObject spawnedPrefab = Instantiate(prefabs[hasPrefab], spawnPosition, Quaternion.identity);
+                    spawnedPrefabs.Add(spawnedPrefab);
+                    prefabPositions.Add(spawnPosition, spawnedPrefab);
+                }
+                /*
                 if (hasPrefab == 1)
                 {
                     float x = j - 2;
@@ -79,7 +87,7 @@ public class EnemyRenderer : MonoBehaviour
                         spawnedPrefabs.Add(spawnedPrefab);
                         prefabPositions.Add(spawnPosition, spawnedPrefab);
                     }
-                }
+                } */
             }
         }
     }
@@ -95,6 +103,15 @@ public class EnemyRenderer : MonoBehaviour
             for (int j = 0; j < row.Count; j++)
             {
                 int hasPrefab = row[j];
+                float x = j - 2;
+                Vector3 spawnPosition = new Vector3(x, 0.55f, z);
+                if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition))
+                {
+                    GameObject spawnedPrefab = Instantiate(prefabs[hasPrefab], spawnPosition, Quaternion.identity);
+                    spawnedPrefabs.Add(spawnedPrefab);
+                    prefabPositions.Add(spawnPosition, spawnedPrefab);
+                }
+                /*
                 if (hasPrefab == 1)
                 {
                     float x = j - 2;
@@ -123,7 +140,7 @@ public class EnemyRenderer : MonoBehaviour
                         spawnedPrefabs.Add(spawnedPrefab);
                         prefabPositions.Add(spawnPosition, spawnedPrefab);
                     }
-                }
+                } */
             }
         }
         
