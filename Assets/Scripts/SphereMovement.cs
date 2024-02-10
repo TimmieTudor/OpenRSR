@@ -84,8 +84,6 @@ public class SphereMovement : MonoBehaviour
             } else if (normalTile == null && glassTile != null) {
                 exponential_falus();
             } */
-        } else {
-            transform.position = new Vector3(0f, 0.5f, 0f);
         }
     }
 

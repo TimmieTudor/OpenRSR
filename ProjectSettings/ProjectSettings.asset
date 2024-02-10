@@ -160,6 +160,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
     Android: com.ComradeCat.DeceBalus
+    Standalone: com.ComradeCat.DeceBalus
   buildNumber:
     Bratwurst: 0
     Standalone: 0
