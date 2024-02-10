@@ -118,6 +118,7 @@ public class GameManager : MonoBehaviour
             sphm.enabled = false;
             sphd.enabled = false;
             themeChanger2.enabled = true;
+            GFreeze.enabled = true;
         }
         else
         {
