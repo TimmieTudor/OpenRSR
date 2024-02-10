@@ -37,31 +37,36 @@ public class GameFreeze : MonoBehaviour
         }
         else
         {
-            sphm.enabled = true;
-            sphd.enabled = true;
+            //sphm.enabled = true;
+            //sphd.enabled = true;
             pausedText.SetActive(false);
             editButton.SetActive(false);
         }
 
-        if (Input.GetMouseButton(0))
-        {
-            // gamePaused = false;
-            timer += 0.01f;
-        }
-        if (!Input.GetMouseButton(0)) {
-            timer = 0f;
-        }
-        if (timer >= 1f) {
-            gamePaused = false;
-            audioPlayer.PlayAudio();
-            sphm.enabled = true;
-            sphd.enabled = true;
+        if (!manager.isGameOver) {
+            if (Input.GetMouseButton(0))
+            {
+                // gamePaused = false;
+                timer += 0.01f;
+            }
+            if (!Input.GetMouseButton(0)) {
+                timer = 0f;
+            }
+            if (timer >= 1f) {
+                gamePaused = false;
+                manager.isGamePaused = false;
+                audioPlayer.PlayAudio();
+                sphm.enabled = true;
+                sphd.enabled = true;
+            }
         }
     }
 
     public void PauseGame()
     {
         gamePaused = true;
+        sphm.enabled = false;
+        sphd.enabled = false;
         timer = 0f;
         audioPlayer.PauseAudio();
     }

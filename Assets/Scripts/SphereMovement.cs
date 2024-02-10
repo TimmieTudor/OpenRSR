@@ -63,7 +63,8 @@ public class SphereMovement : MonoBehaviour
     {
         //Debug.Log(manager.isGamePaused);
         //Debug.Log(manager.isGameOver);
-        if (!manager.isGamePaused) {
+        if (!manager.isGamePaused && !manager.isGameOver) {
+            Debug.Log("Running");
             // Create a Vector3 for the movement of the sphere
             Vector3 direction = Vector3.forward;
             Vector3 movement = direction.normalized * speed;
@@ -84,6 +85,8 @@ public class SphereMovement : MonoBehaviour
             } else if (normalTile == null && glassTile != null) {
                 exponential_falus();
             } */
+        } else {
+            transform.position = new Vector3(0f, 0.5f, 0f);
         }
     }
 

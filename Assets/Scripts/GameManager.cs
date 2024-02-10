@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
             gre.enabled = true;
             ere.enabled = true;
             themeChanger.enabled = true;
-            sphm.enabled = false;
+            sphm.enabled = true;
             sphd.enabled = true;
             themeChanger2.enabled = true;
         }
@@ -101,15 +101,22 @@ public class GameManager : MonoBehaviour
         }
         isGamePaused = GFreeze.gamePaused;
         
-        if (isDataDownloaded && !isGameOver)
+        if (isDataDownloaded && !isGameOver && !isGamePaused)
         {
             gre.enabled = true;
             ere.enabled = true;
             themeChanger.enabled = true;
-            sphm.enabled = true;
+            //sphm.enabled = false;
             GFreeze.enabled = true;
             isGamePaused = GFreeze.gamePaused;
-            sphd.enabled = true;
+            //sphd.enabled = true;
+            themeChanger2.enabled = true;
+        } else if (isDataDownloaded && isGamePaused) {
+            gre.enabled = true;
+            ere.enabled = true;
+            themeChanger.enabled = true;
+            sphm.enabled = false;
+            sphd.enabled = false;
             themeChanger2.enabled = true;
         }
         else
@@ -172,16 +179,17 @@ public class GameManager : MonoBehaviour
         sphm.enabled = false;
         CFollow.enabled = false;
         GFreeze.PauseGame();
-        GFreeze.enabled = false;
+        isGamePaused = GFreeze.gamePaused;
+        //GFreeze.enabled = false;
         audioPlayer.PauseAudio();
-        rb.isKinematic = true;
+        //rb.isKinematic = true;
     }
 
     public void RestartGame()
     {
         sphm.isJumping = false;
-        sphm.enabled = false;
-        sphd.enabled = false;
+        //sphm.enabled = false;
+        //sphd.enabled = false;
         CFollow.enabled = false;
         gre.enabled = false;
         ere.enabled = false;
@@ -195,18 +203,19 @@ public class GameManager : MonoBehaviour
         gre.clearPrefabPositions();
         ere.clearPrefabPositions();
         GFreeze.enabled = true;
-        Time.timeScale = 1f;
+        //Time.timeScale = 1f;
         sphd.enabled = true;
         CFollow.enabled = true;
         audioPlayer.SeekToZero();
         themeChanger.themeID = 0;
+        GFreeze.PauseGame();
         
-        sphm.enabled = true;
-        sphm.ClearFallingObstacles();
         //rb.velocity = Vector3.zero;
+        //rb.isKinematic = false;
         balus.transform.position = new Vector3(0f, 0.5f, 0f);
+        //sphm.enabled = true;
+        sphm.ClearFallingObstacles();
         isGameOver = false;
-        rb.isKinematic = false;
     }
 
     private void LoadData()

@@ -5,10 +5,12 @@ public class SphereDragger : MonoBehaviour
     private bool isDragging = false;
     private Rigidbody rb;
     private float screenWidth;
+    private GameManager manager;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        manager = GetComponent<GameManager>();
         screenWidth = Screen.width;
     }
 
@@ -24,8 +26,9 @@ public class SphereDragger : MonoBehaviour
 
     private void Update()
     {
-        if (isDragging)
+        if (isDragging && !manager.isGamePaused && !manager.isGameOver)
         {
+            Debug.Log("Dragging");
             screenWidth = Screen.width;
             // Get the current mouse position and convert it to world coordinates
             Vector3 mousePos = Input.mousePosition;
