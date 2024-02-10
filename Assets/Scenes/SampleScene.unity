@@ -1633,11 +1633,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 195022811}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a9cd03245369c1646aee537f69c49424, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gamePaused: 1
   balus: {fileID: 1512909149}
 --- !u!114 &195022818
 MonoBehaviour:
@@ -12010,7 +12011,9 @@ MonoBehaviour:
   GFreeze: {fileID: 195022817}
   CFollow: {fileID: 963194229}
   ere: {fileID: 195022814}
+  isGameOver: 0
   isDataDownloaded: 0
+  isGamePaused: 1
 --- !u!114 &1512909159
 MonoBehaviour:
   m_ObjectHideFlags: 0

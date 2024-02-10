@@ -35,4 +35,6 @@ You can download the game, but it's full of bugs and still unfinished, so I don'
 - [x] Improve the touch input for mobile devices
 - [x] Fix the jump script code entirely
 - [x] Add animations to obstacles
-- [ ] Add the option to save and load levels from zip files
+- [ ] Add movers
+- [ ] Add the option to import a level without having to move the level files manually
+- [ ] Add an in-game theme editor, to make it easier to create custom themes
