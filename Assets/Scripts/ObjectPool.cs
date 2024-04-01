@@ -8,6 +8,7 @@ public class ObjectPool : MonoBehaviour
 
     private Dictionary<GameObject, Queue<GameObject>> pooledObjects = new Dictionary<GameObject, Queue<GameObject>>();
     private Dictionary<GameObject, HashSet<GameObject>> activeObjects = new Dictionary<GameObject, HashSet<GameObject>>();
+    private Dictionary<GameObject, int> maxPoolSizes = new Dictionary<GameObject, int>();
     private int maxPoolSize = 200; // Set a maximum pool size
     private List<Vector3> ObstaclePoses = new List<Vector3>();
 
@@ -62,7 +63,7 @@ public class ObjectPool : MonoBehaviour
             } else {
                 return GetPrefab(prefab, spawnPosition);
             }
-        } else if (pooledObjects[prefab].Count + activeObjects[prefab].Count < maxPoolSize) {
+        } else if (pooledObjects[prefab].Count + activeObjects[prefab].Count < maxPoolSizes[prefab]) {
             GameObject newObject = Instantiate(prefab, spawnPosition, Quaternion.identity);
             if (newObject.name.Contains("(Clone)")) {
                 newObject.name = prefab.name;
@@ -106,6 +107,37 @@ public class ObjectPool : MonoBehaviour
             activeObjects[prefab].Remove(objectToReturn);
 
             //Debug.Log($"Returned {objectToReturn.name} to pool. Current pool count: {pooledObjects[prefab].Count}");
+        }
+    }
+
+    public void InitializePools(List<GameObject> prefabs1, List<GameObject> prefabs2, GeoBufferJson geoBufferJson) {
+        int i = 1;
+        while (i < geoBufferJson.ground.Count) {
+            GameObject prefab = prefabs1[i];
+            if (pooledObjects.ContainsKey(prefab)) {
+                i++;
+                continue;
+            }
+            pooledObjects.Add(prefab, new Queue<GameObject>());
+            activeObjects.Add(prefab, new HashSet<GameObject>());
+            maxPoolSizes.Add(prefab, geoBufferJson.ground[i]);
+
+            i++;
+        }
+
+        int j = 1;
+
+        while (j < geoBufferJson.enemies.Count) {
+            GameObject prefab = prefabs2[j];
+            if (pooledObjects.ContainsKey(prefab)) {
+                j++;
+                continue;
+            }
+            pooledObjects.Add(prefab, new Queue<GameObject>());
+            activeObjects.Add(prefab, new HashSet<GameObject>());
+            maxPoolSizes.Add(prefab, geoBufferJson.enemies[j]);
+
+            j++;
         }
     }
 

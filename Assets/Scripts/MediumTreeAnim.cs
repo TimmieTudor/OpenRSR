@@ -22,7 +22,92 @@ public class MediumTreeAnim : MonoBehaviour
     void Start()
     {
         Transform stemTransform = gameObject.transform.Find("DeceBalus_Tree_Stem");
-        ResetAnimation(stemTransform.position);
+        Transform part2Transform = gameObject.transform.Find("DeceBalus_Tree_Part2");
+        Transform part3Transform = gameObject.transform.Find("DeceBalus_Tree_Part3");
+        Transform part4Transform = gameObject.transform.Find("DeceBalus_Tree_Part4");
+        Transform part5Transform = gameObject.transform.Find("DeceBalus_Tree_Part5");
+        GameObject stemObject = stemTransform.gameObject;
+        GameObject part2Object = part2Transform.gameObject;
+        GameObject part3Object = part3Transform.gameObject;
+        GameObject part4Object = part4Transform.gameObject;
+        GameObject part5Object = part5Transform.gameObject;
+        Frame stemInitialFrame = new Frame(new Vector3(stemObject.transform.position.x, -0.6f, stemObject.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), stemObject);
+        frames = new List<Frame>();
+        frames.Add(stemInitialFrame);
+        frames.Add(stemInitialFrame);
+        float YPos = stemInitialFrame.position.y;
+        for (int i = 0; i < 20; i++) {
+            YPos += 0.6f / 20f;
+            frames.Add(new Frame(new Vector3(stemObject.transform.position.x, YPos, stemObject.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), stemObject));
+        }
+        for (int i = 0; i < 100; i++) {
+            frames.Add(new Frame(new Vector3(stemObject.transform.position.x, YPos, stemObject.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), stemObject));
+        }
+        Frame part2InitialFrame = new Frame(new Vector3(part2Object.transform.position.x, -1f, part2Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part2Object);
+        frames2 = new List<Frame>();
+        frames2.Add(part2InitialFrame);
+        frames2.Add(part2InitialFrame);
+        float part2YPos = part2InitialFrame.position.y;
+        for (int i = 0; i < 20; i++) {
+            part2YPos += 0.6f / 20f;
+            frames2.Add(new Frame(new Vector3(part2Object.transform.position.x, part2YPos, part2Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part2Object));
+        }
+        for (int i = 0; i < 100; i++) {
+            frames2.Add(new Frame(new Vector3(part2Object.transform.position.x, part2YPos, part2Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part2Object));
+        }
+        Frame part3InitialFrame = new Frame(new Vector3(part3Object.transform.position.x, -1.39f, part3Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part3Object);
+        frames3 = new List<Frame>();
+        frames3.Add(part3InitialFrame);
+        frames3.Add(part3InitialFrame);
+        float part3YPos = part3InitialFrame.position.y;
+        for (int i = 0; i < 20; i++) {
+            part3YPos += 0.6f / 20f;
+            frames3.Add(new Frame(new Vector3(part3Object.transform.position.x, part3YPos, part3Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part3Object));
+        }
+        for (int i = 0; i < 20; i++) {
+            part3YPos += 0.39f / 20f;
+            frames3.Add(new Frame(new Vector3(part3Object.transform.position.x, part3YPos, part3Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part3Object));
+        }
+        for (int i = 0; i < 80; i++) {
+            frames3.Add(new Frame(new Vector3(part3Object.transform.position.x, part3YPos, part3Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part3Object));
+        }
+        Frame part4InitialFrame = new Frame(new Vector3(part4Object.transform.position.x, -1.78f, part4Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part4Object);
+        frames4 = new List<Frame>();
+        frames4.Add(part4InitialFrame);
+        frames4.Add(part4InitialFrame);
+        float part4YPos = part4InitialFrame.position.y;
+        for (int i = 0; i < 20; i++) {
+            part4YPos += 0.6f / 20f;
+            frames4.Add(new Frame(new Vector3(part4Object.transform.position.x, part4YPos, part4Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part4Object));
+        }
+        for (int i = 0; i < 40; i++) {
+            part4YPos += 0.39f / 20f;
+            frames4.Add(new Frame(new Vector3(part4Object.transform.position.x, part4YPos, part4Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part4Object));
+        }
+        for (int i = 0; i < 60; i++) {
+            frames4.Add(new Frame(new Vector3(part4Object.transform.position.x, part4YPos, part4Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part4Object));
+        }
+        Frame part5InitialFrame = new Frame(new Vector3(part5Object.transform.position.x, -2.17f, part5Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part5Object);
+        frames5 = new List<Frame>();
+        frames5.Add(part5InitialFrame);
+        frames5.Add(part5InitialFrame);
+        float part5YPos = part5InitialFrame.position.y;
+        for (int i = 0; i < 20; i++) {
+            part5YPos += 0.6f / 20f;
+            frames5.Add(new Frame(new Vector3(part5Object.transform.position.x, part5YPos, part5Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part5Object));
+        }
+        for (int i = 0; i < 60; i++) {
+            part5YPos += 0.39f / 20f;
+            frames5.Add(new Frame(new Vector3(part5Object.transform.position.x, part5YPos, part5Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part5Object));
+        }
+        for (int i = 0; i < 40; i++) {
+            frames5.Add(new Frame(new Vector3(part5Object.transform.position.x, part5YPos, part5Object.transform.position.z), Quaternion.Euler(new Vector3(0f, 0f, 0f)), new Vector3(1f, 1f, 1f), part5Object));
+        }
+        animator = new FrameAnim(frames);
+        animator2 = new FrameAnim(frames2);
+        animator3 = new FrameAnim(frames3);
+        animator4 = new FrameAnim(frames4);
+        animator5 = new FrameAnim(frames5);
     }
 
     public void ResetAnimation(Vector3 newPos) {

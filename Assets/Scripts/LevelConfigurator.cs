@@ -16,6 +16,12 @@ public class LevelConfigJson {
     public bool end_portal;
 }
 
+[System.Serializable]
+public class GeoBufferJson {
+    public List<int> ground;
+    public List<int> enemies;
+}
+
 public class LevelConfigurator : MonoBehaviour
 {
     public string jsonFilePath;

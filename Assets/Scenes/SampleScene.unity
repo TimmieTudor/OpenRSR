@@ -2365,7 +2365,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jsonFilePath: LevelData/Config1
+  jsonFilePath2: LevelData/GeoBuffer1
   jsonString: 
+  jsonString2: 
   levelName: 
   levelAuthor: 
   levelSpeed: 0
@@ -18930,9 +18932,13 @@ MonoBehaviour:
   speed: 0
   isJumping: 1
   glassTiles: []
+  fallingObstacles: []
   glassGroup1: []
+  fallingObstaclesGroup1: []
   glassGroup2: []
+  fallingObstaclesGroup2: []
   glassGroup3: []
+  fallingObstaclesGroup3: []
 --- !u!54 &1512909151
 Rigidbody:
   m_ObjectHideFlags: 0

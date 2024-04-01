@@ -321,55 +321,61 @@ public class SphereMovement : MonoBehaviour
         } else if (collision.gameObject.tag == "GlassCollisionGroup1") {
             //hitGroup1 = true;
             glassTile = collision.gameObject;
-            foreach (GameObject m_GlassTile in glassGroup1) {
-                if (m_GlassTile == null) continue;
-                if (!glassTiles.Contains(m_GlassTile)) {
-                    glassTiles.Add(m_GlassTile);
+            if (transform.position.z - collision.gameObject.transform.position.z > 0.49f) {
+                foreach (GameObject m_GlassTile in glassGroup1) {
+                    if (m_GlassTile == null) continue;
+                    if (!glassTiles.Contains(m_GlassTile)) {
+                        glassTiles.Add(m_GlassTile);
+                    }
                 }
-            }
-            foreach (GameObject m_Riser in fallingObstaclesGroup1) {
-                if (m_Riser == null) continue;
-                fallingObstacles.Add(m_Riser);
+                foreach (GameObject m_Riser in fallingObstaclesGroup1) {
+                    if (m_Riser == null) continue;
+                    fallingObstacles.Add(m_Riser);
+                }
             }
             normalTile = collision.gameObject;
             rb.useGravity = false;
-            collisionZ = collision.gameObject.transform.position.z + 0.25f;
+            collisionZ = collision.gameObject.transform.position.z + 0.2f;
             hitGroup1 = false;
             rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         } else if (collision.gameObject.tag == "GlassCollisionGroup2") {
             //hitGroup2 = true;
             glassTile = collision.gameObject;
-            foreach (GameObject m_GlassTile in glassGroup2) {
-                if (m_GlassTile == null) continue;
-                if (!glassTiles.Contains(m_GlassTile)) {
-                    glassTiles.Add(m_GlassTile);
+            if (transform.position.z - collision.gameObject.transform.position.z > 0.49f) {
+                foreach (GameObject m_GlassTile in glassGroup2) {
+                    if (m_GlassTile == null) continue;
+                    if (!glassTiles.Contains(m_GlassTile)) {
+                        glassTiles.Add(m_GlassTile);
+                    }
                 }
-            }
-            foreach (GameObject m_Riser in fallingObstaclesGroup2) {
-                if (m_Riser == null) continue;
-                fallingObstacles.Add(m_Riser);
+                foreach (GameObject m_Riser in fallingObstaclesGroup2) {
+                    if (m_Riser == null) continue;
+                    fallingObstacles.Add(m_Riser);
+                }
             }
             normalTile = collision.gameObject;
             rb.useGravity = false;
-            collisionZ = collision.gameObject.transform.position.z + 0.25f;
+            collisionZ = collision.gameObject.transform.position.z + 0.2f;
             hitGroup2 = false;
             rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         } else if (collision.gameObject.tag == "GlassCollisionGroup3") {
             //hitGroup3 = true;
             glassTile = collision.gameObject;
-            foreach (GameObject m_GlassTile in glassGroup3) {
-                if (m_GlassTile == null) continue;
-                if (!glassTiles.Contains(m_GlassTile)) {
-                    glassTiles.Add(m_GlassTile);
+            if (transform.position.z - collision.gameObject.transform.position.z > 0.49f) {
+                foreach (GameObject m_GlassTile in glassGroup3) {
+                    if (m_GlassTile == null) continue;
+                    if (!glassTiles.Contains(m_GlassTile)) {
+                        glassTiles.Add(m_GlassTile);
+                    }
                 }
-            }
-            foreach (GameObject m_Riser in fallingObstaclesGroup3) {
-                if (m_Riser == null) continue;
-                fallingObstacles.Add(m_Riser);
+                foreach (GameObject m_Riser in fallingObstaclesGroup3) {
+                    if (m_Riser == null) continue;
+                    fallingObstacles.Add(m_Riser);
+                }
             }
             normalTile = collision.gameObject;
             rb.useGravity = false;
-            collisionZ = collision.gameObject.transform.position.z + 0.25f;
+            collisionZ = collision.gameObject.transform.position.z + 0.2f;
             hitGroup3 = false;
             rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         } else {

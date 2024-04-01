@@ -6,6 +6,7 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Newtonsoft.Json;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class GameManager : MonoBehaviour
     public GroundRenderer gre;
     public GameFreeze GFreeze;
     public CameraFollow CFollow;
+    public string geoBufferJsonFilePath = "LevelData/GeoBuffer1.json";
     private GameObject percentTextLabel;
     private TextMeshProUGUI percentTextMesh;
     private string realPercent;
@@ -36,6 +38,7 @@ public class GameManager : MonoBehaviour
     public bool isDeathDisabled = false;
     private IEnumerator updateCacheCoroutine;
     private ObjectPool objectPool;
+    private GeoBufferJson geoBufferJson;
 
     IEnumerator UpdateCache()
     {
@@ -74,6 +77,7 @@ public class GameManager : MonoBehaviour
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies1.json")) 
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes1.json")) 
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config1.json"))
+        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer1.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "ThemeData/ThemeData.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background1.png"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background2.png"))
@@ -111,6 +115,9 @@ public class GameManager : MonoBehaviour
             sphm.enabled = true;
             sphd.enabled = true;
             themeChanger2.enabled = true;
+            string jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
+            geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(jsonString);
+            objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
         }
         else 
         {
@@ -122,6 +129,9 @@ public class GameManager : MonoBehaviour
             sphd.enabled = false;
             themeChanger2.enabled = false;
             LoadData();
+            string jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
+            geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(jsonString);
+            objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
             isDataDownloadedCache = false;
             isDataDownloaded = true;
         }
@@ -135,6 +145,7 @@ public class GameManager : MonoBehaviour
             && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies1.json")) 
             && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes1.json")) 
             && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config1.json"))
+            && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer1.json"))
             && File.Exists(Path.Combine(Application.persistentDataPath, "ThemeData/ThemeData.json"))
             && File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background1.png"))
             && File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background2.png"))
@@ -273,6 +284,9 @@ public class GameManager : MonoBehaviour
     {
         sphm.isJumping = false;
         objectPool.ClearAllPools();
+        string jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
+        geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(jsonString);
+        objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
         //sphm.enabled = false;
         //sphd.enabled = false;
         //CFollow.enabled = false;
@@ -310,6 +324,7 @@ public class GameManager : MonoBehaviour
         TextAsset theme1 = Resources.Load<TextAsset>("LevelData/Themes1");
         TextAsset theme2 = Resources.Load<TextAsset>("ThemeData/ThemeData");
         TextAsset config1 = Resources.Load<TextAsset>("LevelData/Config1");
+        TextAsset geoBuffer1 = Resources.Load<TextAsset>("LevelData/GeoBuffer1");
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "LevelData"));
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "ThemeData"));
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Backgrounds"));
@@ -329,6 +344,9 @@ public class GameManager : MonoBehaviour
         StreamWriter configWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Config1.json"));
         configWriter.Write(config1.text);
         configWriter.Close();
+        StreamWriter geoBufferWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer1.json"));
+        geoBufferWriter.Write(geoBuffer1.text);
+        geoBufferWriter.Close();
         Texture2D background1 = Resources.Load<Texture2D>("Backgrounds/Background1");
         byte[] data = background1.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Backgrounds/Background1.png"), data);
