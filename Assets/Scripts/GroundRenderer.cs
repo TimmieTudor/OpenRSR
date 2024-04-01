@@ -263,6 +263,11 @@ public class GroundRenderer : MonoBehaviour
                 if (sphm.glassTiles.Contains(glassTileCollision)) {
                     sphm.glassTiles.Remove(glassTileCollision);
                 }
+                foreach (Transform transform in spawnedPrefab.transform) {
+                    if (transform.tag == "Edge") {
+                        Destroy(transform.gameObject);
+                    }
+                }
                 //sphm.glassTiles.Clear();
             }
             spawnedPrefab.transform.position = spawnPosition;

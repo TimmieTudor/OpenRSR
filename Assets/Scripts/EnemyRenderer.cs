@@ -133,22 +133,20 @@ public class EnemyRenderer : MonoBehaviour
         if (hasPrefab != 0) {
             GameObject spawnedPrefab = objectPool.GetPrefab(prefabs[hasPrefab], spawnPosition);
             if (sphm.fallingObstaclesGroup1.Contains(spawnedPrefab)) {
-                Debug.Log("Yes1");
                 sphm.fallingObstaclesGroup1.Remove(spawnedPrefab);
                 sphm.fallingObstaclesGroup1.Clear();
             } else if (sphm.fallingObstaclesGroup2.Contains(spawnedPrefab)) {
-                Debug.Log("Yes2");
                 sphm.fallingObstaclesGroup2.Remove(spawnedPrefab);
                 sphm.fallingObstaclesGroup2.Clear();
             } else if (sphm.fallingObstaclesGroup3.Contains(spawnedPrefab)) {
-                Debug.Log("Yes3");
                 sphm.fallingObstaclesGroup3.Remove(spawnedPrefab);
                 sphm.fallingObstaclesGroup3.Clear();
             }
             if (sphm.fallingObstacles.Contains(spawnedPrefab)) {
-                Debug.Log("Yes");
                 sphm.fallingObstacles.Remove(spawnedPrefab);
-                sphm.fallingObstacles.Clear();
+                while (sphm.fallingObstacles.Contains(spawnedPrefab)) {
+                    sphm.fallingObstacles.Remove(spawnedPrefab);
+                }
             }
             if (spawnedPrefab.TryGetComponent<RiserAnim>(out RiserAnim riserAnim)) {
                 if (riserAnim.animator == null || riserAnim.animator2 == null) {
@@ -207,8 +205,7 @@ public class EnemyRenderer : MonoBehaviour
                     goto SkipRiserAnim;
                 }
                 floaterAnim.ResetAnimation(spawnPosition);
-                GameObject part3Object = spawnedPrefab.transform.Find("DeceBalus_Floater_Part3").gameObject;
-                part3Object.transform.position = new Vector3(spawnPosition.x, part3Object.transform.position.y, spawnPosition.z);
+                
             } else if (spawnedPrefab.TryGetComponent<SpotlightAnim>(out SpotlightAnim spotlightAnim)) {
                 if (spotlightAnim.animator == null) {
                     goto SkipRiserAnim;

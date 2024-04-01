@@ -29,7 +29,7 @@ public class FloaterAnim : MonoBehaviour
         part1Object = part1Transform.gameObject;
         part2Object = part2Transform.gameObject;
         part3Object = part3Transform.gameObject;
-        part3Object.transform.position = new Vector3(newPos.x, 2f, newPos.z);
+        
         Frame part1InitialFrame = new Frame(new Vector3(newPos.x, 0f, newPos.z), Quaternion.identity, new Vector3(1f, 1f, 1f), part1Object);
         Frame part2InitialFrame = new Frame(new Vector3(newPos.x, 0f, newPos.z), Quaternion.identity, new Vector3(1f, 1f, 1f), part2Object);
         frames = new List<Frame>();

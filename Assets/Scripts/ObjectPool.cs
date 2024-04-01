@@ -113,12 +113,18 @@ public class ObjectPool : MonoBehaviour
     {
         if (pooledObjects.ContainsKey(prefab))
         {
+            foreach (GameObject obj in pooledObjects[prefab]) {
+                Destroy(obj);
+            }
             pooledObjects[prefab].Clear();
             activeObjects[prefab].Clear();
         }
     }
     public void ClearAllPools() {
         foreach (GameObject prefab in pooledObjects.Keys) {
+            foreach (GameObject obj in pooledObjects[prefab]) {
+                Destroy(obj);
+            }
             pooledObjects[prefab].Clear();
             activeObjects[prefab].Clear();
         }

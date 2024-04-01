@@ -508,8 +508,7 @@ public class SphereMovement : MonoBehaviour
                 foreach (Frame frame in floaterAnim.animator2.frames) {
                     frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
                 }
-                GameObject part3Object = riser.transform.Find("DeceBalus_Floater_Part3").gameObject;
-                part3Object.transform.position = new Vector3(part3Object.transform.position.x, part3Object.transform.position.y - 0.0625f, part3Object.transform.position.z);
+                
             } else if (riser.TryGetComponent<SpotlightAnim>(out SpotlightAnim spotlightAnim)) {
                 foreach (Frame frame in spotlightAnim.animator.frames) {
                     frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
