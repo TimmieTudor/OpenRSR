@@ -54,6 +54,7 @@ public class ThemeChanger : MonoBehaviour
     private GameManager gameManager;
     private string jsonString;
     private GameObject balus;
+    private bool shouldUpdateTheme = true;
     
     private void Start()
     {
@@ -96,17 +97,25 @@ public class ThemeChanger : MonoBehaviour
         }
     }
 
+    public void UpdateTheme(int themeID) {
+        shouldUpdateTheme = true;
+        this.themeID = themeID;
+    }
+
     private void Update() {
-        Theme currentTheme = themes[themeID];
-        Renderer balusRenderer = balus.GetComponent<Renderer>();
-        if (balusRenderer != null) {
-            balusRenderer.material.color = currentTheme.ballColor;
+        if (shouldUpdateTheme) {
+            Theme currentTheme = themes[themeID];
+            Renderer balusRenderer = balus.GetComponent<Renderer>();
+            if (balusRenderer != null) {
+                balusRenderer.material.color = currentTheme.ballColor;
+            }
+            Material backgroundMaterial = GameObject.Find("Background").GetComponent<Renderer>().sharedMaterial;
+            backgroundMaterial.mainTexture = currentTheme.background;
+            Material enemyMaterial = GameObject.Find("Base_2").GetComponent<Renderer>().sharedMaterial;
+            enemyMaterial.mainTexture = currentTheme.enemy;
+            Material generalMaterial = GameObject.Find("DeceBalus_Normal_Tile").transform.GetChild(1).gameObject.GetComponent<Renderer>().sharedMaterial;
+            generalMaterial.mainTexture = currentTheme.general;
+            shouldUpdateTheme = false;
         }
-        Material backgroundMaterial = GameObject.Find("Background").GetComponent<Renderer>().sharedMaterial;
-        backgroundMaterial.mainTexture = currentTheme.background;
-        Material enemyMaterial = GameObject.Find("Base_2").GetComponent<Renderer>().sharedMaterial;
-        enemyMaterial.mainTexture = currentTheme.enemy;
-        Material generalMaterial = GameObject.Find("DeceBalus_Normal_Tile").GetComponent<Renderer>().sharedMaterial;
-        generalMaterial.mainTexture = currentTheme.general;
     }
 }

@@ -22,6 +22,8 @@ public class SliderUtils : MonoBehaviour
     }
 
     void SliderValueChanged(Slider slider) {
+        levelConfig.levelSpeedInput.text = slider.value.ToString();
         m_SphereMovement.speed = slider.value;
+        levelConfig.levelSpeed = slider.value;
     }
 }

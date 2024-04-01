@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
@@ -18,16 +19,32 @@ public class GroundRenderer : MonoBehaviour
     public List<GameObject> prefabs = new List<GameObject>();
     public string jsonFilePath;
     public float prefabSpacing = 1f;
-    public float destroyDistance = 10f; // maximum distance between Balus and prefab to destroy it
+    public float destroyDistance = 12f; // maximum distance between Balus and prefab to destroy it
     public int positionsCount;
 
     private List<GameObject> spawnedPrefabs = new List<GameObject>();
+    private List<int> spawnedPrefabIDs = new List<int>();
     private GameObject balus;
     private Dictionary<Vector3, GameObject> prefabPositions = new Dictionary<Vector3, GameObject>();
     private GameManager gameManager;
     private string jsonString;
+    private PositionsData data;
     private GameObject edgePrefab;
+    private Vector3 lastPosition = new Vector3(0f, 0f, 0f);
+    private bool shouldSpawnPrefabCache = true;
+    private ObjectPool objectPool;
+    private SphereMovement sphm;
 
+    IEnumerator UpdateCache() {
+        while (true)
+        {
+            // Update the cached value
+            shouldSpawnPrefabCache = !shouldSpawnPrefabCache;
+
+            // Wait for a few seconds before updating again
+            yield return new WaitForSeconds(0.4f);
+        }
+    }
     private void HandleAllCases(GameObject spawnedPrefab, Vector3 spawnPosition, List<List<int>> positions, int checknum, int i, int j, float x, float z) {
         if (i > 0 && i < positions.Count - 1 && j > 0 && j < positions[i].Count - 1) {
             if (!(positions[i+1][j] == checknum)) {
@@ -163,82 +180,42 @@ public class GroundRenderer : MonoBehaviour
 
     private void Start()
     {
-        balus = GameObject.FindGameObjectWithTag("Balus");
-        edgePrefab = GameObject.Find("DeceBalus_Grouped_Glass_Edge");
-        gameManager = balus.GetComponent<GameManager>();
-        if (gameManager.isDataDownloaded) {
-            jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
-        } else {
-            jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
-        }
-        PositionsData data = JsonConvert.DeserializeObject<PositionsData>(jsonString);
-        List<List<int>> positions = data.positions;
-        positionsCount = positions.Count;
-        for (int i = 0; i < positions.Count; i++)
-        {
-            List<int> row = positions[i];
-            for (int j = 0; j < row.Count; j++)
-            {
-                int hasPrefab = row[j];
-                float x = j - 2;
-                float z = i * prefabSpacing;
-                Vector3 spawnPosition = new Vector3(x, 0f, z);
-                if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition)) {
-                    GameObject spawnedPrefab = Instantiate(prefabs[hasPrefab], spawnPosition, Quaternion.identity);
-                    spawnedPrefabs.Add(spawnedPrefab);
-                    prefabPositions.Add(spawnPosition, spawnedPrefab);
-                    if (hasPrefab == 4) {
-                        HandleAllCases(spawnedPrefab, spawnPosition, positions, 4, i, j, x, z);
-                    } else if (hasPrefab == 5) {
-                        HandleAllCases(spawnedPrefab, spawnPosition, positions, 5, i, j, x, z);
-                    } else if (hasPrefab == 6) {
-                        HandleAllCases(spawnedPrefab, spawnPosition, positions, 6, i, j, x, z);
-                    }
-                }
-
-                /* if (hasPrefab == 1)
-                {
-                    float x = j - 2;
-                    float z = i * prefabSpacing;
-                    Vector3 spawnPosition = new Vector3(x, 0f, z);
-                    if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition))
-                    {
-                        GameObject spawnedPrefab = Instantiate(prefab, spawnPosition, Quaternion.identity);
-                        spawnedPrefabs.Add(spawnedPrefab);
-                        prefabPositions.Add(spawnPosition, spawnedPrefab);
-                    }
-                }
-                else if (hasPrefab == 2)
-                {
-                    float x = j - 2;
-                    float z = i * prefabSpacing;
-                    Vector3 spawnPosition = new Vector3(x, 0f, z);
-                    if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition))
-                    {
-                        GameObject spawnedPrefab = Instantiate(prefab2, spawnPosition, Quaternion.identity);
-                        spawnedPrefabs.Add(spawnedPrefab);
-                        prefabPositions.Add(spawnPosition, spawnedPrefab);
-                    }
-                } else if (hasPrefab == 3) {
-                    float x = j - 2;
-                    float z = i * prefabSpacing;
-                    Vector3 spawnPosition = new Vector3(x, 0f, z);
-                    if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition))
-                    {
-                        GameObject spawnedPrefab = Instantiate(prefab3, spawnPosition, Quaternion.identity);
-                        spawnedPrefabs.Add(spawnedPrefab);
-                        prefabPositions.Add(spawnPosition, spawnedPrefab);
-                    }
-                } */
-            }
-        }
+        Initialize();
+        //StartCoroutine(UpdateCache());
     }
 
     private void Update()
     {
-        PositionsData data = JsonConvert.DeserializeObject<PositionsData>(jsonString);
-        List<List<int>> positions = data.positions;
-        positionsCount = positions.Count;
+        if (lastPosition.z < balus.transform.position.z) {
+            lastPosition = balus.transform.position;
+        }
+        if (ShouldSpawnPrefab(lastPosition)) {
+            UpdateGround();
+        }
+    }
+
+    private void Initialize()
+    {
+        balus = GameObject.FindGameObjectWithTag("Balus");
+        sphm = balus.GetComponent<SphereMovement>();
+        edgePrefab = GameObject.Find("DeceBalus_Grouped_Glass_Edge");
+        GameObject objPoolObject = GameObject.Find("ObjectPool");
+        objectPool = objPoolObject.GetComponent<ObjectPool>();
+        gameManager = balus.GetComponent<GameManager>();
+        jsonString = gameManager.isDataDownloaded ? File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json") : Resources.Load<TextAsset>(jsonFilePath).text;
+        data = JsonConvert.DeserializeObject<PositionsData>(jsonString);
+        positionsCount = data.positions.Count;
+        ProcessGroundPositions(data.positions);
+    }
+
+    private void UpdateGround()
+    {
+        ProcessGroundPositions(data.positions);
+        CleanupSpawnedPrefabs();
+    }
+
+    private void ProcessGroundPositions(List<List<int>> positions)
+    {
         for (int i = 0; i < positions.Count; i++)
         {
             List<int> row = positions[i];
@@ -248,75 +225,100 @@ public class GroundRenderer : MonoBehaviour
                 int hasPrefab = row[j];
                 float x = j - 2;
                 Vector3 spawnPosition = new Vector3(x, 0f, z);
-                if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition)) {
-                    GameObject spawnedPrefab = Instantiate(prefabs[hasPrefab], spawnPosition, Quaternion.identity);
-                    spawnedPrefabs.Add(spawnedPrefab);
-                    prefabPositions.Add(spawnPosition, spawnedPrefab);
-                    if (hasPrefab == 4) {
-                        HandleAllCases(spawnedPrefab, spawnPosition, positions, 4, i, j, x, z);
-                    } else if (hasPrefab == 5) {
-                        HandleAllCases(spawnedPrefab, spawnPosition, positions, 5, i, j, x, z);
-                    } else if (hasPrefab == 6) {
-                        HandleAllCases(spawnedPrefab, spawnPosition, positions, 6, i, j, x, z);
-                    }
-                }
-                /* if (hasPrefab == 1)
+                if (ShouldSpawnPrefab(spawnPosition))
                 {
-                    float x = j - 2;
-                    Vector3 spawnPosition = new Vector3(x, 0f, z);
-                    if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition))
-                    {
-                        GameObject spawnedPrefab = Instantiate(prefab, spawnPosition, Quaternion.identity);
-                        spawnedPrefabs.Add(spawnedPrefab);
-                        prefabPositions.Add(spawnPosition, spawnedPrefab);
-                    }
+                    SpawnPrefab(hasPrefab, spawnPosition, i, j, x, z);
                 }
-                else if (hasPrefab == 2)
-                {
-                    float x = j - 2;
-                    Vector3 spawnPosition = new Vector3(x, 0f, z);
-                    if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition))
-                    {
-                        GameObject spawnedPrefab = Instantiate(prefab2, spawnPosition, Quaternion.identity);
-                        spawnedPrefabs.Add(spawnedPrefab);
-                        prefabPositions.Add(spawnPosition, spawnedPrefab);
-                    }
-                } else if (hasPrefab == 3) {
-                    float x = j - 2;
-                    Vector3 spawnPosition = new Vector3(x, 0f, z);
-                    if (spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition))
-                    {
-                        GameObject spawnedPrefab = Instantiate(prefab3, spawnPosition, Quaternion.identity);
-                        spawnedPrefabs.Add(spawnedPrefab);
-                        prefabPositions.Add(spawnPosition, spawnedPrefab);
-                    }
-                } */
             }
         }
+    }
 
-        for (int i = spawnedPrefabs.Count - 1; i >= 0; i--)
+    private bool ShouldSpawnPrefab(Vector3 spawnPosition)
+    {
+        return spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition);
+    }
+
+    private void SpawnPrefab(int hasPrefab, Vector3 spawnPosition, int i, int j, float x, float z)
+    {
+        if (hasPrefab != 0) {
+            GameObject spawnedPrefab = objectPool.GetPrefab(prefabs[hasPrefab], spawnPosition);
+            if (hasPrefab == 2) {
+                GameObject jumpTileNormal = spawnedPrefab.transform.GetChild(0).gameObject;
+                GameObject jumpTileActive = spawnedPrefab.transform.GetChild(1).gameObject;
+                jumpTileActive.SetActive(false);
+                jumpTileNormal.SetActive(true);
+            } else if (hasPrefab == 3 || hasPrefab == 4 || hasPrefab == 5 || hasPrefab == 6) {
+                GameObject glassTileCollision = spawnedPrefab.transform.GetChild(0).gameObject;
+                GameObject glassTileActive = spawnedPrefab.transform.GetChild(2).gameObject;
+                GameObject glassTileNormal = spawnedPrefab.transform.GetChild(1).gameObject;
+                glassTileActive.SetActive(false);
+                glassTileNormal.SetActive(true);
+                if (sphm.glassGroup1.Contains(glassTileCollision)) {
+                    sphm.glassGroup1.Remove(glassTileCollision);
+                } else if (sphm.glassGroup2.Contains(glassTileCollision)) {
+                    sphm.glassGroup2.Remove(glassTileCollision);
+                } else if (sphm.glassGroup3.Contains(glassTileCollision)) {
+                    sphm.glassGroup3.Remove(glassTileCollision);
+                }
+                if (sphm.glassTiles.Contains(glassTileCollision)) {
+                    sphm.glassTiles.Remove(glassTileCollision);
+                }
+                //sphm.glassTiles.Clear();
+            }
+            spawnedPrefab.transform.position = spawnPosition;
+            spawnedPrefabs.Add(spawnedPrefab);
+            spawnedPrefabIDs.Add(hasPrefab);
+            prefabPositions.Add(spawnPosition, spawnedPrefab);
+            if (hasPrefab == 4) {
+                HandleAllCases(spawnedPrefab, spawnPosition, data.positions, 4, i, j, x, z);
+            } else if (hasPrefab == 5) {
+                HandleAllCases(spawnedPrefab, spawnPosition, data.positions, 5, i, j, x, z);
+            } else if (hasPrefab == 6) {
+                HandleAllCases(spawnedPrefab, spawnPosition, data.positions, 6, i, j, x, z);
+            } else if (hasPrefab == 7) {
+                if (spawnedPrefab.TryGetComponent<LeftMovingTileAnim>(out LeftMovingTileAnim leftMovingTileAnim)) {
+                    leftMovingTileAnim.xOffset = x;
+                }
+            } else if (hasPrefab == 8) {
+                if (spawnedPrefab.TryGetComponent<RightMovingTileAnim>(out RightMovingTileAnim rightMovingTileAnim)) {
+                    rightMovingTileAnim.xOffset = x;
+                }
+            }
+            lastPosition = balus.transform.position;
+        }
+    }
+
+    private void CleanupSpawnedPrefabs()
+    {
+        for (int i = 0; i < spawnedPrefabs.Count; i++)
         {
             GameObject spawnedPrefab = spawnedPrefabs[i];
-            if (spawnedPrefab == null)
+            if (spawnedPrefab == null || balus.transform.position.z - spawnedPrefab.transform.position.z >= destroyDistance)
             {
+                if (spawnedPrefab != null)
+                {
+                    objectPool.ReturnPrefab(prefabs[spawnedPrefabIDs[i]], spawnedPrefab);
+                }
                 spawnedPrefabs.RemoveAt(i);
-                continue;
-            }
-
-            if (balus.transform.position.z - spawnedPrefab.transform.position.z >= destroyDistance)
-            {
-                Destroy(spawnedPrefab);
-                spawnedPrefabs.RemoveAt(i);
+                spawnedPrefabIDs.RemoveAt(i);
             }
         }
     }
 
     public void UpdateData() {
         jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
+        data = JsonConvert.DeserializeObject<PositionsData>(jsonString);
+        positionsCount = data.positions.Count;
     }
 
-    public void clearPrefabPositions() {
+    public PositionsData GetData() {
+        return JsonConvert.DeserializeObject<PositionsData>(jsonString);
+    }
+
+    public void ClearPrefabPositions() {
         prefabPositions.Clear();
         spawnedPrefabs.Clear();
+        spawnedPrefabIDs.Clear();
+        lastPosition = new Vector3(0f, 0f, 0f);
     }
 }

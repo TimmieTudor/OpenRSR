@@ -12,8 +12,8 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: ComradeCat
-  productName: DeceBalus
+  companyName: TimmieTudor
+  productName: OpenRSR
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -137,7 +137,8 @@ PlayerSettings:
   vulkanEnableCommandBufferRecycling: 1
   loadStoreDebugModeEnabled: 0
   bundleVersion: 0.0.4
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: 11400000, guid: 4c025f9942a17e44bbbe7748ef4c713f, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -158,7 +159,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.ComradeCat.DeceBalus
+    Android: com.TimmieTudor.OpenRSR
     Standalone: com.ComradeCat.DeceBalus
   buildNumber:
     Bratwurst: 0
@@ -282,7 +283,7 @@ PlayerSettings:
   - m_BuildTarget: 
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: 818c01228ae5f7244b74827a660f6748, type: 3}
+      m_Icon: {fileID: 2800000, guid: a1ce206247855264f82be5ab031e5b89, type: 3}
       m_Width: 128
       m_Height: 128
       m_Kind: 0

@@ -18,17 +18,18 @@ public class SphereMovement : MonoBehaviour
     private GameObject jumpTile;
     private GameObject normalTile;
     private GameObject glassTile;
-    private List<GameObject> glassTiles = new List<GameObject>();
-    private List<GameObject> fallingObstacles = new List<GameObject>();
-    private List<GameObject> glassGroup1 = new List<GameObject>();
-    private List<GameObject> fallingObstaclesGroup1 = new List<GameObject>();
+    public List<GameObject> glassTiles = new List<GameObject>();
+    public List<GameObject> fallingObstacles = new List<GameObject>();
+    public List<GameObject> glassGroup1 = new List<GameObject>();
+    public List<GameObject> fallingObstaclesGroup1 = new List<GameObject>();
     private bool hitGroup1 = false;
-    private List<GameObject> glassGroup2 = new List<GameObject>();
-    private List<GameObject> fallingObstaclesGroup2 = new List<GameObject>();
+    public List<GameObject> glassGroup2 = new List<GameObject>();
+    public List<GameObject> fallingObstaclesGroup2 = new List<GameObject>();
     private bool hitGroup2 = false;
-    private List<GameObject> glassGroup3 = new List<GameObject>();
-    private List<GameObject> fallingObstaclesGroup3 = new List<GameObject>();
+    public List<GameObject> glassGroup3 = new List<GameObject>();
+    public List<GameObject> fallingObstaclesGroup3 = new List<GameObject>();
     private bool hitGroup3 = false;
+    private bool isNotFalling = true;
     private GameManager manager;
      // The z-position of the sphere when it collides with the jumpTile
     private float collisionZ;
@@ -41,10 +42,10 @@ public class SphereMovement : MonoBehaviour
         MethFunction meth = new MethFunction();
          // Modify the speed of the sphere using the MethFunction
         // pepsiSpeed = meth.piEpsilon(speed);
-        rb.MovePosition(rb.position + Vector3.back * speed * 0.025f);
+        //rb.MovePosition(rb.position + Vector3.back * speed * 0.025f);
         rb.useGravity = false;
          // Freeze the rotation of the sphere
-        rb.constraints = RigidbodyConstraints.FreezeRotation;
+        //rb.constraints = RigidbodyConstraints.FreezeRotation;
     }
 
     IEnumerator waitBeforeLoading()
@@ -53,6 +54,13 @@ public class SphereMovement : MonoBehaviour
         yield return new WaitForSeconds(1f);
         Debug.Log("Done!");
         enabled = true;
+    }
+
+    IEnumerator WaitFor(float time)
+    {
+        yield return new WaitForSeconds(time);
+        collisionZ = transform.position.z;
+        isNotFalling = false;
     }
 
     public void SetSpeed(float newSpeed) {
@@ -73,20 +81,18 @@ public class SphereMovement : MonoBehaviour
             // If the sphere is jumping, call the Jump() method
             if (jumpTile != null && isJumping)
             {
-                Jump(3.95f, jumpTile);
+                Jump(3.75f, jumpTile);
+                FallingGlass();
             }
-            else if (normalTile != null && glassTile != null && !manager.isGamePaused)
+            else if (normalTile != null && glassTile != null && !isNotFalling && !manager.isDeathDisabled)
             {
                 exponential_falus();
             } else if (glassTiles.Count > 0) {
                 FallingGlass();
-            } /*else if (normalTile != null && glassTile == null) {
-                exponential_falus();
-            } else if (normalTile == null && glassTile != null) {
-                exponential_falus();
-            } */
+            }
         } else {
-            transform.position = new Vector3(0f, 0.5f, 0f);
+            //rb.velocity = Vector3.zero;
+            //rb.position = new Vector3(0f, 0.5f, 0f);
         }
     }
 
@@ -199,51 +205,74 @@ public class SphereMovement : MonoBehaviour
     {
         try
         {
-            //Debug.Log(hitGroup1);
-            // Check if the sphere has collided with a jumpTile
-            if (collision.gameObject.tag == "JumpCollision")
-            {
-                // Set isJumping to true to indicate that the sphere is jumping 
-                isJumping = true; 
-                 // Disable gravity for the sphere 
-                rb.useGravity = false; 
-                 // Set the jumpTile to the GameObject the sphere has collided with 
-                jumpTile = collision.gameObject; 
-                 // Set the collisionZ to the z-position of the sphere 
-            }
-            else if (collision.gameObject.tag == "NormalTile")
-            {
-                normalTile = null;
-                glassTile = null;
-                collisionZ = 0f;
-                isJumping = false;
-                jumpTile = null;
-            } else if (collision.gameObject.tag == "GlassCollision") {
-                GameObject glassTileParent = collision.gameObject.transform.parent.gameObject;
-                GameObject glassTileNormal = glassTileParent.transform.GetChild(1).gameObject;
-                GameObject glassTileActive = glassTileParent.transform.GetChild(2).gameObject;
-                glassTileActive.SetActive(true);
-                glassTileNormal.SetActive(false);
-                normalTile = null;
-                glassTile = null;
-                collisionZ = 0f;
-                isJumping = false;
-                jumpTile = null;
-                GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
-                foreach (GameObject riser in risers) {
-                    if (riser.transform.position.z == glassTileParent.transform.position.z && riser.transform.position.x == glassTileParent.transform.position.x) {
-                        fallingObstacles.Add(riser);
-                    }
+            if (collision.gameObject != null && gameObject != null) {
+                isNotFalling = true;
+                // Check if the sphere has collided with a jumpTile
+                if (collision.gameObject.tag == "JumpCollision")
+                {
+                    // Set isJumping to true to indicate that the sphere is jumping 
+                    isJumping = true; 
+                    // Disable gravity for the sphere 
+                    rb.useGravity = false; 
+                    // Set the jumpTile to the GameObject the sphere has collided with 
+                    jumpTile = collision.gameObject; 
+                    // Set the collisionZ to the z-position of the sphere 
+                    collisionZ = transform.position.z;
+                    hitGroup1 = false;
+                    hitGroup2 = false;
+                    hitGroup3 = false;
                 }
-            } else if (collision.gameObject.tag == "GlassCollisionGroup1" && !hitGroup1) {
-                ActivateGlassTilesG1(collision.gameObject);
-                hitGroup1 = true;
-            } else if (collision.gameObject.tag == "GlassCollisionGroup2" && !hitGroup2) {
-                ActivateGlassTilesG2(collision.gameObject);
-                hitGroup2 = true;
-            } else if (collision.gameObject.tag == "GlassCollisionGroup3" && !hitGroup3) {
-                ActivateGlassTilesG3(collision.gameObject);
-                hitGroup3 = true;
+                else if (collision.gameObject.tag == "NormalCollision")
+                {
+                    normalTile = null;
+                    glassTile = null;
+                    collisionZ = 0f;
+                    isJumping = false;
+                    jumpTile = null;
+                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                    hitGroup1 = false;
+                    hitGroup2 = false;
+                    hitGroup3 = false;
+                } else if (collision.gameObject.tag == "GlassCollision") {
+                    GameObject glassTileParent = collision.gameObject.transform.parent.gameObject;
+                    GameObject glassTileNormal = glassTileParent.transform.GetChild(1).gameObject;
+                    GameObject glassTileActive = glassTileParent.transform.GetChild(2).gameObject;
+                    glassTileActive.SetActive(true);
+                    glassTileNormal.SetActive(false);
+                    normalTile = null;
+                    glassTile = null;
+                    collisionZ = 0f;
+                    isJumping = false;
+                    jumpTile = null;
+                    GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
+                    foreach (GameObject riser in risers) {
+                        if (riser.transform.position.z == glassTileParent.transform.position.z && riser.transform.position.x == glassTileParent.transform.position.x) {
+                            fallingObstacles.Add(riser);
+                        }
+                    }
+                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                    hitGroup1 = false;
+                    hitGroup2 = false;
+                    hitGroup3 = false;
+                } else if (collision.gameObject.tag == "GlassCollisionGroup1" && !hitGroup1) {
+                    ActivateGlassTilesG1(collision.gameObject);
+                    hitGroup1 = true;
+                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                    hitGroup2 = false;
+                    hitGroup3 = false;
+                } else if (collision.gameObject.tag == "GlassCollisionGroup2" && !hitGroup2) {
+                    ActivateGlassTilesG2(collision.gameObject);
+                    hitGroup2 = true;
+                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                    hitGroup1 = false;
+                    hitGroup3 = false;
+                } else if (collision.gameObject.tag == "GlassCollisionGroup3" && !hitGroup3) {
+                    ActivateGlassTilesG3(collision.gameObject);
+                    hitGroup3 = true;
+                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                    hitGroup1 = false;
+                    hitGroup2 = false;
+                }
             }
         } 
         catch (Exception e) 
@@ -254,7 +283,7 @@ public class SphereMovement : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
-        if (collision.gameObject.tag == "NormalTile")
+        if (collision.gameObject.tag == "NormalCollision")
         {
             normalTile = null;
             glassTile = null;
@@ -263,41 +292,40 @@ public class SphereMovement : MonoBehaviour
             normalTile = null;
             glassTile = null;
             collisionZ = 0f;
-        } else if (collision.gameObject.tag == "GlassCollisionGroup1") {
-            normalTile = null;
-            glassTile = null;
-            collisionZ = 0f;
-        } else if (collision.gameObject.tag == "GlassCollisionGroup2") {
-            normalTile = null;
-            glassTile = null;
-            collisionZ = 0f;
-        } else if (collision.gameObject.tag == "GlassCollisionGroup3") {
+        } else {
             normalTile = null;
             glassTile = null;
             collisionZ = 0f;
         }
+        isNotFalling = true;
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.tag == "NormalTile")
+        if (collision.gameObject.tag == "NormalCollision")
         {
             normalTile = collision.gameObject;
             glassTile = collision.gameObject;
             rb.useGravity = false;
-            collisionZ = collision.gameObject.transform.position.z + 0.1f;
+            collisionZ = collision.gameObject.transform.position.z;
+        } else if (collision.gameObject.tag == "JumpCollision") {
+            isJumping = true;
+            normalTile = null;
+            glassTile = null;
         } else if (collision.gameObject.tag == "GlassCollision") {
             glassTile = collision.gameObject;
             glassTiles.Add(collision.gameObject);
             normalTile = collision.gameObject;
             rb.useGravity = false;
-            collisionZ = collision.gameObject.transform.position.z + 0.1f;
+            collisionZ = collision.gameObject.transform.position.z;
         } else if (collision.gameObject.tag == "GlassCollisionGroup1") {
-            hitGroup1 = true;
+            //hitGroup1 = true;
             glassTile = collision.gameObject;
             foreach (GameObject m_GlassTile in glassGroup1) {
                 if (m_GlassTile == null) continue;
-                glassTiles.Add(m_GlassTile);
+                if (!glassTiles.Contains(m_GlassTile)) {
+                    glassTiles.Add(m_GlassTile);
+                }
             }
             foreach (GameObject m_Riser in fallingObstaclesGroup1) {
                 if (m_Riser == null) continue;
@@ -305,14 +333,17 @@ public class SphereMovement : MonoBehaviour
             }
             normalTile = collision.gameObject;
             rb.useGravity = false;
-            collisionZ = collision.gameObject.transform.position.z + 0.1f;
+            collisionZ = collision.gameObject.transform.position.z + 0.25f;
             hitGroup1 = false;
+            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         } else if (collision.gameObject.tag == "GlassCollisionGroup2") {
-            hitGroup2 = true;
+            //hitGroup2 = true;
             glassTile = collision.gameObject;
             foreach (GameObject m_GlassTile in glassGroup2) {
                 if (m_GlassTile == null) continue;
-                glassTiles.Add(m_GlassTile);
+                if (!glassTiles.Contains(m_GlassTile)) {
+                    glassTiles.Add(m_GlassTile);
+                }
             }
             foreach (GameObject m_Riser in fallingObstaclesGroup2) {
                 if (m_Riser == null) continue;
@@ -320,14 +351,17 @@ public class SphereMovement : MonoBehaviour
             }
             normalTile = collision.gameObject;
             rb.useGravity = false;
-            collisionZ = collision.gameObject.transform.position.z + 0.1f;
+            collisionZ = collision.gameObject.transform.position.z + 0.25f;
             hitGroup2 = false;
+            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         } else if (collision.gameObject.tag == "GlassCollisionGroup3") {
-            hitGroup3 = true;
+            //hitGroup3 = true;
             glassTile = collision.gameObject;
             foreach (GameObject m_GlassTile in glassGroup3) {
                 if (m_GlassTile == null) continue;
-                glassTiles.Add(m_GlassTile);
+                if (!glassTiles.Contains(m_GlassTile)) {
+                    glassTiles.Add(m_GlassTile);
+                }
             }
             foreach (GameObject m_Riser in fallingObstaclesGroup3) {
                 if (m_Riser == null) continue;
@@ -335,8 +369,14 @@ public class SphereMovement : MonoBehaviour
             }
             normalTile = collision.gameObject;
             rb.useGravity = false;
-            collisionZ = collision.gameObject.transform.position.z + 0.1f;
+            collisionZ = collision.gameObject.transform.position.z + 0.25f;
             hitGroup3 = false;
+            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+        } else {
+            rb.MovePosition(rb.position + Vector3.down * 0.2f);
+        }
+        if (!hitGroup1 && !hitGroup2 && !hitGroup3) {
+            isNotFalling = false;
         }
     }
 
@@ -346,31 +386,141 @@ public class SphereMovement : MonoBehaviour
             GameObject glassTileParent = m_glassTile.transform.parent.gameObject;
             GameObject glassTileNormal = glassTileParent.transform.GetChild(1).gameObject;
             GameObject glassTileActive = glassTileParent.transform.GetChild(2).gameObject;
-            Vector3 newPosition = new Vector3(glassTileParent.transform.position.x, glassTileParent.transform.position.y - 0.125f, glassTileParent.transform.position.z);
-            glassTileParent.transform.position = newPosition;
+            glassTileParent.transform.position = new Vector3(glassTileParent.transform.position.x, glassTileParent.transform.position.y - 0.125f, glassTileParent.transform.position.z);
         }
         foreach(GameObject riser in fallingObstacles) {
             if (riser == null) continue;
             if (riser.TryGetComponent<RiserAnim>(out RiserAnim riserAnim)) {
                 foreach (Frame frame in riserAnim.animator.frames) {
-                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.125f, frame.position.z);
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
                 }
                 foreach (Frame frame in riserAnim.animator2.frames) {
-                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.125f, frame.position.z);
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
                 }
             } else if (riser.TryGetComponent<CrusherAnim>(out CrusherAnim crusherAnim)) {
                 foreach (Frame frame in crusherAnim.animator.frames) {
-                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.125f, frame.position.z);
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
                 }
                 foreach (Frame frame in crusherAnim.animator2.frames) {
-                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.125f, frame.position.z);
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+            } else if (riser.TryGetComponent<LeftHammerAnim>(out LeftHammerAnim hammerAnim)) {
+                foreach (Frame frame in hammerAnim.animator.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in hammerAnim.animator2.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+            } else if (riser.TryGetComponent<RightHammerAnim>(out RightHammerAnim hammerAnim2)) {
+                foreach (Frame frame in hammerAnim2.animator.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in hammerAnim2.animator2.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+            } else if (riser.TryGetComponent<LeftHammerLargeAnim>(out LeftHammerLargeAnim hammerLargeAnim)) {
+                foreach (Frame frame in hammerLargeAnim.animator.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+            } else if (riser.TryGetComponent<RightHammerLargeAnim>(out RightHammerLargeAnim hammerLargeAnim2)) {
+                foreach (Frame frame in hammerLargeAnim2.animator.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+            } else if (riser.TryGetComponent<LargeTreeAnim>(out LargeTreeAnim largeTreeAnim)) {
+                foreach (Frame frame in largeTreeAnim.animator.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in largeTreeAnim.animator2.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in largeTreeAnim.animator3.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in largeTreeAnim.animator4.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in largeTreeAnim.animator5.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in largeTreeAnim.animator6.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in largeTreeAnim.animator7.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in largeTreeAnim.animator8.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+            } else if (riser.TryGetComponent<MediumTreeAnim>(out MediumTreeAnim mediumTreeAnim)) {
+                foreach (Frame frame in mediumTreeAnim.animator.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in mediumTreeAnim.animator2.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in mediumTreeAnim.animator3.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in mediumTreeAnim.animator4.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in mediumTreeAnim.animator5.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+            } else if (riser.TryGetComponent<SmallTreeAnim>(out SmallTreeAnim smallTreeAnim)) {
+                foreach (Frame frame in smallTreeAnim.animator.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in smallTreeAnim.animator2.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in smallTreeAnim.animator3.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in smallTreeAnim.animator4.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in smallTreeAnim.animator5.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in smallTreeAnim.animator6.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in smallTreeAnim.animator7.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+            } else if (riser.TryGetComponent<LaserAnim>(out LaserAnim laserAnim)) {
+                foreach (Frame frame in laserAnim.animator.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in laserAnim.animator2.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in laserAnim.animator3.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                GameObject laserBaseObject = riser.transform.Find("DeceBalus_Laser_Base").gameObject;
+                laserBaseObject.transform.position = new Vector3(laserBaseObject.transform.position.x, laserBaseObject.transform.position.y - 0.0625f, laserBaseObject.transform.position.z);
+            } else if (riser.TryGetComponent<FloaterAnim>(out FloaterAnim floaterAnim)) {
+                foreach (Frame frame in floaterAnim.animator.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                foreach (Frame frame in floaterAnim.animator2.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
+                }
+                GameObject part3Object = riser.transform.Find("DeceBalus_Floater_Part3").gameObject;
+                part3Object.transform.position = new Vector3(part3Object.transform.position.x, part3Object.transform.position.y - 0.0625f, part3Object.transform.position.z);
+            } else if (riser.TryGetComponent<SpotlightAnim>(out SpotlightAnim spotlightAnim)) {
+                foreach (Frame frame in spotlightAnim.animator.frames) {
+                    frame.position = new Vector3(frame.position.x, frame.position.y - 0.0625f, frame.position.z);
                 }
             }
+            riser.transform.position = new Vector3(riser.transform.position.x, riser.transform.position.y - 0.0625f, riser.transform.position.z);
         }
     }
 
     private float jumpFunction(float x, float div_coeff) {
-        return 2f * speed * ((Mathf.Exp(-x) - Mathf.Exp(x)) / (Mathf.Exp(x) + Mathf.Exp(-x)));
+        return Mathf.Sqrt(2f) * speed * -x / div_coeff;
     }
 
     public void Jump(float distance, GameObject jumpTile) 
@@ -386,8 +536,8 @@ public class SphereMovement : MonoBehaviour
         /*float h = 0f;
         float k = 6.12f;
         float jumpCalc = p * ((float)Math.Pow(z - h, 2)) + k; */
-        float jumpCalc = jumpFunction(z - (distance / (2f)), 1f);
-        if (z < 0.01f) {
+        float jumpCalc = jumpFunction(z - (distance / (2f)), distance / 4f);
+        if (z < 0f) {
             jumpCalc = 0f;
         }
         isJumping = true;
@@ -399,8 +549,12 @@ public class SphereMovement : MonoBehaviour
         Vector3 movement2 = Vector3.up * jumpCalc;
         try 
         { 
-            if (z > 0.2f && z < 1.2f && isJumping) {
+            if (z > 0.25f && z < 1.25f && isJumping) {
                 newPosition = new Vector3(jumpTile.transform.position.x, jumpTileActive.transform.position.y + 0.1f, jumpTile.transform.position.z);
+                jumpTileActive.transform.position = newPosition;
+            }
+            if (z > 2.5f && z < 3.5f && isJumping) {
+                newPosition = new Vector3(jumpTile.transform.position.x, jumpTileActive.transform.position.y - 0.1f, jumpTile.transform.position.z);
                 jumpTileActive.transform.position = newPosition;
             }
             if (isJumping)
@@ -410,13 +564,13 @@ public class SphereMovement : MonoBehaviour
             }
             // If the zDiff is greater than the distance, set the jumpTile to null and enable gravity for the sphere 
             if (z > distance) 
-            { 
+            {
                 newPosition = new Vector3(jumpTile.transform.position.x, 0f, jumpTile.transform.position.z);
-                //jumpTileActive.transform.position = newPosition;
-                // jumpTile = null;
-                // jumpCalc = 0f;
-                // isJumping = false;
-                // collisionZ = transform.position.z + 0.03f;
+                jumpTileActive.transform.position = newPosition;
+                jumpTile = null;
+                jumpCalc = 0f;
+                isJumping = false;
+                collisionZ = transform.position.z;
             } 
         } 
         catch (Exception e) 
@@ -427,11 +581,14 @@ public class SphereMovement : MonoBehaviour
     // Initialize the boner (exponentially growing dick)
     public void exponential_falus() 
     {
-        if (!manager.isGameOver) {  
+        if (!manager.isGameOver) {
             float z = transform.position.z - collisionZ;
-            float downY = jumpFunction(z + 4f, 1f) * -1f;
+            float downY = jumpFunction(z + 2f, 1f) * -0.45f;
             Vector3 downVector = Vector3.down * downY;
             rb.MovePosition(rb.position + downVector * Time.fixedDeltaTime);
+            hitGroup1 = false;
+            hitGroup2 = false;
+            hitGroup3 = false;
         }
     }
 

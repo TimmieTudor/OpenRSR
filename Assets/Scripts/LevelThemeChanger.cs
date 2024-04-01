@@ -45,12 +45,12 @@ public class LevelThemeChanger : MonoBehaviour
         float ballZPos = ball.transform.position.z;
 
         // Check if ball has reached the next theme Z position
-        if (themeID < themeZPositions.Count && ballZPos >= themeZPositions[themeID])
+        if (themeID < themeZPositions.Count && ballZPos >= themeZPositions[themeID] - 0.01f)
         {
             // Update theme ID for ThemeChanger script
             if (themeID < themeIds.Count)
             {
-                themeChanger.themeID = themeIds[themeID];
+                themeChanger.UpdateTheme(themeIds[themeID]);
             }
 
             // Change to next theme ID

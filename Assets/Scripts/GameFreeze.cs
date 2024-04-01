@@ -7,6 +7,7 @@ public class GameFreeze : MonoBehaviour
     public bool gamePaused = true;
     GameObject pausedText;
     GameObject editButton;
+    GameObject settingsButton;
     float timer;
     public GameObject balus;
     private SphereMovement sphm;
@@ -24,6 +25,7 @@ public class GameFreeze : MonoBehaviour
         gamePaused = true;
         pausedText = GameObject.Find("PausedText");
         editButton = GameObject.Find("EditButton");
+        settingsButton = GameObject.Find("SettingsButton");
     }
     
     void Update()
@@ -34,6 +36,7 @@ public class GameFreeze : MonoBehaviour
             sphd.enabled = false;
             pausedText.SetActive(true);
             editButton.SetActive(true);
+            settingsButton.SetActive(true);
         }
         else
         {
@@ -41,6 +44,7 @@ public class GameFreeze : MonoBehaviour
             //sphd.enabled = true;
             pausedText.SetActive(false);
             editButton.SetActive(false);
+            settingsButton.SetActive(false);
         }
 
         if (!manager.isGameOver) {

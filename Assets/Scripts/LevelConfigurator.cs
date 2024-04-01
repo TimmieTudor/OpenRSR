@@ -11,6 +11,7 @@ public class LevelConfigJson {
     public string level_name;
     public string level_author;
     public float level_speed;
+    public int start_pos;
     public string music_path;
     public bool end_portal;
 }
@@ -22,18 +23,24 @@ public class LevelConfigurator : MonoBehaviour
     public string levelName;
     public string levelAuthor;
     public float levelSpeed;
+    public int startPos;
     public string musicPath;
     public bool endPortal;
     private GameObject balus;
+    private Rigidbody rb;
     private GameManager gameManager;
     public GameObject levelConfigPanel;
     private GameObject levelNameObject;
     private GameObject levelAuthorObject;
     private GameObject levelSpeedObject;
+    private GameObject levelSpeedObject2;
+    private GameObject startPosObject;
     private GameObject musicPathObject;
     private GameObject endPortalObject;
     TMP_InputField levelNameInput;
     TMP_InputField levelAuthorInput;
+    public TMP_InputField levelSpeedInput;
+    TMP_InputField startPosInput;
     TMP_InputField musicPathInput;
     Slider levelSpeedSlider;
     Toggle endPortalToggle;
@@ -42,6 +49,7 @@ public class LevelConfigurator : MonoBehaviour
     void Start()
     {
         balus = GameObject.FindGameObjectWithTag("Balus");
+        rb = balus.GetComponent<Rigidbody>();
         gameManager = balus.GetComponent<GameManager>();
         if (gameManager.isDataDownloaded) {
             jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
@@ -54,14 +62,20 @@ public class LevelConfigurator : MonoBehaviour
         levelName = config.level_name;
         levelAuthor = config.level_author;
         levelSpeed = config.level_speed;
+        startPos = config.start_pos;
         musicPath = config.music_path;
         endPortal = config.end_portal;
+        rb.position = new Vector3(balus.transform.position.x, balus.transform.position.y, startPos);
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void OnInputValueChanged(TMP_InputField inputField) {
+        levelSpeedSlider.value = float.Parse(inputField.text);
     }
 
     public void ShowConfigPanel() {
@@ -72,9 +86,16 @@ public class LevelConfigurator : MonoBehaviour
         levelAuthorObject = GameObject.Find("LevelAuthorInput");
         levelAuthorInput = levelAuthorObject.GetComponent<TMP_InputField>();
         levelAuthorInput.text = levelAuthor;
+        levelSpeedObject2 = GameObject.Find("LevelSpeedInput");
+        levelSpeedInput = levelSpeedObject2.GetComponent<TMP_InputField>();
+        levelSpeedInput.text = levelSpeed.ToString();
+        levelSpeedInput.onValueChanged.AddListener(delegate { OnInputValueChanged(levelSpeedInput); });
         levelSpeedObject = GameObject.Find("LevelSpeedSlider");
         levelSpeedSlider = levelSpeedObject.GetComponent<Slider>();
         levelSpeedSlider.value = levelSpeed;
+        startPosObject = GameObject.Find("StartPosInput");
+        startPosInput = startPosObject.GetComponent<TMP_InputField>();
+        startPosInput.text = startPos.ToString();
         musicPathObject = GameObject.Find("MusicPathInput");
         musicPathInput = musicPathObject.GetComponent<TMP_InputField>();
         musicPathInput.text = musicPath;
@@ -89,6 +110,7 @@ public class LevelConfigurator : MonoBehaviour
         levelName = levelNameInput.text;
         levelAuthor = levelAuthorInput.text;
         levelSpeed = levelSpeedSlider.value;
+        startPos = int.Parse(startPosInput.text);
         musicPath = musicPathInput.text;
         endPortal = endPortalToggle.isOn;
         levelConfigPanel.SetActive(false);
@@ -101,6 +123,7 @@ public class LevelConfigurator : MonoBehaviour
         config.level_name = levelName;
         config.level_author = levelAuthor;
         config.level_speed = levelSpeed;
+        config.start_pos = startPos;
         config.music_path = musicPath;
         config.end_portal = endPortal;
         return config;

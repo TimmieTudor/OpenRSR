@@ -25,6 +25,8 @@ TagManager:
   - GlassCollisionGroup2
   - GlassGroup3
   - GlassCollisionGroup3
+  - NormalCollision
+  - Edge
   layers:
   - Default
   - TransparentFX

@@ -112,6 +112,18 @@ public class LevelEditor : MonoBehaviour
         ObstaclePoses.Add(new Vector3(-33f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-40f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-42f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-51f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-54f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-56f, 0.2f, 0f));
+        ObstaclePoses.Add(new Vector3(-60f, 0.2f, 0f));
+        ObstaclePoses.Add(new Vector3(-64f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-66f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-68f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-70f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-72f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-74f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-76f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-5f, 0f, 0f));
         foreach (GameObject tile in normalTiles) {
             if (tile.transform.position == normalTilePos) {
                 continue;
@@ -167,7 +179,7 @@ public class LevelEditor : MonoBehaviour
         CFollow.enabled = false;
         sphd.enabled = false;
         sphm.enabled = false;
-        balus.transform.position = new Vector3(0f, 0.5f, 0f);
+        balus.transform.position = new Vector3(0f, 0.5f, levelConfig.startPos);
         Vector3 camPos = new Vector3(0f, 10f, 0f);
         Quaternion q = Quaternion.Euler(90f, 0f, 0f);
         m_camera.transform.position = camPos;
@@ -230,6 +242,48 @@ public class LevelEditor : MonoBehaviour
                     canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                     canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                     canvasObject.transform.position = new Vector3(x, 1f, z);
+                } else if (hasPrefab == 7) {
+                    if (spawnedPrefab.TryGetComponent<LeftMovingTileAnim>(out LeftMovingTileAnim leftMovingTileAnim)) {
+                        leftMovingTileAnim.enabled = false;
+                        GameObject tileBaseObject = spawnedPrefab.transform.Find("DeceBalus_Normal_Tile_Base").gameObject;
+                        tileBaseObject.transform.position = new Vector3(x, 0f, z);
+                        GameObject canvasObject = new GameObject("Text_Canvas");
+                        Canvas canvas = canvasObject.AddComponent<Canvas>();
+                        GameObject textObject = new GameObject("Text");
+                        TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                        textComponent.text = "<~";
+                        textComponent.alignment = TextAlignmentOptions.Center;
+                        canvas.renderMode = RenderMode.WorldSpace;
+                        textComponent.fontStyle = FontStyles.Bold;
+                        textComponent.fontSize = 0.4f;
+                        canvasObject.transform.SetParent(spawnedPrefab.transform);
+                        textObject.transform.SetParent(canvasObject.transform);
+                        RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                        canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                        canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                        canvasObject.transform.position = new Vector3(x, 1f, z);
+                    }
+                } else if (hasPrefab == 8) {
+                    if (spawnedPrefab.TryGetComponent<RightMovingTileAnim>(out RightMovingTileAnim rightMovingTileAnim)) {
+                        rightMovingTileAnim.enabled = false;
+                        GameObject tileBaseObject = spawnedPrefab.transform.Find("DeceBalus_Normal_Tile_Base").gameObject;
+                        tileBaseObject.transform.position = new Vector3(x, 0f, z);
+                        GameObject canvasObject = new GameObject("Text_Canvas");
+                        Canvas canvas = canvasObject.AddComponent<Canvas>();
+                        GameObject textObject = new GameObject("Text");
+                        TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                        textComponent.text = "~>";
+                        textComponent.alignment = TextAlignmentOptions.Center;
+                        canvas.renderMode = RenderMode.WorldSpace;
+                        textComponent.fontStyle = FontStyles.Bold;
+                        textComponent.fontSize = 0.4f;
+                        canvasObject.transform.SetParent(spawnedPrefab.transform);
+                        textObject.transform.SetParent(canvasObject.transform);
+                        RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                        canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                        canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                        canvasObject.transform.position = new Vector3(x, 1f, z);
+                    }
                 }
                 // Obsolete code. Will remove later
                 /*
@@ -258,8 +312,16 @@ public class LevelEditor : MonoBehaviour
                 float x = j - 2;
                 float z = i * ere.prefabSpacing;
                 Vector3 spawnPosition = new Vector3(x, 0.55f, z);
+                if (hasPrefab == 4 || hasPrefab == 5 || (hasPrefab >= 10 && hasPrefab <= 15)) {
+                    spawnPosition = new Vector3(x, 0f, z);
+                } else if (hasPrefab == 6 || hasPrefab == 7) {
+                    spawnPosition = new Vector3(x, 0.2f, z);
+                } else if (hasPrefab == 8) {
+                    spawnPosition = new Vector3(x + 1f, 0.2f, z);
+                } else if (hasPrefab == 9) {
+                    spawnPosition = new Vector3(x - 1f, 0.2f, z);
+                }
                 GameObject spawnedPrefab = Instantiate(ere.prefabs[hasPrefab], spawnPosition, Quaternion.identity);
-                // Obsolete code. Will remove later
                 
                 if (hasPrefab == 3) {
                     GameObject canvasObject = new GameObject("Text_Canvas");
@@ -277,6 +339,81 @@ public class LevelEditor : MonoBehaviour
                     canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                     canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                     canvasObject.transform.position = new Vector3(x, 2f, z);
+                } else if (hasPrefab == 6 || hasPrefab == 7 || hasPrefab == 15) {
+                    if (gpositions[i][j] == 3
+                    || gpositions[i][j] == 4
+                    || gpositions[i][j] == 5
+                    || gpositions[i][j] == 6) {
+                        GameObject rotor = Instantiate(ere.glassRotor, new Vector3(x, 0f, z), Quaternion.identity);
+                        rotor.transform.SetParent(spawnedPrefab.transform);
+                    } else {
+                        GameObject rotor = Instantiate(ere.groundRotor, new Vector3(x, 0f, z), Quaternion.identity);
+                        rotor.transform.SetParent(spawnedPrefab.transform);
+                    }
+                } else if (hasPrefab == 8) {
+                    if (gpositions[i][j] == 3
+                    || gpositions[i][j] == 4
+                    || gpositions[i][j] == 5
+                    || gpositions[i][j] == 6) {
+                        GameObject rotor = Instantiate(ere.glassRotor, new Vector3(x + 1f, 0f, z), Quaternion.identity);
+                        rotor.transform.SetParent(spawnedPrefab.transform);
+                    } else {
+                        GameObject rotor = Instantiate(ere.groundRotor, new Vector3(x + 1f, 0f, z), Quaternion.identity);
+                        rotor.transform.SetParent(spawnedPrefab.transform);
+                    }
+                } else if (hasPrefab == 9) {
+                    if (gpositions[i][j] == 3
+                    || gpositions[i][j] == 4
+                    || gpositions[i][j] == 5
+                    || gpositions[i][j] == 6) {
+                        GameObject rotor = Instantiate(ere.glassRotor, new Vector3(x - 1f, 0f, z), Quaternion.identity);
+                        rotor.transform.SetParent(spawnedPrefab.transform);
+                    } else {
+                        GameObject rotor = Instantiate(ere.groundRotor, new Vector3(x - 1f, 0f, z), Quaternion.identity);
+                        rotor.transform.SetParent(spawnedPrefab.transform);
+                    }
+                } else if (hasPrefab == 16) {
+                    if (spawnedPrefab.TryGetComponent<LeftRollerAnim>(out LeftRollerAnim leftRollerAnim)) {
+                        leftRollerAnim.enabled = false;
+                        GameObject tileBaseObject = spawnedPrefab.transform.Find("DeceBalus_Roller_Base").gameObject;
+                        tileBaseObject.transform.position = new Vector3(x, 0.55f, z);
+                        GameObject canvasObject = new GameObject("Text_Canvas");
+                        Canvas canvas = canvasObject.AddComponent<Canvas>();
+                        GameObject textObject = new GameObject("Text");
+                        TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                        textComponent.text = "<~";
+                        textComponent.alignment = TextAlignmentOptions.Center;
+                        canvas.renderMode = RenderMode.WorldSpace;
+                        textComponent.fontStyle = FontStyles.Bold;
+                        textComponent.fontSize = 0.4f;
+                        canvasObject.transform.SetParent(spawnedPrefab.transform);
+                        textObject.transform.SetParent(canvasObject.transform);
+                        RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                        canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                        canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                        canvasObject.transform.position = new Vector3(x, 1f, z);
+                    }
+                } else if (hasPrefab == 17) {
+                    if (spawnedPrefab.TryGetComponent<RightRollerAnim>(out RightRollerAnim rightRollerAnim)) {
+                        rightRollerAnim.enabled = false;
+                        GameObject tileBaseObject = spawnedPrefab.transform.Find("DeceBalus_Roller_Base").gameObject;
+                        tileBaseObject.transform.position = new Vector3(x, 0.55f, z);
+                        GameObject canvasObject = new GameObject("Text_Canvas");
+                        Canvas canvas = canvasObject.AddComponent<Canvas>();
+                        GameObject textObject = new GameObject("Text");
+                        TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                        textComponent.text = "~>";
+                        textComponent.alignment = TextAlignmentOptions.Center;
+                        canvas.renderMode = RenderMode.WorldSpace;
+                        textComponent.fontStyle = FontStyles.Bold;
+                        textComponent.fontSize = 0.4f;
+                        canvasObject.transform.SetParent(spawnedPrefab.transform);
+                        textObject.transform.SetParent(canvasObject.transform);
+                        RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                        canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                        canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                        canvasObject.transform.position = new Vector3(x, 1f, z);
+                    }
                 }
             }
         }
@@ -378,10 +515,20 @@ public class LevelEditor : MonoBehaviour
         balus.transform.position = new Vector3(0f, 0.5f, 0f);
     }
 
+    public void OnGoToButtonClick() {
+        TMP_InputField offsetInputField = GameObject.Find("GoToInputField").GetComponent<TMP_InputField>();
+        int offset = int.Parse(offsetInputField.text);
+        GoToPosition(offset);
+    }
+
+    public void GoToPosition(int position) {
+        m_camera.transform.position = new Vector3(m_camera.transform.position.x, m_camera.transform.position.y, (float)position);
+    }
+
     // scrolls sus
     public void ScrollUp() {
         float camPosZ = m_camera.transform.position.z;
-        camPosZ += 0.15f;
+        camPosZ += 0.2f;
         Vector3 camPos = new Vector3(m_camera.transform.position.x, m_camera.transform.position.y, camPosZ);
         m_camera.transform.position = camPos;
     }
@@ -389,7 +536,7 @@ public class LevelEditor : MonoBehaviour
     // scrolls jos
     public void ScrollDown() {
         float camPosZ = m_camera.transform.position.z;
-        camPosZ -= 0.15f;
+        camPosZ -= 0.2f;
         Vector3 camPos = new Vector3(m_camera.transform.position.x, m_camera.transform.position.y, camPosZ);
         if (m_camera.transform.position.z > 0f) {
             m_camera.transform.position = camPos;
@@ -501,6 +648,48 @@ public class LevelEditor : MonoBehaviour
                 canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                 canvasObject.transform.position = new Vector3(x, 1f, z);
+            } else if (hasPrefab == 7) {
+                if (spawnedPrefab.TryGetComponent<LeftMovingTileAnim>(out LeftMovingTileAnim leftMovingTileAnim)) {
+                    leftMovingTileAnim.enabled = false;
+                    GameObject tileBaseObject = spawnedPrefab.transform.Find("DeceBalus_Normal_Tile_Base").gameObject;
+                    tileBaseObject.transform.position = new Vector3(x, 0f, z);
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "<~";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 1f, z);
+                }
+            } else if (hasPrefab == 8) {
+                if (spawnedPrefab.TryGetComponent<RightMovingTileAnim>(out RightMovingTileAnim rightMovingTileAnim)) {
+                    rightMovingTileAnim.enabled = false;
+                    GameObject tileBaseObject = spawnedPrefab.transform.Find("DeceBalus_Normal_Tile_Base").gameObject;
+                    tileBaseObject.transform.position = new Vector3(x, 0f, z);
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "~>";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 1f, z);
+                }
             }
             /*
             if (gdata.positions[i][j] == 1) {
@@ -512,13 +701,26 @@ public class LevelEditor : MonoBehaviour
             } */
         } else if (objectLayer == 1) {
             foreach (GameObject tile in risers) {
-                if (tile.transform.position == new Vector3(x, 0.55f, z)) {
+                if (tile.transform.position == new Vector3(x, 0.55f, z) || tile.transform.position == new Vector3(x, 0.2f, z) || tile.transform.position == new Vector3(x, 0f, z)) {
+                    Destroy(tile);
+                    break;
+                } else if (tile.transform.position == new Vector3(x + 1f, 0.2f, z) || tile.transform.position == new Vector3(x - 1f, 0.2f, z)) {
                     Destroy(tile);
                     break;
                 }
             }
             int hasPrefab = edata.positions[i][j];
-            GameObject spawnedPrefab = Instantiate(ere.prefabs[hasPrefab], new Vector3(x, 0.55f, z), Quaternion.identity);
+            Vector3 spawnPosition = new Vector3(x, 0.55f, z);
+            if (hasPrefab == 4 || hasPrefab == 5 || (hasPrefab >= 10 && hasPrefab <= 15)) {
+                spawnPosition = new Vector3(x, 0f, z);
+            } else if (hasPrefab == 6 || hasPrefab == 7) {
+                spawnPosition = new Vector3(x, 0.2f, z);
+            } else if (hasPrefab == 8) {
+                spawnPosition = new Vector3(x + 1f, 0.2f, z);
+            } else if (hasPrefab == 9) {
+                spawnPosition = new Vector3(x - 1f, 0.2f, z);
+            }
+            GameObject spawnedPrefab = Instantiate(ere.prefabs[hasPrefab], spawnPosition, Quaternion.identity);
             if (hasPrefab == 3) {
                 GameObject canvasObject = new GameObject("Text_Canvas");
                 Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -535,6 +737,84 @@ public class LevelEditor : MonoBehaviour
                 canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                 canvasObject.transform.position = new Vector3(x, 2f, z);
+            } else if (hasPrefab == 6 || hasPrefab == 7 || hasPrefab == 15) {
+                List<List<int>> gpositions = gdata.positions;
+                if (gpositions[i][j] == 3
+                || gpositions[i][j] == 4
+                || gpositions[i][j] == 5
+                || gpositions[i][j] == 6) {
+                    GameObject rotor = Instantiate(ere.glassRotor, new Vector3(x, 0f, z), Quaternion.identity);
+                    rotor.transform.SetParent(spawnedPrefab.transform);
+                } else {
+                    GameObject rotor = Instantiate(ere.groundRotor, new Vector3(x, 0f, z), Quaternion.identity);
+                    rotor.transform.SetParent(spawnedPrefab.transform);
+                }
+            } else if (hasPrefab == 8) {
+                List<List<int>> gpositions = gdata.positions;
+                if (gpositions[i][j] == 3
+                || gpositions[i][j] == 4
+                || gpositions[i][j] == 5
+                || gpositions[i][j] == 6) {
+                    GameObject rotor = Instantiate(ere.glassRotor, new Vector3(x + 1f, 0f, z), Quaternion.identity);
+                    rotor.transform.SetParent(spawnedPrefab.transform);
+                } else {
+                    GameObject rotor = Instantiate(ere.groundRotor, new Vector3(x + 1f, 0f, z), Quaternion.identity);
+                    rotor.transform.SetParent(spawnedPrefab.transform);
+                }
+            } else if (hasPrefab == 9) {
+                List<List<int>> gpositions = gdata.positions;
+                if (gpositions[i][j] == 3
+                || gpositions[i][j] == 4
+                || gpositions[i][j] == 5
+                || gpositions[i][j] == 6) {
+                    GameObject rotor = Instantiate(ere.glassRotor, new Vector3(x - 1f, 0f, z), Quaternion.identity);
+                    rotor.transform.SetParent(spawnedPrefab.transform);
+                } else {
+                    GameObject rotor = Instantiate(ere.groundRotor, new Vector3(x - 1f, 0f, z), Quaternion.identity);
+                    rotor.transform.SetParent(spawnedPrefab.transform);
+                }
+            } else if (hasPrefab == 16) {
+                if (spawnedPrefab.TryGetComponent<LeftRollerAnim>(out LeftRollerAnim leftRollerAnim)) {
+                    leftRollerAnim.enabled = false;
+                    GameObject tileBaseObject = spawnedPrefab.transform.Find("DeceBalus_Roller_Base").gameObject;
+                    tileBaseObject.transform.position = new Vector3(x, 0.55f, z);
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "<~";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 1f, z);
+                }
+            } else if (hasPrefab == 17) {
+                if (spawnedPrefab.TryGetComponent<RightRollerAnim>(out RightRollerAnim rightRollerAnim)) {
+                    rightRollerAnim.enabled = false;
+                    GameObject tileBaseObject = spawnedPrefab.transform.Find("DeceBalus_Roller_Base").gameObject;
+                    tileBaseObject.transform.position = new Vector3(x, 0.55f, z);
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "~>";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 1f, z);
+                }
             }
         }
     }
@@ -639,6 +919,7 @@ public class LevelEditor : MonoBehaviour
                     GameObject[] m_themes = GameObject.FindGameObjectsWithTag("Theme");
                     GameObject currentTheme = null;
                     foreach (GameObject m_theme in m_themes) {
+                        Debug.Log(m_theme.transform.position);
                         if (m_theme.transform.position == new Vector3(-1.4f, 0.1f, i - 0.4f)) {
                             themeAlreadyExists = true;
                             currentTheme = m_theme;
@@ -675,7 +956,7 @@ public class LevelEditor : MonoBehaviour
             for (int i = 1; i < mhn_themes.Length; i++) {
                 if (mhn_themes[i].transform.position.z < m_camera.transform.position.z && m_camera.transform.position.z > mhn_themes[i-1].transform.position.z) {
                     ThemeEditor te = mhn_themes[i].GetComponent<ThemeEditor>();
-                    themeChanger2.themeID = te.themeID;
+                    themeChanger2.UpdateTheme(te.themeID);
                 }
             }
         }

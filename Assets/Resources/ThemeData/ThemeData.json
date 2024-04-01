@@ -7,7 +7,7 @@
 			"r": 240,
 			"g": 72,
 			"b": 50,
-			"a": 256
+			"a": 255
 		}
 	},
 	{
@@ -18,7 +18,29 @@
 			"r": 164,
 			"g": 50,
 			"b": 240,
-			"a": 256
+			"a": 255
+		}
+	},
+	{
+		"background_path": "Backgrounds/Background3",
+		"enemy_path": "Enemy3",
+		"general_path": "General3",
+		"ball_color": {
+			"r": 255,
+			"g": 143,
+			"b": 64,
+			"a": 255
+		}
+	},
+	{
+		"background_path": "Backgrounds/Background6",
+		"enemy_path": "Enemy6",
+		"general_path": "General6",
+		"ball_color": {
+			"r": 255,
+			"g": 232,
+			"b": 61,
+			"a": 255
 		}
 	}
 ]
