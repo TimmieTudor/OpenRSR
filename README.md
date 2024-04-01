@@ -23,8 +23,8 @@ You can download the game, but it's full of bugs and still unfinished, so I don'
 ---
 
 ## To do list:
-- [ ] Add more obstacles
-- [ ] Make a demo level
+- [ ] Add all Old14 obstacles + Power-Ups and special tiles
+- [ ] Remake all the Old14 levels
 - [x] Add a music player that plays music from a file path
 - [ ] Optimize the game
 - [ ] Add sound effects
