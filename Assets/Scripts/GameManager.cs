@@ -27,18 +27,23 @@ public class GameManager : MonoBehaviour
     private SphereDragger sphd;
     private ThemeChanger themeChanger2;
     private GameObject levelRenderer;
-    private LevelConfigurator levelConfig;
+    public LevelConfigurator levelConfig;
     private LevelEditor levelEdit;
     public bool isGameOver = false;
     public bool isDataDownloaded = false;
     private bool isDataDownloadedCache = false;
     public bool isGamePaused = true;
+    public bool isInMainMenu = true;
     private Rigidbody rb;
     private AudioPlayer audioPlayer;
     public bool isDeathDisabled = false;
     private IEnumerator updateCacheCoroutine;
     private ObjectPool objectPool;
     private GeoBufferJson geoBufferJson;
+    private GameObject mainMenuNormalTile;
+    public int num_collectedGems = 0;
+    private int totalGemCount = 0;
+    private List<GameObject> collectedGems = new List<GameObject>();
 
     IEnumerator UpdateCache()
     {
@@ -91,7 +96,9 @@ public class GameManager : MonoBehaviour
         && File.Exists(Path.Combine(Application.persistentDataPath, "General2.png"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "General3.png"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "General6.png"))
-        && File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music1.mp3")))
+        && File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music1.mp3"))
+        && File.Exists(Path.Combine(Application.persistentDataPath, "WorldShow/World1.png"))
+        && File.Exists(Path.Combine(Application.persistentDataPath, "MenuData/MenuData.json")))
         {
             isDataDownloaded = true;
             isDataDownloadedCache = true;
@@ -104,23 +111,29 @@ public class GameManager : MonoBehaviour
         updateCacheCoroutine = UpdateCache();
         StartCoroutine(updateCacheCoroutine);
 
+        isGamePaused = GFreeze.gamePaused;
+
         if (isDataDownloaded)
         {
-            // rb.useGravity = true;
-            GFreeze.enabled = true;
-            isGamePaused = GFreeze.gamePaused;
-            gre.enabled = true;
-            ere.enabled = true;
-            themeChanger.enabled = true;
-            sphm.enabled = true;
-            sphd.enabled = true;
+            CFollow.enabled = false;
+            Camera.main.transform.position = new Vector3(0f, 2.25f, -2f);
+            GFreeze.enabled = false;
+            gre.enabled = false;
+            ere.enabled = false;
+            themeChanger.enabled = false;
+            sphm.enabled = false;
+            sphd.enabled = false;
             themeChanger2.enabled = true;
             string jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
             geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(jsonString);
             objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
+            gamePlayCanvas.SetActive(false);
         }
         else 
         {
+            CFollow.enabled = false;
+            Camera.main.transform.position = new Vector3(0f, 2.25f, -2f);
+            GFreeze.enabled = false;
             rb.useGravity = false;
             gre.enabled = false;
             ere.enabled = false;
@@ -129,13 +142,23 @@ public class GameManager : MonoBehaviour
             sphd.enabled = false;
             themeChanger2.enabled = false;
             LoadData();
+            gamePlayCanvas.SetActive(false);
+            themeChanger.enabled = true;
+            themeChanger2.enabled = true;
+            themeChanger2.UpdateTheme(themeChanger.themeID);
             string jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
             geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(jsonString);
             objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
             isDataDownloadedCache = false;
             isDataDownloaded = true;
         }
-        rb.position = new Vector3(0f, 0.5f, levelConfig.startPos);
+        mainMenuNormalTile = Instantiate(gre.prefabs[1], new Vector3(0f, 0f, rb.position.z), Quaternion.identity);
+        GameObject level1CoverObject = GameObject.Find("Level1Cover");
+        byte[] level1CoverBytes = File.ReadAllBytes(Path.Combine(Application.persistentDataPath, "WorldShow/World1.png"));
+        Texture2D level1CoverTexture = new Texture2D(1024, 2048);
+        level1CoverTexture.LoadImage(level1CoverBytes);
+        Image level1CoverImage = level1CoverObject.GetComponent<Image>();
+        level1CoverImage.sprite = Sprite.Create(level1CoverTexture, new Rect(0, 0, level1CoverTexture.width, level1CoverTexture.height), new Vector2(0.5f, 0.5f), 100f);
     }
 
     void Update()
@@ -159,7 +182,9 @@ public class GameManager : MonoBehaviour
             && File.Exists(Path.Combine(Application.persistentDataPath, "General2.png"))
             && File.Exists(Path.Combine(Application.persistentDataPath, "General3.png"))
             && File.Exists(Path.Combine(Application.persistentDataPath, "General6.png"))
-            && File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music1.mp3")))
+            && File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music1.mp3"))
+            && File.Exists(Path.Combine(Application.persistentDataPath, "WorldShow/World1.png"))
+            && File.Exists(Path.Combine(Application.persistentDataPath, "MenuData/MenuData.json")))
             {
                 isDataDownloaded = true;
                 StopCoroutine(updateCacheCoroutine);
@@ -184,13 +209,7 @@ public class GameManager : MonoBehaviour
             //sphd.enabled = true;
             themeChanger2.enabled = true;
         } else if (isDataDownloaded && isGamePaused) {
-            gre.enabled = true;
-            ere.enabled = true;
-            themeChanger.enabled = true;
-            sphm.enabled = false;
-            sphd.enabled = false;
-            themeChanger2.enabled = true;
-            GFreeze.enabled = true;
+
         }
         else
         {
@@ -214,12 +233,6 @@ public class GameManager : MonoBehaviour
         sphm.speed = levelConfig.levelSpeed;
 
         float balusPercent = (balus.transform.position.z / (float)gre.positionsCount) * 100f;
-        if (balusPercent >= 100f) {
-            balusPercent = 100f;
-            realPercent = "100%";
-            percentTextMesh.SetText(realPercent);
-            GameOver(realPercent);
-        }
         balusPercent = Mathf.Clamp(balusPercent, 0f, 100f);
         realPercent = Math.Round(balusPercent).ToString() + "%";
         percentTextMesh.SetText(realPercent);
@@ -236,6 +249,51 @@ public class GameManager : MonoBehaviour
         if (other.gameObject.CompareTag("Obstacle") && !isGameOver && !isDeathDisabled)
         {
             GameOver(realPercent);
+        } else if (other.gameObject.CompareTag("DiamondCollision") && !isGameOver) {
+            GameObject diamondParent = other.gameObject.transform.parent.gameObject;
+            SoundPlayer snd = diamondParent.GetComponent<SoundPlayer>();
+            snd.PlayAudio();
+            GameObject diamond1stChild = diamondParent.transform.GetChild(0).gameObject;
+            if (diamond1stChild.activeSelf) {
+                num_collectedGems++;
+            }
+            diamond1stChild.SetActive(false);
+        } else if (other.gameObject.CompareTag("LevelEnd")) {
+            GameOver(realPercent);
+        }
+    }
+
+    public void SetIsInMainMenu(bool isInMainMenu)
+    {
+        this.isInMainMenu = isInMainMenu;
+    }
+
+    public void LoadLevel(int level) {
+        gre.jsonFilePath = "LevelData/Ground" + level.ToString();
+        ere.jsonFilePath = "LevelData/Enemies" + level.ToString();
+        themeChanger.jsonFilePath = "LevelData/Themes" + level.ToString();
+        levelConfig.jsonFilePath = "LevelData/Config" + level.ToString();
+        levelConfig.LoadLevelConfig();
+        CFollow.enabled = true;
+        gre.enabled = true;
+        ere.enabled = true;
+        ere.Initialize();
+        gre.Initialize();
+        totalGemCount = ere.CountEnemies(18);
+        num_collectedGems = 0;
+        themeChanger.enabled = true;
+        sphm.enabled = false;
+        GFreeze.enabled = true;
+        sphd.enabled = true;
+        themeChanger2.enabled = true;
+        isGamePaused = GFreeze.gamePaused;
+        gamePlayCanvas.SetActive(true);
+        gameOverPanel.SetActive(false);
+        Destroy(mainMenuNormalTile);
+        if (levelConfig.startPortal) {
+            balus.transform.position = new Vector3(0f, 0.55f, levelConfig.startPos);
+        } else {
+            balus.transform.position = new Vector3(0f, 0.5f, levelConfig.startPos);
         }
     }
 
@@ -261,6 +319,9 @@ public class GameManager : MonoBehaviour
         GameObject percentTextLabel2 = GameObject.Find("Percent2");
         TextMeshProUGUI percentTextMesh2 = percentTextLabel2.GetComponent<TextMeshProUGUI>();
         percentTextMesh2.SetText(percent);
+        GameObject gemCountTextLabel = GameObject.Find("GemCountText");
+        TextMeshProUGUI gemCountTextMesh = gemCountTextLabel.GetComponent<TextMeshProUGUI>();
+        gemCountTextMesh.SetText($"{num_collectedGems}/{totalGemCount}");
         GameObject levelNameTextLabel = GameObject.Find("LevelName");
         TextMeshProUGUI levelNameTextMesh = levelNameTextLabel.GetComponent<TextMeshProUGUI>();
         levelNameTextMesh.SetText(levelConfig.levelName);
@@ -278,12 +339,14 @@ public class GameManager : MonoBehaviour
         audioPlayer.PauseAudio();
         //rb.isKinematic = true;
         rb.velocity = Vector3.zero;
+        rb.useGravity = false;
     }
 
     public void RestartGame()
     {
         sphm.isJumping = false;
         objectPool.ClearAllPools();
+        num_collectedGems = 0;
         string jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
         geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(jsonString);
         objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
@@ -294,10 +357,13 @@ public class GameManager : MonoBehaviour
         ere.enabled = false;
         gamePlayCanvas.SetActive(true);
         gameOverPanel.SetActive(false);
-        Vector3 balusPos = new Vector3(0f, 0.5f, levelConfig.startPos);
+        Vector3 balusPos = levelConfig.startPortal ? new Vector3(0f, 0.55f, levelConfig.startPos) : new Vector3(0f, 0.5f, levelConfig.startPos);
         gre.enabled = true;
         ere.enabled = true;
+        themeChanger.enabled = true;
         themeChanger.themeID = 0;
+        themeChanger2.enabled = true;
+        themeChanger2.UpdateTheme(themeChanger.themeID);
         levelEdit.ClearEverything();
         gre.ClearPrefabPositions();
         ere.ClearPrefabPositions();
@@ -329,6 +395,8 @@ public class GameManager : MonoBehaviour
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "ThemeData"));
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Backgrounds"));
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Music"));
+        Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "WorldShow"));
+        Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "MenuData"));
         StreamWriter groundWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Ground1.json"));
         groundWriter.Write(ground1.text);
         groundWriter.Close();
@@ -386,6 +454,11 @@ public class GameManager : MonoBehaviour
         AudioClip music1 = Resources.Load<AudioClip>("Music/Music1");
         byte[] mp3 = WavToMp3.ConvertWavToMp3(music1, 128);
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Music/Music1.mp3"), mp3);
+        Texture2D worldShow1 = Resources.Load<Texture2D>("WorldShow/World1");
+        byte[] worldShowData = worldShow1.EncodeToPNG();
+        File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "WorldShow/World1.png"), worldShowData);
+        string menuDataJson = Resources.Load<TextAsset>("MenuData/MenuData").text;
+        File.WriteAllText(Path.Combine(Application.persistentDataPath, "MenuData/MenuData.json"), menuDataJson);
         isDataDownloaded = true;
     }
 }

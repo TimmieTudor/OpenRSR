@@ -46,6 +46,9 @@ public class SphereMovement : MonoBehaviour
         rb.useGravity = false;
          // Freeze the rotation of the sphere
         //rb.constraints = RigidbodyConstraints.FreezeRotation;
+        if (manager.levelConfig.startPortal) {
+            rb.position = new Vector3(0f, 0.55f, manager.levelConfig.startPos);
+        }
     }
 
     IEnumerator waitBeforeLoading()
@@ -78,16 +81,22 @@ public class SphereMovement : MonoBehaviour
             Vector3 movement = direction.normalized * speed;
             // Move the sphere according to the movement Vector3
             rb.MovePosition(transform.position + movement * Time.fixedDeltaTime);
+            if (!isNotFalling && !manager.isDeathDisabled && !manager.isGameOver) {
+                rb.useGravity = true;
+            }
             // If the sphere is jumping, call the Jump() method
             if (jumpTile != null && isJumping)
             {
-                Jump(3.75f, jumpTile);
+                Jump(3.8f, jumpTile);
                 FallingGlass();
             }
             else if (normalTile != null && glassTile != null && !isNotFalling && !manager.isDeathDisabled)
             {
                 exponential_falus();
             } else if (glassTiles.Count > 0) {
+                FallingGlass();
+            } else if (manager.levelConfig.startPortal && rb.position.z >= manager.levelConfig.startPos && rb.position.z <= manager.levelConfig.startPos + 4f) {
+                Jump(3.8f, new Vector3(0f, 0f, manager.levelConfig.startPos));
                 FallingGlass();
             }
         } else {
@@ -203,82 +212,85 @@ public class SphereMovement : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        try
-        {
-            if (collision.gameObject != null && gameObject != null) {
-                isNotFalling = true;
-                // Check if the sphere has collided with a jumpTile
-                if (collision.gameObject.tag == "JumpCollision")
-                {
-                    // Set isJumping to true to indicate that the sphere is jumping 
-                    isJumping = true; 
-                    // Disable gravity for the sphere 
-                    rb.useGravity = false; 
-                    // Set the jumpTile to the GameObject the sphere has collided with 
-                    jumpTile = collision.gameObject; 
-                    // Set the collisionZ to the z-position of the sphere 
-                    collisionZ = transform.position.z;
-                    hitGroup1 = false;
-                    hitGroup2 = false;
-                    hitGroup3 = false;
-                }
-                else if (collision.gameObject.tag == "NormalCollision")
-                {
-                    normalTile = null;
-                    glassTile = null;
-                    collisionZ = 0f;
-                    isJumping = false;
-                    jumpTile = null;
-                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-                    hitGroup1 = false;
-                    hitGroup2 = false;
-                    hitGroup3 = false;
-                } else if (collision.gameObject.tag == "GlassCollision") {
-                    GameObject glassTileParent = collision.gameObject.transform.parent.gameObject;
-                    GameObject glassTileNormal = glassTileParent.transform.GetChild(1).gameObject;
-                    GameObject glassTileActive = glassTileParent.transform.GetChild(2).gameObject;
-                    glassTileActive.SetActive(true);
-                    glassTileNormal.SetActive(false);
-                    normalTile = null;
-                    glassTile = null;
-                    collisionZ = 0f;
-                    isJumping = false;
-                    jumpTile = null;
-                    GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
-                    foreach (GameObject riser in risers) {
-                        if (riser.transform.position.z == glassTileParent.transform.position.z && riser.transform.position.x == glassTileParent.transform.position.x) {
-                            fallingObstacles.Add(riser);
-                        }
-                    }
-                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-                    hitGroup1 = false;
-                    hitGroup2 = false;
-                    hitGroup3 = false;
-                } else if (collision.gameObject.tag == "GlassCollisionGroup1" && !hitGroup1) {
-                    ActivateGlassTilesG1(collision.gameObject);
-                    hitGroup1 = true;
-                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-                    hitGroup2 = false;
-                    hitGroup3 = false;
-                } else if (collision.gameObject.tag == "GlassCollisionGroup2" && !hitGroup2) {
-                    ActivateGlassTilesG2(collision.gameObject);
-                    hitGroup2 = true;
-                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-                    hitGroup1 = false;
-                    hitGroup3 = false;
-                } else if (collision.gameObject.tag == "GlassCollisionGroup3" && !hitGroup3) {
-                    ActivateGlassTilesG3(collision.gameObject);
-                    hitGroup3 = true;
-                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-                    hitGroup1 = false;
-                    hitGroup2 = false;
-                }
+        if (collision.gameObject != null && gameObject != null) {
+            isNotFalling = true;
+            // Check if the sphere has collided with a jumpTile
+            if (collision.gameObject.tag == "JumpCollision")
+            {
+                // Set isJumping to true to indicate that the sphere is jumping 
+                isJumping = true; 
+                // Disable gravity for the sphere 
+                rb.useGravity = false; 
+                // Set the jumpTile to the GameObject the sphere has collided with 
+                jumpTile = collision.gameObject; 
+                // Set the collisionZ to the z-position of the sphere 
+                collisionZ = transform.position.z;
+                hitGroup1 = false;
+                hitGroup2 = false;
+                hitGroup3 = false;
             }
-        } 
-        catch (Exception e) 
-        { 
-            Debug.LogError("Error in OnCollisionEnter: " + e.Message); 
-        } 
+            else if (collision.gameObject.tag == "NormalCollision")
+            {
+                normalTile = null;
+                glassTile = null;
+                collisionZ = 0f;
+                //isJumping = false;
+                jumpTile = null;
+                if (!isJumping && rb != null) {
+                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                }
+                hitGroup1 = false;
+                hitGroup2 = false;
+                hitGroup3 = false;
+            } else if (collision.gameObject.tag == "GlassCollision") {
+                GameObject glassTileParent = collision.gameObject.transform.parent.gameObject;
+                GameObject glassTileNormal = glassTileParent.transform.GetChild(1).gameObject;
+                GameObject glassTileActive = glassTileParent.transform.GetChild(2).gameObject;
+                glassTileActive.SetActive(true);
+                glassTileNormal.SetActive(false);
+                normalTile = null;
+                glassTile = null;
+                collisionZ = 0f;
+                //isJumping = false;
+                jumpTile = null;
+                GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
+                foreach (GameObject riser in risers) {
+                    if (riser.transform.position.z == glassTileParent.transform.position.z && riser.transform.position.x == glassTileParent.transform.position.x) {
+                        fallingObstacles.Add(riser);
+                    }
+                }
+                if (!isJumping) {
+                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                }
+                hitGroup1 = false;
+                hitGroup2 = false;
+                hitGroup3 = false;
+            } else if (collision.gameObject.tag == "GlassCollisionGroup1" && !hitGroup1) {
+                ActivateGlassTilesG1(collision.gameObject);
+                hitGroup1 = true;
+                if (!isJumping) {
+                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                }
+                hitGroup2 = false;
+                hitGroup3 = false;
+            } else if (collision.gameObject.tag == "GlassCollisionGroup2" && !hitGroup2) {
+                ActivateGlassTilesG2(collision.gameObject);
+                hitGroup2 = true;
+                if (!isJumping) {
+                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                }
+                hitGroup1 = false;
+                hitGroup3 = false;
+            } else if (collision.gameObject.tag == "GlassCollisionGroup3" && !hitGroup3) {
+                ActivateGlassTilesG3(collision.gameObject);
+                hitGroup3 = true;
+                if (!isJumping) {
+                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                }
+                hitGroup1 = false;
+                hitGroup2 = false;
+            }
+        }
     }
 
     private void OnCollisionStay(Collision collision)
@@ -296,6 +308,9 @@ public class SphereMovement : MonoBehaviour
             normalTile = null;
             glassTile = null;
             collisionZ = 0f;
+        }
+        if (collision.gameObject.tag == "DiamondCollision") {
+            rb.MovePosition(rb.position + Vector3.down * Time.fixedDeltaTime);
         }
         isNotFalling = true;
     }
@@ -379,7 +394,9 @@ public class SphereMovement : MonoBehaviour
             hitGroup3 = false;
             rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         } else {
-            rb.MovePosition(rb.position + Vector3.down * 0.2f);
+            if (!isJumping) {
+                rb.MovePosition(rb.position + Vector3.down * 0.25f);
+            }
         }
         if (!hitGroup1 && !hitGroup2 && !hitGroup3) {
             isNotFalling = false;
@@ -558,7 +575,7 @@ public class SphereMovement : MonoBehaviour
                 newPosition = new Vector3(jumpTile.transform.position.x, jumpTileActive.transform.position.y + 0.1f, jumpTile.transform.position.z);
                 jumpTileActive.transform.position = newPosition;
             }
-            if (z > 2.5f && z < 3.5f && isJumping) {
+            if (z > 2.25f && z < 3.25f && isJumping) {
                 newPosition = new Vector3(jumpTile.transform.position.x, jumpTileActive.transform.position.y - 0.1f, jumpTile.transform.position.z);
                 jumpTileActive.transform.position = newPosition;
             }
@@ -583,6 +600,27 @@ public class SphereMovement : MonoBehaviour
             Debug.LogError("Error in Jump: " + e.Message); 
         } 
     }
+
+    public void Jump(float distance, Vector3 startPosition) {
+        float z = transform.position.z - startPosition.z;
+        float jumpCalc = jumpFunction(z - (distance / (2f)), distance / 4f);
+        if (z < 0f) {
+            jumpCalc = 0f;
+        }
+        isJumping = true;
+        Vector3 movement2 = Vector3.up * jumpCalc;
+        if (isJumping)
+        {
+            rb.MovePosition(rb.position + movement2 * Time.fixedDeltaTime);
+            //collisionZ += 0.075f;
+        }
+        if (z > distance) {
+            isJumping = false;
+            jumpCalc = 0f;
+            collisionZ = transform.position.z;
+        }
+    }
+
     // Initialize the boner (exponentially growing dick)
     public void exponential_falus() 
     {

@@ -161,7 +161,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
     Android: com.TimmieTudor.OpenRSR
-    Standalone: com.ComradeCat.DeceBalus
+    Standalone: com.TimmieTudor.OpenRSR
   buildNumber:
     Bratwurst: 0
     Standalone: 0

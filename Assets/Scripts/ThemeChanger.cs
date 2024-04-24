@@ -31,6 +31,7 @@ public class ThemeJson {
     public string enemy_path;
     public string general_path;
     public MyColor ball_color;
+    public MyColor gem_color;
 }
 
 public class ThemeChanger : MonoBehaviour
@@ -40,12 +41,14 @@ public class ThemeChanger : MonoBehaviour
         public Texture2D enemy;
         public Texture2D general;
         public Color ballColor;
+        public Color gemColor;
 
-        public Theme(Texture2D background, Texture2D enemy, Texture2D general, Color ballColor) {
+        public Theme(Texture2D background, Texture2D enemy, Texture2D general, Color ballColor, Color gemColor) {
             this.background = background;
             this.enemy = enemy;
             this.general = general;
             this.ballColor = ballColor;
+            this.gemColor = gemColor;
         }
     }
     public List<Theme> themes = new List<Theme>();
@@ -68,6 +71,7 @@ public class ThemeChanger : MonoBehaviour
                 string enemyPath = Path.Combine(Application.persistentDataPath, theme.enemy_path + ".png");
                 string generalPath = Path.Combine(Application.persistentDataPath, theme.general_path + ".png");
                 Color ballColor = theme.ball_color.ToUnityColor();
+                Color gemColor = theme.gem_color.ToUnityColor();
                 byte[] backgroundData = File.ReadAllBytes(backgroundPath);
                 byte[] enemyData = File.ReadAllBytes(enemyPath);
                 byte[] generalData = File.ReadAllBytes(generalPath);
@@ -77,7 +81,7 @@ public class ThemeChanger : MonoBehaviour
                 background.LoadImage(backgroundData);
                 enemy.LoadImage(enemyData);
                 general.LoadImage(generalData);
-                Theme m_theme = new Theme(background, enemy, general, ballColor);
+                Theme m_theme = new Theme(background, enemy, general, ballColor, gemColor);
                 themes.Add(m_theme);
             }
         } else {
@@ -88,10 +92,11 @@ public class ThemeChanger : MonoBehaviour
                 string enemyPath = theme.enemy_path;
                 string generalPath = theme.general_path;
                 Color ballColor = theme.ball_color.ToUnityColor();
+                Color gemColor = theme.gem_color.ToUnityColor();
                 Texture2D background = Resources.Load<Texture2D>(backgroundPath);
                 Texture2D enemy = Resources.Load<Texture2D>(enemyPath);
                 Texture2D general = Resources.Load<Texture2D>(generalPath);
-                Theme m_theme = new Theme(background, enemy, general, ballColor);
+                Theme m_theme = new Theme(background, enemy, general, ballColor, gemColor);
                 themes.Add(m_theme);
             }
         }
@@ -109,6 +114,8 @@ public class ThemeChanger : MonoBehaviour
             if (balusRenderer != null) {
                 balusRenderer.material.color = currentTheme.ballColor;
             }
+            Material gemMaterial = GameObject.Find("DeceBalus_Gem").transform.GetChild(0).gameObject.GetComponent<Renderer>().sharedMaterial;
+            gemMaterial.color = currentTheme.gemColor;
             Material backgroundMaterial = GameObject.Find("Background").GetComponent<Renderer>().sharedMaterial;
             backgroundMaterial.mainTexture = currentTheme.background;
             Material enemyMaterial = GameObject.Find("Base_2").GetComponent<Renderer>().sharedMaterial;

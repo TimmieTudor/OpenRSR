@@ -7,26 +7,6 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-[System.Serializable]
-public class GroundPositionsData
-{
-    public List<List<int>> positions;
-
-    public GroundPositionsData(List<List<int>> positions) {
-        this.positions = positions;
-    }
-}
-
-[System.Serializable]
-public class EnemyPositionsData2
-{
-    public List<List<int>> positions;
-
-    public EnemyPositionsData2(List<List<int>> positions) {
-        this.positions = positions;
-    }
-}
-
 public class LevelEditor : MonoBehaviour
 {
     public GameObject balus;
@@ -38,8 +18,6 @@ public class LevelEditor : MonoBehaviour
     public Camera m_camera;
     public CameraFollow CFollow;
     public GameObject grid;
-    private GameObject percentTextLabel;
-    private TextMeshProUGUI percentTextMesh;
     private string realPercent;
     public EnemyRenderer ere;
     public int gridSize = 10;
@@ -56,8 +34,8 @@ public class LevelEditor : MonoBehaviour
     private string groundJsonString;
     private string enemyJsonString;
     private string themeJsonString;
-    private GroundPositionsData gdata;
-    private EnemyPositionsData2 edata;
+    private PositionsData gdata;
+    private EnemyPositionsData edata;
     private LevelThemeData ltdata;
     public int objectLayer = 0;
     public int objectID = 0;
@@ -68,8 +46,6 @@ public class LevelEditor : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        percentTextLabel = GameObject.Find("Percent");
-        percentTextMesh = percentTextLabel.GetComponent<TextMeshProUGUI>();
         balus = GameObject.FindGameObjectWithTag("Balus");
         levelRenderer = GameObject.Find("LevelRenderer");
         rb = GetComponent<Rigidbody>();
@@ -88,8 +64,8 @@ public class LevelEditor : MonoBehaviour
             enemyJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, ere.jsonFilePath + ".json"));
             themeJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, themeChanger.jsonFilePath + ".json"));
         }
-        gdata = JsonConvert.DeserializeObject<GroundPositionsData>(groundJsonString);
-        edata = JsonConvert.DeserializeObject<EnemyPositionsData2>(enemyJsonString);
+        gdata = JsonConvert.DeserializeObject<PositionsData>(groundJsonString);
+        edata = JsonConvert.DeserializeObject<EnemyPositionsData>(enemyJsonString);
         ltdata = JsonConvert.DeserializeObject<LevelThemeData>(themeJsonString);
         themeText = GameObject.Find("DeceBalus_Theme_Text");
     }
@@ -124,6 +100,7 @@ public class LevelEditor : MonoBehaviour
         ObstaclePoses.Add(new Vector3(-74f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-76f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-5f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-83f, 0f, 0f));
         foreach (GameObject tile in normalTiles) {
             if (tile.transform.position == normalTilePos) {
                 continue;
@@ -320,6 +297,8 @@ public class LevelEditor : MonoBehaviour
                     spawnPosition = new Vector3(x + 1f, 0.2f, z);
                 } else if (hasPrefab == 9) {
                     spawnPosition = new Vector3(x - 1f, 0.2f, z);
+                } else {
+                    spawnPosition = new Vector3(x, 0.55f, z);
                 }
                 GameObject spawnedPrefab = Instantiate(ere.prefabs[hasPrefab], spawnPosition, Quaternion.identity);
                 
@@ -512,7 +491,7 @@ public class LevelEditor : MonoBehaviour
         manager.RestartGame();
         isInEditor = false;
         gameEditCanvas.SetActive(false);
-        balus.transform.position = new Vector3(0f, 0.5f, 0f);
+        balus.transform.position = new Vector3(0f, 0.5f, levelConfig.startPos);
     }
 
     public void OnGoToButtonClick() {

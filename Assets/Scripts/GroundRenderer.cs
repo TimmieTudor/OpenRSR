@@ -34,6 +34,7 @@ public class GroundRenderer : MonoBehaviour
     private bool shouldSpawnPrefabCache = true;
     private ObjectPool objectPool;
     private SphereMovement sphm;
+    private GameObject endObject;
 
     IEnumerator UpdateCache() {
         while (true)
@@ -194,7 +195,7 @@ public class GroundRenderer : MonoBehaviour
         }
     }
 
-    private void Initialize()
+    public void Initialize()
     {
         balus = GameObject.FindGameObjectWithTag("Balus");
         sphm = balus.GetComponent<SphereMovement>();
@@ -206,12 +207,26 @@ public class GroundRenderer : MonoBehaviour
         data = JsonConvert.DeserializeObject<PositionsData>(jsonString);
         positionsCount = data.positions.Count;
         ProcessGroundPositions(data.positions);
+        GameObject end = GameObject.Find("End");
+        endObject = end;
     }
 
     private void UpdateGround()
     {
         ProcessGroundPositions(data.positions);
         CleanupSpawnedPrefabs();
+    }
+
+    public int CountEnemies(int id) {
+        int count = 0;
+        for (int i = 0; i < data.positions.Count; i++) {
+            for (int j = 0; j < data.positions[i].Count; j++) {
+                if (data.positions[i][j] == id) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     private void ProcessGroundPositions(List<List<int>> positions)
@@ -228,6 +243,9 @@ public class GroundRenderer : MonoBehaviour
                 if (ShouldSpawnPrefab(spawnPosition))
                 {
                     SpawnPrefab(hasPrefab, spawnPosition, i, j, x, z);
+                    if (i + 1 == positions.Count && endObject != null && endObject.transform.position != new Vector3(0f, 0f, positions.Count)) {
+                        endObject.transform.position = new Vector3(0f, 0f, positions.Count);
+                    }
                 }
             }
         }
@@ -255,13 +273,25 @@ public class GroundRenderer : MonoBehaviour
                 glassTileNormal.SetActive(true);
                 if (sphm.glassGroup1.Contains(glassTileCollision)) {
                     sphm.glassGroup1.Remove(glassTileCollision);
+                    while (sphm.glassGroup1.Contains(glassTileCollision)) {
+                        sphm.glassGroup1.Remove(glassTileCollision);
+                    }
                 } else if (sphm.glassGroup2.Contains(glassTileCollision)) {
                     sphm.glassGroup2.Remove(glassTileCollision);
+                    while (sphm.glassGroup2.Contains(glassTileCollision)) {
+                        sphm.glassGroup2.Remove(glassTileCollision);
+                    }
                 } else if (sphm.glassGroup3.Contains(glassTileCollision)) {
                     sphm.glassGroup3.Remove(glassTileCollision);
+                    while (sphm.glassGroup3.Contains(glassTileCollision)) {
+                        sphm.glassGroup3.Remove(glassTileCollision);
+                    }
                 }
                 if (sphm.glassTiles.Contains(glassTileCollision)) {
                     sphm.glassTiles.Remove(glassTileCollision);
+                    while (sphm.glassTiles.Contains(glassTileCollision)) {
+                        sphm.glassTiles.Remove(glassTileCollision);
+                    }
                 }
                 foreach (Transform transform in spawnedPrefab.transform) {
                     if (transform.tag == "Edge") {
@@ -325,5 +355,6 @@ public class GroundRenderer : MonoBehaviour
         spawnedPrefabs.Clear();
         spawnedPrefabIDs.Clear();
         lastPosition = new Vector3(0f, 0f, 0f);
+        endObject.transform.position = new Vector3(-90f, 0f, 0f);
     }
 }

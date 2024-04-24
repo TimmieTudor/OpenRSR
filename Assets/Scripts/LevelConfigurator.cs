@@ -13,7 +13,8 @@ public class LevelConfigJson {
     public float level_speed;
     public int start_pos;
     public string music_path;
-    public bool end_portal;
+    public string worldshow_path;
+    public bool start_portal;
 }
 
 [System.Serializable]
@@ -31,7 +32,8 @@ public class LevelConfigurator : MonoBehaviour
     public float levelSpeed;
     public int startPos;
     public string musicPath;
-    public bool endPortal;
+    public string worldshowPath;
+    public bool startPortal;
     private GameObject balus;
     private Rigidbody rb;
     private GameManager gameManager;
@@ -42,14 +44,15 @@ public class LevelConfigurator : MonoBehaviour
     private GameObject levelSpeedObject2;
     private GameObject startPosObject;
     private GameObject musicPathObject;
-    private GameObject endPortalObject;
+    private GameObject startPortalObject;
     TMP_InputField levelNameInput;
     TMP_InputField levelAuthorInput;
     public TMP_InputField levelSpeedInput;
     TMP_InputField startPosInput;
     TMP_InputField musicPathInput;
     Slider levelSpeedSlider;
-    Toggle endPortalToggle;
+    Toggle startPortalToggle;
+    GameObject startPortalObject2;
     
     // Start is called before the first frame update
     void Start()
@@ -70,8 +73,36 @@ public class LevelConfigurator : MonoBehaviour
         levelSpeed = config.level_speed;
         startPos = config.start_pos;
         musicPath = config.music_path;
-        endPortal = config.end_portal;
-        rb.position = new Vector3(balus.transform.position.x, balus.transform.position.y, startPos);
+        worldshowPath = config.worldshow_path;
+        startPortal = config.start_portal;
+        startPortalObject2 = GameObject.Find("DeceBalus_Pod_Start");
+        startPortalObject2.SetActive(false);
+        //rb.position = new Vector3(balus.transform.position.x, balus.transform.position.y, startPos);
+    }
+
+    public void LoadLevelConfig() {
+        if (gameManager.isDataDownloaded) {
+            jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
+            Debug.Log("Data downloaded");
+        } else {
+            jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
+            Debug.Log("Data not downloaded");
+        }
+        LevelConfigJson config = JsonConvert.DeserializeObject<LevelConfigJson>(jsonString);
+        levelName = config.level_name;
+        levelAuthor = config.level_author;
+        levelSpeed = config.level_speed;
+        startPos = config.start_pos;
+        musicPath = config.music_path;
+        worldshowPath = config.worldshow_path;
+        startPortal = config.start_portal;
+        if (startPortal) {
+            startPortalObject2.SetActive(true);
+            startPortalObject2.transform.position = new Vector3(0f, 0f, startPos);
+        } else {
+            startPortalObject2.SetActive(false);
+            startPortalObject2.transform.position = new Vector3(0f, 0f, startPos);
+        }
     }
 
     // Update is called once per frame
@@ -105,9 +136,9 @@ public class LevelConfigurator : MonoBehaviour
         musicPathObject = GameObject.Find("MusicPathInput");
         musicPathInput = musicPathObject.GetComponent<TMP_InputField>();
         musicPathInput.text = musicPath;
-        endPortalObject = GameObject.Find("EndPortalToggle");
-        endPortalToggle = endPortalObject.GetComponent<Toggle>();
-        endPortalToggle.isOn = endPortal;
+        startPortalObject = GameObject.Find("StartPortalToggle");
+        startPortalToggle = startPortalObject.GetComponent<Toggle>();
+        startPortalToggle.isOn = startPortal;
         LevelEditor le = GameObject.Find("Balus").GetComponent<LevelEditor>();
         le.SetPopupOpen(true);
     }
@@ -118,7 +149,14 @@ public class LevelConfigurator : MonoBehaviour
         levelSpeed = levelSpeedSlider.value;
         startPos = int.Parse(startPosInput.text);
         musicPath = musicPathInput.text;
-        endPortal = endPortalToggle.isOn;
+        startPortal = startPortalToggle.isOn;
+        if (startPortal) {
+            startPortalObject2.SetActive(true);
+            startPortalObject2.transform.position = new Vector3(0f, 0f, startPos);
+        } else {
+            startPortalObject2.SetActive(false);
+            startPortalObject2.transform.position = new Vector3(0f, 0f, startPos);
+        }
         levelConfigPanel.SetActive(false);
         LevelEditor le = GameObject.Find("Balus").GetComponent<LevelEditor>();
         le.SetPopupOpen(false);
@@ -131,7 +169,7 @@ public class LevelConfigurator : MonoBehaviour
         config.level_speed = levelSpeed;
         config.start_pos = startPos;
         config.music_path = musicPath;
-        config.end_portal = endPortal;
+        config.start_portal = startPortal;
         return config;
     }
 }

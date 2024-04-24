@@ -34,17 +34,21 @@ public class GameFreeze : MonoBehaviour
         {
             sphm.enabled = false;
             sphd.enabled = false;
+            if (pausedText != null && editButton != null && settingsButton != null) {
             pausedText.SetActive(true);
             editButton.SetActive(true);
             settingsButton.SetActive(true);
+            }
         }
         else
         {
             //sphm.enabled = true;
             //sphd.enabled = true;
+            if (pausedText != null && editButton != null && settingsButton != null) {
             pausedText.SetActive(false);
             editButton.SetActive(false);
             settingsButton.SetActive(false);
+            }
         }
 
         if (!manager.isGameOver) {
@@ -69,8 +73,10 @@ public class GameFreeze : MonoBehaviour
     public void PauseGame()
     {
         gamePaused = true;
-        sphm.enabled = false;
-        sphd.enabled = false;
+        if (sphm != null && sphd != null) {
+            sphm.enabled = false;
+            sphd.enabled = false;
+        }
         timer = 0f;
         audioPlayer.PauseAudio();
     }

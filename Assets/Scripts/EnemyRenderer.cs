@@ -64,7 +64,7 @@ public class EnemyRenderer : MonoBehaviour
         }
     }
 
-    private void Initialize()
+    public void Initialize()
     {
         balus = GameObject.FindGameObjectWithTag("Balus");
         sphm = balus.GetComponent<SphereMovement>();
@@ -80,6 +80,20 @@ public class EnemyRenderer : MonoBehaviour
     {
         ProcessEnemyPositions(data.positions);
         CleanupSpawnedPrefabs();
+    }
+
+    public int CountEnemies(int id) {
+        int count = 0;
+        if (data != null) {
+            for (int i = 0; i < data.positions.Count; i++) {
+                for (int j = 0; j < data.positions[i].Count; j++) {
+                    if (data.positions[i][j] == id) {
+                        count++;
+                    }
+                }
+            }
+        }
+        return count;
     }
 
     private void ProcessEnemyPositions(List<List<int>> positions)
@@ -211,6 +225,13 @@ public class EnemyRenderer : MonoBehaviour
                     goto SkipRiserAnim;
                 }
                 spotlightAnim.ResetAnimation(spawnPosition);
+            } else if (spawnedPrefab.TryGetComponent<SoundPlayer>(out SoundPlayer soundPlayer)) {
+                GameObject gemBaseObject = spawnedPrefab.transform.GetChild(0).gameObject;
+                gemBaseObject.SetActive(true);
+                if (gemBaseObject.transform.position.x - spawnedPrefab.transform.position.x > 0) {
+                    gemBaseObject.transform.position = new Vector3(spawnedPrefab.transform.position.x, gemBaseObject.transform.position.y, gemBaseObject.transform.position.z);
+                }
+                soundPlayer.SeekToZero();
             }
             SkipRiserAnim:
             spawnedPrefab.transform.position = spawnPosition;

@@ -154,6 +154,9 @@ public class LeftMovingTileAnim : MonoBehaviour
                     frame.position = new Vector3(baseObject.transform.position.x, frame.position.y, frame.position.z);
                 }
                 m_Riser.transform.position = new Vector3(baseObject.transform.position.x, m_Riser.transform.position.y, baseObject.transform.position.z);
+            } else if (m_Riser.TryGetComponent<SoundPlayer>(out SoundPlayer soundPlayer)) {
+                GameObject gem1stChild = m_Riser.transform.GetChild(0).gameObject;
+                gem1stChild.transform.position = new Vector3(baseObject.transform.position.x, gem1stChild.transform.position.y, baseObject.transform.position.z);
             }
         }
     }

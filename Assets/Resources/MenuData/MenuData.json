@@ -1,0 +1,16 @@
+{
+	"sort_by": "difficulty_avg",
+	"sort_order": "ascending",
+	"mean_type": "arithmetic",
+	"level_list": [
+		{
+			"display_title": "Massif",
+			"display_gems": 20,
+			"display_crowns": 0,
+			"display_author": false,
+			"display_progress": true,
+			"level_difficulty_easy": 0.7,
+			"level_difficulty_hard": 0.9
+		}
+	]
+}
