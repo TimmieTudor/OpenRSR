@@ -74,10 +74,13 @@ public class GameFreeze : MonoBehaviour
     {
         gamePaused = true;
         if (sphm != null && sphd != null) {
+            sphm.isNotFalling = true;
             sphm.enabled = false;
             sphd.enabled = false;
         }
         timer = 0f;
-        audioPlayer.PauseAudio();
+        if (audioPlayer != null) {
+            audioPlayer.PauseAudio();
+        }
     }
 }

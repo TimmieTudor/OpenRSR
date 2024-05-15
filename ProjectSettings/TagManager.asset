@@ -29,6 +29,9 @@ TagManager:
   - Edge
   - DiamondCollision
   - LevelEnd
+  - NormalEndCollision
+  - MoverGroup1
+  - MoverCollisionGroup1
   layers:
   - Default
   - TransparentFX

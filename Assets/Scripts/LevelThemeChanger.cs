@@ -69,6 +69,11 @@ public class LevelThemeChanger : MonoBehaviour
         // Set initial theme ID for ThemeChanger script
         themeChanger.themeID = themeIds[0];
     }
+
+    public LevelThemeData GetData() {
+        jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
+        return JsonConvert.DeserializeObject<LevelThemeData>(jsonString);
+    }
 }
 
 [System.Serializable]

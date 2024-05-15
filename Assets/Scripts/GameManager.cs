@@ -44,7 +44,8 @@ public class GameManager : MonoBehaviour
     public int num_collectedGems = 0;
     private int totalGemCount = 0;
     private List<GameObject> collectedGems = new List<GameObject>();
-
+    private GameObject levelEditButton;
+    private GameObject levelEndObject;
     IEnumerator UpdateCache()
     {
         while (true)
@@ -75,6 +76,8 @@ public class GameManager : MonoBehaviour
         audioPlayer.audioPath = levelConfig.musicPath;
         audioPlayer.LoadAudioClip();
         levelEdit = GetComponent<LevelEditor>();
+        levelEditButton = GameObject.Find("EditButton");
+        levelEndObject = GameObject.Find("End");
 
         Application.targetFrameRate = 60;
 
@@ -153,12 +156,6 @@ public class GameManager : MonoBehaviour
             isDataDownloaded = true;
         }
         mainMenuNormalTile = Instantiate(gre.prefabs[1], new Vector3(0f, 0f, rb.position.z), Quaternion.identity);
-        GameObject level1CoverObject = GameObject.Find("Level1Cover");
-        byte[] level1CoverBytes = File.ReadAllBytes(Path.Combine(Application.persistentDataPath, "WorldShow/World1.png"));
-        Texture2D level1CoverTexture = new Texture2D(1024, 2048);
-        level1CoverTexture.LoadImage(level1CoverBytes);
-        Image level1CoverImage = level1CoverObject.GetComponent<Image>();
-        level1CoverImage.sprite = Sprite.Create(level1CoverTexture, new Rect(0, 0, level1CoverTexture.width, level1CoverTexture.height), new Vector2(0.5f, 0.5f), 100f);
     }
 
     void Update()
@@ -244,7 +241,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Obstacle") && !isGameOver && !isDeathDisabled)
         {
@@ -258,7 +255,9 @@ public class GameManager : MonoBehaviour
                 num_collectedGems++;
             }
             diamond1stChild.SetActive(false);
-        } else if (other.gameObject.CompareTag("LevelEnd")) {
+        } else if (other.gameObject.CompareTag("LevelEnd") && !isGameOver) {
+            rb.position = new Vector3(rb.position.x, 0.55f, rb.position.z - 0.1f);
+            sphm.isNotFalling = true;
             GameOver(realPercent);
         }
     }
@@ -274,6 +273,8 @@ public class GameManager : MonoBehaviour
         themeChanger.jsonFilePath = "LevelData/Themes" + level.ToString();
         levelConfig.jsonFilePath = "LevelData/Config" + level.ToString();
         levelConfig.LoadLevelConfig();
+        audioPlayer.audioPath = levelConfig.musicPath;
+        audioPlayer.UpdateAudioClip();
         CFollow.enabled = true;
         gre.enabled = true;
         ere.enabled = true;
@@ -290,11 +291,73 @@ public class GameManager : MonoBehaviour
         gamePlayCanvas.SetActive(true);
         gameOverPanel.SetActive(false);
         Destroy(mainMenuNormalTile);
+        geoBufferJsonFilePath = "LevelData/GeoBuffer" + level.ToString() + ".json";
+        string geoBufferJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
+        geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(geoBufferJsonString);
+        objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
         if (levelConfig.startPortal) {
             balus.transform.position = new Vector3(0f, 0.55f, levelConfig.startPos);
         } else {
             balus.transform.position = new Vector3(0f, 0.5f, levelConfig.startPos);
         }
+        levelEditButton.GetComponent<Button>().onClick.AddListener(() => LoadLevelInEditor(level));
+    }
+
+    public void LoadLevelInEditor(int level) {
+        gre.jsonFilePath = "LevelData/Ground" + level.ToString();
+        ere.jsonFilePath = "LevelData/Enemies" + level.ToString();
+        themeChanger.jsonFilePath = "LevelData/Themes" + level.ToString();
+        levelConfig.jsonFilePath = "LevelData/Config" + level.ToString();
+        levelConfig.LoadLevelConfig();
+        audioPlayer.audioPath = levelConfig.musicPath;
+        audioPlayer.UpdateAudioClip();
+        CFollow.enabled = true;
+        gre.enabled = true;
+        ere.enabled = true;
+        ere.Initialize();
+        gre.Initialize();
+        totalGemCount = ere.CountEnemies(18);
+        num_collectedGems = 0;
+        themeChanger.enabled = true;
+        sphm.enabled = false;
+        GFreeze.enabled = true;
+        sphd.enabled = true;
+        themeChanger2.enabled = true;
+        isGamePaused = GFreeze.gamePaused;
+        gamePlayCanvas.SetActive(true);
+        gameOverPanel.SetActive(false);
+        Destroy(mainMenuNormalTile);
+        geoBufferJsonFilePath = "LevelData/GeoBuffer" + level.ToString() + ".json";
+        string geoBufferJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
+        geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(geoBufferJsonString);
+        objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
+        if (levelConfig.startPortal) {
+            balus.transform.position = new Vector3(0f, 0.55f, levelConfig.startPos);
+        } else {
+            balus.transform.position = new Vector3(0f, 0.5f, levelConfig.startPos);
+        }
+        levelEditButton.GetComponent<Button>().onClick.AddListener(() => LoadLevelInEditor(level));
+        levelEndObject.transform.position = new Vector3(-90f, 0f, 0f);
+        levelEdit.editorTransition();
+    }
+
+    public void CreateNewLevel(int previousLevel) {
+        StreamWriter configWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"Config{previousLevel+1}.json"));
+        configWriter.Write(@"{""level_name"":""Unnamed Level"",""level_author"":""Anonymous"",""level_speed"":7.55,""start_pos"":0,""music_path"":""Music/Music1"",""worldshow_path"":null,""start_portal"":false}");
+        configWriter.Close();
+        StreamWriter groundWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"Ground{previousLevel+1}.json"));
+        groundWriter.Write(@"{""positions"":[[0,0,0,0,0]]}");
+        groundWriter.Close();
+        StreamWriter enemiesWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"Enemies{previousLevel+1}.json"));
+        enemiesWriter.Write(@"{""positions"":[[0,0,0,0,0]]}");
+        enemiesWriter.Close();
+        StreamWriter themeWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"Themes{previousLevel+1}.json"));
+        themeWriter.Write(@"{""themeZPositions"":[0],""themeIds"":[0]}");
+        themeWriter.Close();
+        StreamWriter geoBufferWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"GeoBuffer{previousLevel+1}.json"));
+        geoBufferWriter.Write(@"{""ground"":[200,200,200,200,200,200,200,190,190],""enemies"":[200,190,190,190,190,190,195,195,195,195,190,190,195,190,190,190,190,190,20]}");
+        geoBufferWriter.Close();
+        LoadLevelInEditor(previousLevel+1);
     }
 
     public void SetDeathDisabled(bool isDisabled)
@@ -329,7 +392,8 @@ public class GameManager : MonoBehaviour
         TextMeshProUGUI levelAuthorTextMesh = levelAuthorTextLabel.GetComponent<TextMeshProUGUI>();
         levelAuthorTextMesh.SetText(levelConfig.levelAuthor);
         gamePlayCanvas.SetActive(false);
-        sphm.isJumping = false;
+        sphm.isJumping = true;
+        sphm.isNotFalling = true;
         sphd.enabled = false;
         sphm.enabled = false;
         //CFollow.enabled = false;
@@ -372,8 +436,12 @@ public class GameManager : MonoBehaviour
         sphd.enabled = true;
         CFollow.enabled = true;
         audioPlayer.SeekToZero();
+        //rb.velocity = Vector3.zero;
         rb.position = balusPos;
         balus.transform.position = balusPos;
+        sphm.collisionZ = levelConfig.startPos + 0.5f;
+        sphm.isJumping = true;
+        sphm.isNotFalling = true;
         GFreeze.PauseGame();
         //rb.velocity = Vector3.zero;
         //rb.isKinematic = false;
@@ -381,6 +449,25 @@ public class GameManager : MonoBehaviour
         //sphm.enabled = true;
         sphm.ClearFallingObstacles();
         isGameOver = false;
+    }
+
+    public void EnsureCorrectPosAfterRestart() {
+        RestartGame();
+        if (levelConfig.startPortal) {
+            rb.position = new Vector3(0f, 0.55f, levelConfig.startPos);
+            balus.transform.position = new Vector3(0f, 0.55f, levelConfig.startPos);
+            sphm.isJumping = true;
+            sphm.isNotFalling = true;
+            if (!sphm.isNotFalling) {
+                Debug.Log("Error");
+            }
+        } else {
+            rb.position = new Vector3(0f, 0.5f, levelConfig.startPos);
+            balus.transform.position = new Vector3(0f, 0.5f, levelConfig.startPos);
+            if (rb.position != new Vector3(0f, 0.5f, levelConfig.startPos)) {
+                Debug.Log("Error");
+            }
+        }
     }
 
     private void LoadData()

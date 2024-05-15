@@ -76,6 +76,10 @@ public class AudioPlayer : MonoBehaviour
         }
     }
 
+    public void UpdateAudioClip() {
+        StartCoroutine(LoadAudioClip());
+    }
+
     private void Update()
     {
         audioPath = levelConfig.musicPath;

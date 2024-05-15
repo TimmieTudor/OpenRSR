@@ -162,6 +162,12 @@ public class LevelEditor : MonoBehaviour
         m_camera.transform.position = camPos;
         m_camera.transform.rotation = q;
         ClearEverything();
+        gre.UpdateData();
+        ere.UpdateData();
+        themeChanger.UpdateData();
+        gdata = gre.GetData();
+        edata = ere.GetData();
+        ltdata = themeChanger.GetData();
         List<List<int>> gpositions = gdata.positions;
         List<List<int>> epositions = edata.positions;
         for (int i = 0; i < gpositions.Count; i++) {
@@ -479,6 +485,9 @@ public class LevelEditor : MonoBehaviour
         gre.UpdateData();
         ere.UpdateData();
         themeChanger.UpdateData();
+        AudioPlayer audioPlayer = GetComponent<AudioPlayer>();
+        audioPlayer.audioPath = levelConfig.musicPath;
+        audioPlayer.UpdateAudioClip();
         Vector3 gridPosition = grid.transform.position;
         GameObject[] Grids = GameObject.FindGameObjectsWithTag("Grid");
         foreach (GameObject m_grid in Grids) {

@@ -10,7 +10,18 @@
 			"display_author": false,
 			"display_progress": true,
 			"level_difficulty_easy": 0.7,
-			"level_difficulty_hard": 0.9
+			"level_difficulty_hard": 0.9,
+			"level_id": 1
+		},
+		{
+			"display_title": "Sky",
+			"display_gems": 20,
+			"display_crowns": 0,
+			"display_author": false,
+			"display_progress": true,
+			"level_difficulty_easy": 2.2,
+			"level_difficulty_hard": 2.5,
+			"level_id": 2
 		}
 	]
 }

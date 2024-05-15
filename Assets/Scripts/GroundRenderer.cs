@@ -29,7 +29,8 @@ public class GroundRenderer : MonoBehaviour
     private GameManager gameManager;
     private string jsonString;
     private PositionsData data;
-    private GameObject edgePrefab;
+    private GameObject glassEdgePrefab;
+    private GameObject moverEdgePrefab;
     private Vector3 lastPosition = new Vector3(0f, 0f, 0f);
     private bool shouldSpawnPrefabCache = true;
     private ObjectPool objectPool;
@@ -46,7 +47,7 @@ public class GroundRenderer : MonoBehaviour
             yield return new WaitForSeconds(0.4f);
         }
     }
-    private void HandleAllCases(GameObject spawnedPrefab, Vector3 spawnPosition, List<List<int>> positions, int checknum, int i, int j, float x, float z) {
+    private void HandleAllCases(GameObject spawnedPrefab, GameObject edgePrefab, Vector3 spawnPosition, List<List<int>> positions, int checknum, int i, int j, float x, float z) {
         if (i > 0 && i < positions.Count - 1 && j > 0 && j < positions[i].Count - 1) {
             if (!(positions[i+1][j] == checknum)) {
                 GameObject edge1 = Instantiate(edgePrefab, new Vector3(x, 0.1f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
@@ -199,7 +200,8 @@ public class GroundRenderer : MonoBehaviour
     {
         balus = GameObject.FindGameObjectWithTag("Balus");
         sphm = balus.GetComponent<SphereMovement>();
-        edgePrefab = GameObject.Find("DeceBalus_Grouped_Glass_Edge");
+        glassEdgePrefab = GameObject.Find("DeceBalus_Grouped_Glass_Edge");
+        moverEdgePrefab = GameObject.Find("DeceBalus_Mover_Edge");
         GameObject objPoolObject = GameObject.Find("ObjectPool");
         objectPool = objPoolObject.GetComponent<ObjectPool>();
         gameManager = balus.GetComponent<GameManager>();
@@ -305,11 +307,11 @@ public class GroundRenderer : MonoBehaviour
             spawnedPrefabIDs.Add(hasPrefab);
             prefabPositions.Add(spawnPosition, spawnedPrefab);
             if (hasPrefab == 4) {
-                HandleAllCases(spawnedPrefab, spawnPosition, data.positions, 4, i, j, x, z);
+                HandleAllCases(spawnedPrefab, glassEdgePrefab, spawnPosition, data.positions, 4, i, j, x, z);
             } else if (hasPrefab == 5) {
-                HandleAllCases(spawnedPrefab, spawnPosition, data.positions, 5, i, j, x, z);
+                HandleAllCases(spawnedPrefab, glassEdgePrefab, spawnPosition, data.positions, 5, i, j, x, z);
             } else if (hasPrefab == 6) {
-                HandleAllCases(spawnedPrefab, spawnPosition, data.positions, 6, i, j, x, z);
+                HandleAllCases(spawnedPrefab, glassEdgePrefab, spawnPosition, data.positions, 6, i, j, x, z);
             } else if (hasPrefab == 7) {
                 if (spawnedPrefab.TryGetComponent<LeftMovingTileAnim>(out LeftMovingTileAnim leftMovingTileAnim)) {
                     leftMovingTileAnim.xOffset = x;

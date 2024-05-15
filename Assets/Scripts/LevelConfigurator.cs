@@ -149,6 +149,9 @@ public class LevelConfigurator : MonoBehaviour
         levelSpeed = levelSpeedSlider.value;
         startPos = int.Parse(startPosInput.text);
         musicPath = musicPathInput.text;
+        AudioPlayer ap = balus.GetComponent<AudioPlayer>();
+        ap.audioPath = musicPath;
+        ap.LoadAudioClip();
         startPortal = startPortalToggle.isOn;
         if (startPortal) {
             startPortalObject2.SetActive(true);
