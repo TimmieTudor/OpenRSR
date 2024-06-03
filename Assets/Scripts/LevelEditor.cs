@@ -77,12 +77,14 @@ public class LevelEditor : MonoBehaviour
         GameObject[] glassTilesGroup1 = GameObject.FindGameObjectsWithTag("GlassGroup1");
         GameObject[] glassTilesGroup2 = GameObject.FindGameObjectsWithTag("GlassGroup2");
         GameObject[] glassTilesGroup3 = GameObject.FindGameObjectsWithTag("GlassGroup3");
+        GameObject[] moverTilesGroup1 = GameObject.FindGameObjectsWithTag("MoverGroup1");
         GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
         Vector3 jumpTilePos = new Vector3(-32f, 0.2f, -2f);
         Vector3 glassTilePos = new Vector3(-46f, 0f, 0f);
         Vector3 glassGroup1Pos = new Vector3(-49f, 0f, 0f);
         Vector3 glassGroup2Pos = new Vector3(-50f, 0f, 0f);
         Vector3 glassGroup3Pos = new Vector3(-51f, 0f, 0f);
+        Vector3 moverGroup1Pos = new Vector3(-99f, 0f, 0f);
         Vector3 normalTilePos = new Vector3(-35f, 0.2f, 0.08f);
         List<Vector3> ObstaclePoses = new List<Vector3>();
         ObstaclePoses.Add(new Vector3(-33f, 0f, 0f));
@@ -133,6 +135,12 @@ public class LevelEditor : MonoBehaviour
         }
         foreach (GameObject tile in glassTilesGroup3) {
             if (tile.transform.position == glassGroup3Pos) {
+                continue;
+            }
+            Destroy(tile);
+        }
+        foreach (GameObject tile in moverTilesGroup1) {
+            if (tile.transform.position == moverGroup1Pos) {
                 continue;
             }
             Destroy(tile);
@@ -267,6 +275,22 @@ public class LevelEditor : MonoBehaviour
                         canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                         canvasObject.transform.position = new Vector3(x, 1f, z);
                     }
+                } else if (hasPrefab == 9) {
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "1";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 1f, z);
                 }
                 // Obsolete code. Will remove later
                 /*
@@ -549,6 +573,7 @@ public class LevelEditor : MonoBehaviour
         GameObject[] glassTilesGroup1 = GameObject.FindGameObjectsWithTag("GlassGroup1");
         GameObject[] glassTilesGroup2 = GameObject.FindGameObjectsWithTag("GlassGroup2");
         GameObject[] glassTilesGroup3 = GameObject.FindGameObjectsWithTag("GlassGroup3");
+        GameObject[] moverTilesGroup1 = GameObject.FindGameObjectsWithTag("MoverGroup1");
         if (objectLayer == 0) {
             foreach (GameObject tile in normalTiles) {
                 if (tile.transform.position == new Vector3(x, 0f, z)) {
@@ -581,6 +606,12 @@ public class LevelEditor : MonoBehaviour
                 }
             }
             foreach (GameObject tile in glassTilesGroup3) {
+                if (tile.transform.position == new Vector3(x, 0f, z)) {
+                    Destroy(tile);
+                    break;
+                }
+            }
+            foreach (GameObject tile in moverTilesGroup1) {
                 if (tile.transform.position == new Vector3(x, 0f, z)) {
                     Destroy(tile);
                     break;
@@ -678,6 +709,22 @@ public class LevelEditor : MonoBehaviour
                     canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                     canvasObject.transform.position = new Vector3(x, 1f, z);
                 }
+            } else if (hasPrefab == 9) {
+                GameObject canvasObject = new GameObject("Text_Canvas");
+                Canvas canvas = canvasObject.AddComponent<Canvas>();
+                GameObject textObject = new GameObject("Text");
+                TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                textComponent.text = "1";
+                textComponent.alignment = TextAlignmentOptions.Center;
+                canvas.renderMode = RenderMode.WorldSpace;
+                textComponent.fontStyle = FontStyles.Bold;
+                textComponent.fontSize = 0.4f;
+                canvasObject.transform.SetParent(spawnedPrefab.transform);
+                textObject.transform.SetParent(canvasObject.transform);
+                RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                canvasObject.transform.position = new Vector3(x, 1f, z);
             }
             /*
             if (gdata.positions[i][j] == 1) {

@@ -320,6 +320,8 @@ public class GroundRenderer : MonoBehaviour
                 if (spawnedPrefab.TryGetComponent<RightMovingTileAnim>(out RightMovingTileAnim rightMovingTileAnim)) {
                     rightMovingTileAnim.xOffset = x;
                 }
+            } else if (hasPrefab == 9) {
+                HandleAllCases(spawnedPrefab, moverEdgePrefab, spawnPosition, data.positions, 9, i, j, x, z);
             }
             lastPosition = balus.transform.position;
         }

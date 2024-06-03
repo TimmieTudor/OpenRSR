@@ -355,7 +355,7 @@ public class GameManager : MonoBehaviour
         themeWriter.Write(@"{""themeZPositions"":[0],""themeIds"":[0]}");
         themeWriter.Close();
         StreamWriter geoBufferWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"GeoBuffer{previousLevel+1}.json"));
-        geoBufferWriter.Write(@"{""ground"":[200,200,200,200,200,200,200,190,190],""enemies"":[200,190,190,190,190,190,195,195,195,195,190,190,195,190,190,190,190,190,20]}");
+        geoBufferWriter.Write(@"{""ground"":[200,200,200,200,200,200,200,190,190,190],""enemies"":[200,190,190,190,190,190,195,195,195,195,190,190,195,190,190,190,190,190,20]}");
         geoBufferWriter.Close();
         LoadLevelInEditor(previousLevel+1);
     }

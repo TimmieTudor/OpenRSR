@@ -84,7 +84,7 @@ public class SphereMovement : MonoBehaviour
             // If the sphere is jumping, call the Jump() method
             if (jumpTile != null && isJumping)
             {
-                Jump(3.75f, jumpTile);
+                Jump(3.8f, jumpTile);
                 FallingGlass();
             }
             else if (normalTile != null && glassTile != null && !isNotFalling && !manager.isDeathDisabled)
@@ -93,7 +93,7 @@ public class SphereMovement : MonoBehaviour
             } else if (glassTiles.Count > 0) {
                 FallingGlass();
             } else if (manager.levelConfig.startPortal && rb.position.z >= manager.levelConfig.startPos && rb.position.z <= manager.levelConfig.startPos + 4f && isJumping) {
-                Jump(3.75f, new Vector3(0f, 0f, manager.levelConfig.startPos));
+                Jump(3.725f, new Vector3(0f, 0f, manager.levelConfig.startPos));
                 FallingGlass();
             }
         } else {
@@ -286,6 +286,17 @@ public class SphereMovement : MonoBehaviour
                 }
                 hitGroup1 = false;
                 hitGroup2 = false;
+            } else if (collision.gameObject.tag == "MoverCollision") {
+                normalTile = null;
+                glassTile = null;
+                collisionZ = 0f;
+                jumpTile = null;
+                if (!isJumping && rb != null) {
+                    rb.velocity = new Vector3(0f, 0f, 0f);
+                }
+                hitGroup1 = false;
+                hitGroup2 = false;
+                hitGroup3 = false;
             } else if (collision.gameObject.tag == "NormalEndCollision") {
                 normalTile = null;
                 glassTile = null;
@@ -340,6 +351,12 @@ public class SphereMovement : MonoBehaviour
         } else if (collision.gameObject.tag == "GlassCollision") {
             glassTile = collision.gameObject;
             glassTiles.Add(collision.gameObject);
+            normalTile = collision.gameObject;
+            rb.useGravity = false;
+            collisionZ = collision.gameObject.transform.position.z;
+            isNotFalling = false;
+        } else if (collision.gameObject.tag == "MoverCollision") {
+            glassTile = collision.gameObject;
             normalTile = collision.gameObject;
             rb.useGravity = false;
             collisionZ = collision.gameObject.transform.position.z;
