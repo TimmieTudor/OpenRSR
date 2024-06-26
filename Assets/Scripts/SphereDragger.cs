@@ -14,7 +14,7 @@ public class SphereDragger : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && !manager.isGamePaused && !manager.isGameOver) {
+        if (Input.GetMouseButton(0) && !manager.isGamePaused && !manager.isGameOver) {
             isDragging = true;
         } else if (Input.GetMouseButtonUp(0) && !manager.isGamePaused && !manager.isGameOver) {
             isDragging = false;

@@ -84,10 +84,12 @@ public class MainMenuScripts : MonoBehaviour
     private bool isMovingLeft = false;
     private bool isMovingRight = false;
     private int levelCount = 1;
+    public static MainMenuScripts instance;
     // Start is called before the first frame update
     void Start()
     {
         gameManager = GetComponent<GameManager>();
+        instance = this;
         mainMenuCanvas = GameObject.Find("MainMenu");
         leftButton = mainMenuCanvas.transform.Find("LeftButton").gameObject;
         rightButton = mainMenuCanvas.transform.Find("RightButton").gameObject;
@@ -152,6 +154,16 @@ public class MainMenuScripts : MonoBehaviour
         newLevelPercentage.GetComponent<TextMeshProUGUI>().text = "?%";
         GameObject newLevelGems = newLevelItem.transform.GetChild(3).gameObject;
         newLevelGems.GetComponent<TextMeshProUGUI>().text = "?/?";
+    }
+
+    public void ResetMenu() {
+        menuIdx = 0;
+        levelUIComponent.transform.localPosition = new Vector3(800f, 0f, 0f);
+        Debug.Log(levelUIComponent.transform.localPosition);
+        titleText.SetActive(true);
+        isInTitleScreen = true;
+        leftButton.SetActive(false);
+        rightButton.SetActive(false);
     }
 
     public void CreateLevelObjects() {

@@ -133,6 +133,8 @@ public class EnemyRenderer : MonoBehaviour
         else if (hasPrefab == 9)
         {
             spawnPosition = new Vector3(x - 1f, 0.2f, z);
+        } else if (hasPrefab == 19) {
+            spawnPosition = new Vector3(x, 0f, z);
         }
         return spawnPosition;
     }
@@ -146,6 +148,10 @@ public class EnemyRenderer : MonoBehaviour
     {
         if (hasPrefab != 0) {
             GameObject spawnedPrefab = objectPool.GetPrefab(prefabs[hasPrefab], spawnPosition);
+            GlassObject obstacleGlassObject = spawnedPrefab.GetComponent<GlassObject>();
+            if (obstacleGlassObject != null) {
+                obstacleGlassObject.fallCoefficient = 0.125f;
+            }
             if (sphm.fallingObstaclesGroup1.Contains(spawnedPrefab)) {
                 sphm.fallingObstaclesGroup1.Remove(spawnedPrefab);
                 sphm.fallingObstaclesGroup1.Clear();
@@ -285,6 +291,13 @@ public class EnemyRenderer : MonoBehaviour
                 if (spawnedPrefab.TryGetComponent<RightRollerAnim>(out RightRollerAnim rr)) {
                     rr.xOffset = x;
                 }
+            } else if (hasPrefab == 19) {
+                GameObject activeMover = spawnedPrefab.transform.GetChild(0).gameObject;
+                GameObject normalMover = spawnedPrefab.transform.GetChild(1).gameObject;
+                GameObject moverCollision = spawnedPrefab.transform.GetChild(2).gameObject;
+                normalMover.SetActive(true);
+                activeMover.SetActive(false);
+                moverCollision.SetActive(true);
             }
             lastPosition = balus.transform.position;
         }

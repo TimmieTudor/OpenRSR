@@ -6,6 +6,7 @@ using TMPro;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using System;
 
 public class LevelEditor : MonoBehaviour
 {
@@ -78,6 +79,8 @@ public class LevelEditor : MonoBehaviour
         GameObject[] glassTilesGroup2 = GameObject.FindGameObjectsWithTag("GlassGroup2");
         GameObject[] glassTilesGroup3 = GameObject.FindGameObjectsWithTag("GlassGroup3");
         GameObject[] moverTilesGroup1 = GameObject.FindGameObjectsWithTag("MoverGroup1");
+        GameObject[] moverTilesGroup2 = GameObject.FindGameObjectsWithTag("MoverGroup2");
+        GameObject[] moverTilesGroup3 = GameObject.FindGameObjectsWithTag("MoverGroup3");
         GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
         Vector3 jumpTilePos = new Vector3(-32f, 0.2f, -2f);
         Vector3 glassTilePos = new Vector3(-46f, 0f, 0f);
@@ -85,6 +88,8 @@ public class LevelEditor : MonoBehaviour
         Vector3 glassGroup2Pos = new Vector3(-50f, 0f, 0f);
         Vector3 glassGroup3Pos = new Vector3(-51f, 0f, 0f);
         Vector3 moverGroup1Pos = new Vector3(-99f, 0f, 0f);
+        Vector3 moverGroup2Pos = new Vector3(-100f, 0f, 0f);
+        Vector3 moverGroup3Pos = new Vector3(-101f, 0f, 0f);
         Vector3 normalTilePos = new Vector3(-35f, 0.2f, 0.08f);
         List<Vector3> ObstaclePoses = new List<Vector3>();
         ObstaclePoses.Add(new Vector3(-33f, 0f, 0f));
@@ -103,6 +108,7 @@ public class LevelEditor : MonoBehaviour
         ObstaclePoses.Add(new Vector3(-76f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-5f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-83f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-97f, 0f, 0f));
         foreach (GameObject tile in normalTiles) {
             if (tile.transform.position == normalTilePos) {
                 continue;
@@ -141,6 +147,18 @@ public class LevelEditor : MonoBehaviour
         }
         foreach (GameObject tile in moverTilesGroup1) {
             if (tile.transform.position == moverGroup1Pos) {
+                continue;
+            }
+            Destroy(tile);
+        }
+        foreach (GameObject tile in moverTilesGroup2) {
+            if (tile.transform.position == moverGroup2Pos) {
+                continue;
+            }
+            Destroy(tile);
+        }
+        foreach (GameObject tile in moverTilesGroup3) {
+            if (tile.transform.position == moverGroup3Pos) {
                 continue;
             }
             Destroy(tile);
@@ -291,6 +309,38 @@ public class LevelEditor : MonoBehaviour
                     canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                     canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                     canvasObject.transform.position = new Vector3(x, 1f, z);
+                } else if (hasPrefab == 10) {
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "2";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 1f, z);
+                } else if (hasPrefab == 11) {
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "3";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 1f, z);
                 }
                 // Obsolete code. Will remove later
                 /*
@@ -429,6 +479,12 @@ public class LevelEditor : MonoBehaviour
         List<float> themeZPositions = ltdata.themeZPositions;
         Quaternion themetextRotation = Quaternion.Euler(90f, 0f, 0f);
         for (int i = 0; i < themeZPositions.Count; i++) {
+            GameObject[] themes = GameObject.FindGameObjectsWithTag("Theme");
+            foreach (GameObject theme in themes) {
+                if (theme.transform.position == new Vector3(-1.4f, 0.1f, themeZPositions[i] - 0.4f)) {
+                    Destroy(theme);
+                }
+            }
             float z = themeZPositions[i];
             Vector3 spawnPosition = new Vector3(-1.4f, 0.1f, z - 0.4f);
             GameObject spawnedPrefab = Instantiate(themeText, spawnPosition, themetextRotation);
@@ -468,7 +524,9 @@ public class LevelEditor : MonoBehaviour
         string enemyJsonString = JsonConvert.SerializeObject(edata);
         List<int> m_themeIDs = new List<int>();
         List<float> m_themeZPositions = new List<float>();
+        Debug.Log("Theme IDs: " + m_themeIDs.Count);
         GameObject[] m_themes = GameObject.FindGameObjectsWithTag("Theme");
+        Array.Sort(m_themes, new GameObjectComparer());
         Vector3 m_themePos = new Vector3(-37f, 0f, 0f);
         foreach (GameObject m_theme in m_themes) {
             if (m_theme.transform.position == m_themePos) {
@@ -478,18 +536,6 @@ public class LevelEditor : MonoBehaviour
             m_themeIDs.Add(te.themeID);
             m_themeZPositions.Add(m_theme.transform.position.z + 0.4f);
             Destroy(m_theme);
-        }
-        float previousZ = 0f;
-        int previousID = 0;
-        for (int i = 0; i < m_themeZPositions.Count; i++) {
-            if (m_themeZPositions[i] < previousZ) {
-                m_themeZPositions[i-1] = m_themeZPositions[i];
-                m_themeZPositions[i] = previousZ;
-                m_themeIDs[i-1] = m_themeIDs[i];
-                m_themeIDs[i] = previousID;
-            }
-            previousZ = m_themeZPositions[i];
-            previousID = m_themeIDs[i];
         }
         ltdata.themeIds = m_themeIDs;
         ltdata.themeZPositions = m_themeZPositions;
@@ -725,7 +771,39 @@ public class LevelEditor : MonoBehaviour
                 canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                 canvasObject.transform.position = new Vector3(x, 1f, z);
-            }
+            } else if (hasPrefab == 10) {
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "2";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 1f, z);
+                } else if (hasPrefab == 11) {
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "3";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 1f, z);
+                }
             /*
             if (gdata.positions[i][j] == 1) {
                 Instantiate(gre.prefab, new Vector3(x, 0f, z), Quaternion.identity);
@@ -932,6 +1010,7 @@ public class LevelEditor : MonoBehaviour
                     int k = 0;
                     bool themeAlreadyRemoved = false;
                     GameObject[] m_themes = GameObject.FindGameObjectsWithTag("Theme");
+                    Array.Sort(m_themes, new GameObjectComparer());
                     foreach (GameObject m_theme in m_themes) {
                         if (m_theme.transform.position == new Vector3(-1.4f, 0.1f, i - 0.4f)) {
                             Destroy(m_theme);
@@ -995,5 +1074,12 @@ public class LevelEditor : MonoBehaviour
                 }
             }
         }
+    }
+}
+
+public class GameObjectComparer : IComparer {
+
+    public int Compare(object x, object y) {
+        return (x as GameObject).transform.position.z.CompareTo((y as GameObject).transform.position.z);
     }
 }

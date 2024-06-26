@@ -31,7 +31,12 @@ TagManager:
   - LevelEnd
   - NormalEndCollision
   - MoverGroup1
-  - MoverCollision
+  - MoverArrowCollision
+  - MoverCollisionGroup1
+  - MoverGroup2
+  - MoverCollisionGroup2
+  - MoverGroup3
+  - MoverCollisionGroup3
   layers:
   - Default
   - TransparentFX

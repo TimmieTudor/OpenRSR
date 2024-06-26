@@ -46,6 +46,7 @@ public class GameManager : MonoBehaviour
     private List<GameObject> collectedGems = new List<GameObject>();
     private GameObject levelEditButton;
     private GameObject levelEndObject;
+    private GameObject mainMenuCanvas;
     IEnumerator UpdateCache()
     {
         while (true)
@@ -78,6 +79,7 @@ public class GameManager : MonoBehaviour
         levelEdit = GetComponent<LevelEditor>();
         levelEditButton = GameObject.Find("EditButton");
         levelEndObject = GameObject.Find("End");
+        mainMenuCanvas = GameObject.Find("MainMenu");
 
         Application.targetFrameRate = 60;
 
@@ -156,6 +158,39 @@ public class GameManager : MonoBehaviour
             isDataDownloaded = true;
         }
         mainMenuNormalTile = Instantiate(gre.prefabs[1], new Vector3(0f, 0f, rb.position.z), Quaternion.identity);
+    }
+
+    public void ExitToMainMenu() {
+        themeChanger.themeID = 0;
+        themeChanger2.UpdateTheme(themeChanger.themeID);
+        if (levelConfig.startPortal) {
+            levelConfig.startPortalObject2.SetActive(false);
+        }
+        CFollow.enabled = false;
+        Camera.main.transform.position = new Vector3(0f, 2.25f, -2f);
+        audioPlayer.SeekToZero();
+        sphm.ClearFallingObstacles();
+        objectPool.ClearAllPools();
+        gre.ClearPrefabPositions();
+        ere.ClearPrefabPositions();
+        GFreeze.enabled = false;
+        gre.enabled = false;
+        ere.enabled = false;
+        themeChanger.enabled = false;
+        sphm.enabled = false;
+        sphd.enabled = false;
+        themeChanger2.enabled = true;
+        string jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
+        geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(jsonString);
+        objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
+        gamePlayCanvas.SetActive(false);
+        levelEdit.ClearEverything();
+        balus.transform.position = new Vector3(0f, 0.5f, 0f);
+        rb.position = new Vector3(0f, 0.5f, 0f);
+        mainMenuNormalTile = Instantiate(gre.prefabs[1], new Vector3(0f, 0f, rb.position.z), Quaternion.identity);
+        MainMenuScripts.instance.ResetMenu();
+        mainMenuCanvas.SetActive(true);
+        SetIsInMainMenu(true);
     }
 
     void Update()
@@ -255,8 +290,47 @@ public class GameManager : MonoBehaviour
                 num_collectedGems++;
             }
             diamond1stChild.SetActive(false);
+        } else if (other.gameObject.CompareTag("MoverArrowCollision") && !isGameOver) {
+            Vector3 direction = Vector3.zero;
+            if (other.gameObject.transform.rotation.eulerAngles.y == 0f) {
+                direction = Vector3.forward;
+            } else if (other.gameObject.transform.rotation.eulerAngles.y == 90f) {
+                direction = Vector3.right;
+            } else if (other.gameObject.transform.rotation.eulerAngles.y == 180f) {
+                direction = Vector3.back;
+            } else if (other.gameObject.transform.rotation.eulerAngles.y == 270f) {
+                direction = Vector3.left;
+            }
+            GameObject[] moverTiles = GameObject.FindGameObjectsWithTag("MoverCollisionGroup1");
+            foreach (GameObject tile in moverTiles) {
+                if (tile.transform.position.x == other.gameObject.transform.position.x && tile.transform.position.z == other.gameObject.transform.position.z) {
+                    sphm.ActivateMoverTilesG1(direction);
+                    break;
+                }
+            }
+            GameObject[] moverTiles2 = GameObject.FindGameObjectsWithTag("MoverCollisionGroup2");
+            foreach (GameObject tile in moverTiles2) {
+                if (tile.transform.position.x == other.gameObject.transform.position.x && tile.transform.position.z == other.gameObject.transform.position.z) {
+                    sphm.ActivateMoverTilesG2(direction);
+                    break;
+                }
+            }
+            GameObject[] moverTiles3 = GameObject.FindGameObjectsWithTag("MoverCollisionGroup3");
+            foreach (GameObject tile in moverTiles3) {
+                if (tile.transform.position.x == other.gameObject.transform.position.x && tile.transform.position.z == other.gameObject.transform.position.z) {
+                    sphm.ActivateMoverTilesG3(direction);
+                    break;
+                }
+            }
+            GameObject otherParent = other.gameObject.transform.parent.gameObject;
+            GameObject otherActive = otherParent.transform.GetChild(0).gameObject;
+            GameObject otherNormal = otherParent.transform.GetChild(1).gameObject;
+            //otherParent.transform.Translate(direction);
+            otherActive.SetActive(true);
+            otherNormal.SetActive(false);
+            other.gameObject.SetActive(false);
         } else if (other.gameObject.CompareTag("LevelEnd") && !isGameOver) {
-            rb.position = new Vector3(rb.position.x, 0.55f, rb.position.z - 0.1f);
+            rb.position = new Vector3(rb.position.x, 0.5f, rb.position.z - 0.1f);
             sphm.isNotFalling = true;
             GameOver(realPercent);
         }
@@ -275,6 +349,7 @@ public class GameManager : MonoBehaviour
         levelConfig.LoadLevelConfig();
         audioPlayer.audioPath = levelConfig.musicPath;
         audioPlayer.UpdateAudioClip();
+        themeChanger.UpdateData();
         CFollow.enabled = true;
         gre.enabled = true;
         ere.enabled = true;
@@ -296,7 +371,7 @@ public class GameManager : MonoBehaviour
         geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(geoBufferJsonString);
         objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
         if (levelConfig.startPortal) {
-            balus.transform.position = new Vector3(0f, 0.55f, levelConfig.startPos);
+            balus.transform.position = new Vector3(0f, 0.5f, levelConfig.startPos);
         } else {
             balus.transform.position = new Vector3(0f, 0.5f, levelConfig.startPos);
         }
@@ -311,6 +386,7 @@ public class GameManager : MonoBehaviour
         levelConfig.LoadLevelConfig();
         audioPlayer.audioPath = levelConfig.musicPath;
         audioPlayer.UpdateAudioClip();
+        themeChanger.UpdateData();
         CFollow.enabled = true;
         gre.enabled = true;
         ere.enabled = true;
@@ -332,7 +408,7 @@ public class GameManager : MonoBehaviour
         geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(geoBufferJsonString);
         objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
         if (levelConfig.startPortal) {
-            balus.transform.position = new Vector3(0f, 0.55f, levelConfig.startPos);
+            balus.transform.position = new Vector3(0f, 0.5f, levelConfig.startPos);
         } else {
             balus.transform.position = new Vector3(0f, 0.5f, levelConfig.startPos);
         }
@@ -355,7 +431,7 @@ public class GameManager : MonoBehaviour
         themeWriter.Write(@"{""themeZPositions"":[0],""themeIds"":[0]}");
         themeWriter.Close();
         StreamWriter geoBufferWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"GeoBuffer{previousLevel+1}.json"));
-        geoBufferWriter.Write(@"{""ground"":[200,200,200,200,200,200,200,190,190,190],""enemies"":[200,190,190,190,190,190,195,195,195,195,190,190,195,190,190,190,190,190,20]}");
+        geoBufferWriter.Write(@"{""ground"":[200,200,200,200,200,200,200,190,190,190,190,190],""enemies"":[200,190,190,190,190,190,195,195,195,195,190,190,195,190,190,190,190,190,20,125]}");
         geoBufferWriter.Close();
         LoadLevelInEditor(previousLevel+1);
     }
@@ -421,7 +497,7 @@ public class GameManager : MonoBehaviour
         ere.enabled = false;
         gamePlayCanvas.SetActive(true);
         gameOverPanel.SetActive(false);
-        Vector3 balusPos = levelConfig.startPortal ? new Vector3(0f, 0.55f, levelConfig.startPos) : new Vector3(0f, 0.5f, levelConfig.startPos);
+        Vector3 balusPos = levelConfig.startPortal ? new Vector3(0f, 0.5f, levelConfig.startPos) : new Vector3(0f, 0.5f, levelConfig.startPos);
         gre.enabled = true;
         ere.enabled = true;
         themeChanger.enabled = true;

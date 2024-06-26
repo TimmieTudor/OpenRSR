@@ -193,6 +193,9 @@ public class GroundRenderer : MonoBehaviour
         }
         if (ShouldSpawnPrefab(lastPosition)) {
             UpdateGround();
+        } 
+        if (endObject != null && endObject.transform.position != new Vector3(0f, 0f, positionsCount)) {
+            endObject.transform.position = new Vector3(0f, 0f, positionsCount);
         }
     }
 
@@ -245,7 +248,7 @@ public class GroundRenderer : MonoBehaviour
                 if (ShouldSpawnPrefab(spawnPosition))
                 {
                     SpawnPrefab(hasPrefab, spawnPosition, i, j, x, z);
-                    if (i + 1 == positions.Count && endObject != null && endObject.transform.position != new Vector3(0f, 0f, positions.Count)) {
+                    if (i + 1 >= positions.Count && endObject != null && endObject.transform.position != new Vector3(0f, 0f, positions.Count)) {
                         endObject.transform.position = new Vector3(0f, 0f, positions.Count);
                     }
                 }
@@ -300,6 +303,8 @@ public class GroundRenderer : MonoBehaviour
                         Destroy(transform.gameObject);
                     }
                 }
+                GlassObject glassObject = spawnedPrefab.GetComponent<GlassObject>();
+                glassObject.fallCoefficient = 0.125f;
                 //sphm.glassTiles.Clear();
             }
             spawnedPrefab.transform.position = spawnPosition;
@@ -322,6 +327,10 @@ public class GroundRenderer : MonoBehaviour
                 }
             } else if (hasPrefab == 9) {
                 HandleAllCases(spawnedPrefab, moverEdgePrefab, spawnPosition, data.positions, 9, i, j, x, z);
+            } else if (hasPrefab == 10) {
+                HandleAllCases(spawnedPrefab, moverEdgePrefab, spawnPosition, data.positions, 10, i, j, x, z);
+            } else if (hasPrefab == 11) {
+                HandleAllCases(spawnedPrefab, moverEdgePrefab, spawnPosition, data.positions, 11, i, j, x, z);
             }
             lastPosition = balus.transform.position;
         }

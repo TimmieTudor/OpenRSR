@@ -361,6 +361,10 @@ public class DebugModeScripts : MonoBehaviour
         if (isPlaying && currentScene.name == "AnimationDebugScene") {
             PlayAnimation();
         }
+        if (Input.GetKeyDown("7") && (Debug.isDebugBuild || Application.isEditor)) {
+            // Placeholder for the debug menu
+            Debug.Log("Debug Menu");
+        }
     }
 
     private void OnGUI()

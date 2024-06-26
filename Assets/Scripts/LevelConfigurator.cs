@@ -52,7 +52,7 @@ public class LevelConfigurator : MonoBehaviour
     TMP_InputField musicPathInput;
     Slider levelSpeedSlider;
     Toggle startPortalToggle;
-    GameObject startPortalObject2;
+    public GameObject startPortalObject2;
     
     // Start is called before the first frame update
     void Start()

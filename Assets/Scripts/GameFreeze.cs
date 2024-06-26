@@ -6,6 +6,8 @@ public class GameFreeze : MonoBehaviour
 {
     public bool gamePaused = true;
     GameObject pausedText;
+    GameObject pauseButton;
+    GameObject exitButton;
     GameObject editButton;
     GameObject settingsButton;
     float timer;
@@ -24,8 +26,10 @@ public class GameFreeze : MonoBehaviour
         manager = balus.GetComponent<GameManager>();
         gamePaused = true;
         pausedText = GameObject.Find("PausedText");
+        pauseButton = GameObject.Find("PauseButton");
         editButton = GameObject.Find("EditButton");
         settingsButton = GameObject.Find("SettingsButton");
+        exitButton = GameObject.Find("ExitButton");
     }
     
     void Update()
@@ -38,16 +42,20 @@ public class GameFreeze : MonoBehaviour
             pausedText.SetActive(true);
             editButton.SetActive(true);
             settingsButton.SetActive(true);
+            pauseButton.SetActive(false);
+            exitButton.SetActive(true);
             }
         }
         else
         {
             //sphm.enabled = true;
             //sphd.enabled = true;
-            if (pausedText != null && editButton != null && settingsButton != null) {
+            if (pausedText != null && editButton != null && settingsButton != null && pauseButton != null && exitButton != null) {
             pausedText.SetActive(false);
             editButton.SetActive(false);
             settingsButton.SetActive(false);
+            pauseButton.SetActive(true);
+            exitButton.SetActive(false);
             }
         }
 
