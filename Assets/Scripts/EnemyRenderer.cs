@@ -133,7 +133,7 @@ public class EnemyRenderer : MonoBehaviour
         else if (hasPrefab == 9)
         {
             spawnPosition = new Vector3(x - 1f, 0.2f, z);
-        } else if (hasPrefab == 19) {
+        } else if (hasPrefab == 19 || hasPrefab == 20 || hasPrefab == 21 || hasPrefab == 22) {
             spawnPosition = new Vector3(x, 0f, z);
         }
         return spawnPosition;

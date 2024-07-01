@@ -304,7 +304,7 @@ public class GroundRenderer : MonoBehaviour
                     }
                 }
                 GlassObject glassObject = spawnedPrefab.GetComponent<GlassObject>();
-                glassObject.fallCoefficient = 0.125f;
+                glassObject.fallCoefficient = 0.15f;
                 //sphm.glassTiles.Clear();
             }
             spawnedPrefab.transform.position = spawnPosition;

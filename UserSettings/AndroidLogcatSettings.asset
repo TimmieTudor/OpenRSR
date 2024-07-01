@@ -1,9 +1,9 @@
 {
-    "m_SelectedDeviceId": "RF8N72PYSMJ",
+    "m_SelectedDeviceId": "127.0.0.1:58526",
     "m_SelectedPackage": {
-        "deviceId": "RF8N72PYSMJ",
-        "name": "com.ComradeCat.DeceBalus",
-        "processId": 13187,
+        "deviceId": "127.0.0.1:58526",
+        "name": "com.TimmieTudor.OpenRSR",
+        "processId": 1943,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -48,6 +48,30 @@
             "deviceId": "RF8N72PYSMJ",
             "name": "com.ComradeCat.DeceBalus",
             "processId": 13187,
+            "exited": false
+        },
+        {
+            "deviceId": "127.0.0.1:58526",
+            "name": "com.TimmieTudor.OpenRSR",
+            "processId": 2383,
+            "exited": false
+        },
+        {
+            "deviceId": "127.0.0.1:58526",
+            "name": "com.TimmieTudor.OpenRSR",
+            "processId": 2848,
+            "exited": false
+        },
+        {
+            "deviceId": "127.0.0.1:58526",
+            "name": "com.TimmieTudor.OpenRSR",
+            "processId": 3010,
+            "exited": false
+        },
+        {
+            "deviceId": "127.0.0.1:58526",
+            "name": "com.TimmieTudor.OpenRSR",
+            "processId": 1943,
             "exited": false
         }
     ],

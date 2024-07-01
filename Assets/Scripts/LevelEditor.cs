@@ -109,6 +109,9 @@ public class LevelEditor : MonoBehaviour
         ObstaclePoses.Add(new Vector3(-5f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-83f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-97f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-102f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-103f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-104f, 0f, 0f));
         foreach (GameObject tile in normalTiles) {
             if (tile.transform.position == normalTilePos) {
                 continue;
@@ -620,6 +623,8 @@ public class LevelEditor : MonoBehaviour
         GameObject[] glassTilesGroup2 = GameObject.FindGameObjectsWithTag("GlassGroup2");
         GameObject[] glassTilesGroup3 = GameObject.FindGameObjectsWithTag("GlassGroup3");
         GameObject[] moverTilesGroup1 = GameObject.FindGameObjectsWithTag("MoverGroup1");
+        GameObject[] moverTilesGroup2 = GameObject.FindGameObjectsWithTag("MoverGroup2");
+        GameObject[] moverTilesGroup3 = GameObject.FindGameObjectsWithTag("MoverGroup3");
         if (objectLayer == 0) {
             foreach (GameObject tile in normalTiles) {
                 if (tile.transform.position == new Vector3(x, 0f, z)) {
@@ -658,6 +663,18 @@ public class LevelEditor : MonoBehaviour
                 }
             }
             foreach (GameObject tile in moverTilesGroup1) {
+                if (tile.transform.position == new Vector3(x, 0f, z)) {
+                    Destroy(tile);
+                    break;
+                }
+            }
+            foreach (GameObject tile in moverTilesGroup2) {
+                if (tile.transform.position == new Vector3(x, 0f, z)) {
+                    Destroy(tile);
+                    break;
+                }
+            }
+            foreach (GameObject tile in moverTilesGroup3) {
                 if (tile.transform.position == new Vector3(x, 0f, z)) {
                     Destroy(tile);
                     break;

@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class SphereDragger : MonoBehaviour
 {
-    private bool isDragging = false;
+    public bool isDragging = false;
+    public float maxOffset = 6.5f;
     private Rigidbody rb;
     private GameManager manager;
 
@@ -34,7 +35,7 @@ public class SphereDragger : MonoBehaviour
             float normalizedX = ((mousePos.x) / Screen.width) * 2f - 1f;
 
             // Update the x position of the sphere based on the mouse position
-            float xPos = 6.5f * normalizedX * Screen.width / Screen.height;
+            float xPos = maxOffset * normalizedX * Screen.width / Screen.height;
             rb.MovePosition(new Vector3(xPos, transform.position.y, transform.position.z));
         }
     }

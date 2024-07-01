@@ -94,12 +94,12 @@ public class SphereMovement : MonoBehaviour
                 rb.useGravity = false;
                 FallingGlass();
             }
-            else if (normalTile != null && glassTile != null && !isNotFalling && !manager.isDeathDisabled)
+            else if (CheckIfObjectIsNotAboveAnyOtherObject() && !isJumping && !isNotFalling && !manager.isDeathDisabled && !manager.isGameOver)
             {
                 exponential_falus();
             } else if (glassTiles.Count > 0) {
                 FallingGlass();
-            } else if (manager.levelConfig.startPortal && isJumping) {
+            } else if (manager.levelConfig.startPortal && isJumping && rb.position.z < manager.levelConfig.startPos + speed) {
                 rb.useGravity = false;
                 isNotFalling = true;
                 Jump(4f, new Vector3(0f, 0f, manager.levelConfig.startPos));
@@ -419,6 +419,7 @@ public class SphereMovement : MonoBehaviour
             } else if (collision.gameObject.tag == "GlassCollisionGroup1" && !hitGroup1) {
                 ActivateGlassTilesG1(collision.gameObject);
                 hitGroup1 = true;
+                isJumping = false;
                 if (!isJumping && rb != null) {
                     rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
                 }
@@ -427,6 +428,7 @@ public class SphereMovement : MonoBehaviour
             } else if (collision.gameObject.tag == "GlassCollisionGroup2" && !hitGroup2) {
                 ActivateGlassTilesG2(collision.gameObject);
                 hitGroup2 = true;
+                isJumping = false;
                 if (!isJumping && rb != null) {
                     rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
                 }
@@ -435,6 +437,7 @@ public class SphereMovement : MonoBehaviour
             } else if (collision.gameObject.tag == "GlassCollisionGroup3" && !hitGroup3) {
                 ActivateGlassTilesG3(collision.gameObject);
                 hitGroup3 = true;
+                isJumping = false;
                 if (!isJumping && rb != null) {
                     rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
                 }
@@ -498,15 +501,15 @@ public class SphereMovement : MonoBehaviour
         {
             normalTile = null;
             glassTile = null;
-            collisionZ = 0f;
+            collisionZ = transform.position.z;
         } else if (collision.gameObject.tag == "GlassCollision") {
             normalTile = null;
             glassTile = null;
-            collisionZ = 0f;
+            collisionZ = transform.position.z;
         } else {
             normalTile = null;
             glassTile = null;
-            collisionZ = 0f;
+            collisionZ = transform.position.z;
         }
         if (collision.gameObject.tag == "DiamondCollision") {
             rb.MovePosition(rb.position + Vector3.down * 5f * Time.fixedDeltaTime);
@@ -537,16 +540,16 @@ public class SphereMovement : MonoBehaviour
             rb.useGravity = false;
             collisionZ = collision.gameObject.transform.position.z;
             isNotFalling = false;
-        } else if (collision.gameObject.tag == "MoverCollision") {
+        } else if (collision.gameObject.tag == "MoverArrowCollision") {
             glassTile = collision.gameObject;
             normalTile = collision.gameObject;
             rb.useGravity = false;
             collisionZ = collision.gameObject.transform.position.z;
-            isNotFalling = false;
+            isNotFalling = true;
         } else if (collision.gameObject.tag == "GlassCollisionGroup1") {
             //hitGroup1 = true;
             glassTile = collision.gameObject;
-            if (transform.position.z - collision.gameObject.transform.position.z > 0.1f) {
+            if (transform.position.z - collision.gameObject.transform.position.z > 0.01f) {
                 foreach (GameObject m_GlassTile in glassGroup1) {
                     if (m_GlassTile == null) continue;
                     if (!glassTiles.Contains(m_GlassTile)) {
@@ -567,7 +570,7 @@ public class SphereMovement : MonoBehaviour
         } else if (collision.gameObject.tag == "GlassCollisionGroup2") {
             //hitGroup2 = true;
             glassTile = collision.gameObject;
-            if (transform.position.z - collision.gameObject.transform.position.z > 0.1f) {
+            if (transform.position.z - collision.gameObject.transform.position.z > 0.01f) {
                 foreach (GameObject m_GlassTile in glassGroup2) {
                     if (m_GlassTile == null) continue;
                     if (!glassTiles.Contains(m_GlassTile)) {
@@ -588,7 +591,7 @@ public class SphereMovement : MonoBehaviour
         } else if (collision.gameObject.tag == "GlassCollisionGroup3") {
             //hitGroup3 = true;
             glassTile = collision.gameObject;
-            if (transform.position.z - collision.gameObject.transform.position.z > 0.1f) {
+            if (transform.position.z - collision.gameObject.transform.position.z > 0.01f) {
                 foreach (GameObject m_GlassTile in glassGroup3) {
                     if (m_GlassTile == null) continue;
                     if (!glassTiles.Contains(m_GlassTile)) {
@@ -635,6 +638,28 @@ public class SphereMovement : MonoBehaviour
             /*if (!isJumping && !(manager.levelConfig.startPortal && rb.position.z < manager.levelConfig.startPos + 4f)) {
                 rb.MovePosition(rb.position + Vector3.down * 0.25f);
             } */
+        }
+    }
+
+    bool CheckIfObjectIsNotAboveAnyOtherObject()
+    {
+        // Cast a ray downward from the object's position
+        Ray ray = new Ray(transform.position, Vector3.down);
+
+        // Perform the raycast
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
+        {
+            // If the raycast hits any collider, the object is above another object
+            if ((hit.collider.gameObject.tag == "GlassCollisionGroup1" || hit.collider.gameObject.tag == "GlassCollisionGroup2" || hit.collider.gameObject.tag == "GlassCollisionGroup3") && hit.collider.gameObject.transform.position.y < -0.1f) {
+                return true;
+            }
+            return false;
+        }
+        else
+        {
+            // If the raycast does not hit any collider, the object is not above any other object
+            return true;
         }
     }
 
@@ -869,7 +894,6 @@ public class SphereMovement : MonoBehaviour
             // If the zDiff is greater than the distance, set the jumpTile to null and enable gravity for the sphere 
             if (z >= distance) 
             {
-                Debug.Log("Jumped");
                 //jumpCalc = 0f;
                 isJumping = false;
                 collisionZ = transform.position.z;
@@ -884,7 +908,6 @@ public class SphereMovement : MonoBehaviour
     {
         if (!manager.isGameOver) {
             float z = transform.position.z - collisionZ;
-            Debug.Log(z);
             float downY = jumpFunction(z + 2f, 1f) * -1f;
             Vector3 downVector = Vector3.down * downY;
             rb.MovePosition(rb.position + downVector * Time.fixedDeltaTime);
@@ -903,5 +926,11 @@ public class SphereMovement : MonoBehaviour
         fallingObstaclesGroup2.Clear();
         glassGroup3.Clear();
         fallingObstaclesGroup3.Clear();
+        moverGroup1.Clear();
+        movingObstaclesGroup1.Clear();
+        moverGroup2.Clear();
+        movingObstaclesGroup2.Clear();
+        moverGroup3.Clear();
+        movingObstaclesGroup3.Clear();
     }
 }

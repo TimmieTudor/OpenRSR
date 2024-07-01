@@ -47,6 +47,10 @@ public class GameManager : MonoBehaviour
     private GameObject levelEditButton;
     private GameObject levelEndObject;
     private GameObject mainMenuCanvas;
+    public bool hasFallen = false;
+    public bool hasHitObstacle = false;
+    public bool delayed = false;
+    public static GameManager instance;
     IEnumerator UpdateCache()
     {
         while (true)
@@ -60,6 +64,7 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
+        instance = this;
         percentTextLabel = GameObject.Find("Percent");
         percentTextMesh = percentTextLabel.GetComponent<TextMeshProUGUI>();
         balus = GameObject.FindGameObjectWithTag("Balus");
@@ -81,13 +86,18 @@ public class GameManager : MonoBehaviour
         levelEndObject = GameObject.Find("End");
         mainMenuCanvas = GameObject.Find("MainMenu");
 
-        Application.targetFrameRate = 60;
+        //Application.targetFrameRate = 60;
 
         if (File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Ground1.json")) 
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies1.json")) 
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes1.json")) 
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config1.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer1.json"))
+        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Ground2.json")) 
+        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies2.json")) 
+        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes2.json")) 
+        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config2.json"))
+        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer2.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "ThemeData/ThemeData.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background1.png"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background2.png"))
@@ -102,6 +112,7 @@ public class GameManager : MonoBehaviour
         && File.Exists(Path.Combine(Application.persistentDataPath, "General3.png"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "General6.png"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music1.mp3"))
+        && File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music2.mp3"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "WorldShow/World1.png"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "MenuData/MenuData.json")))
         {
@@ -201,6 +212,11 @@ public class GameManager : MonoBehaviour
             && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes1.json")) 
             && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config1.json"))
             && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer1.json"))
+            && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Ground2.json")) 
+            && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies2.json")) 
+            && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes2.json")) 
+            && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config2.json"))
+            && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer2.json"))
             && File.Exists(Path.Combine(Application.persistentDataPath, "ThemeData/ThemeData.json"))
             && File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background1.png"))
             && File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background2.png"))
@@ -215,6 +231,7 @@ public class GameManager : MonoBehaviour
             && File.Exists(Path.Combine(Application.persistentDataPath, "General3.png"))
             && File.Exists(Path.Combine(Application.persistentDataPath, "General6.png"))
             && File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music1.mp3"))
+            && File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music2.mp3"))
             && File.Exists(Path.Combine(Application.persistentDataPath, "WorldShow/World1.png"))
             && File.Exists(Path.Combine(Application.persistentDataPath, "MenuData/MenuData.json")))
             {
@@ -270,9 +287,10 @@ public class GameManager : MonoBehaviour
         percentTextMesh.SetText(realPercent);
 
         // Check if Balus falls under Y position 0
-        if (balus.transform.position.y < 0.05f && !isGameOver && !isDeathDisabled)
+        if (balus.transform.position.y < 0f && !isGameOver && !isDeathDisabled && !delayed)
         {
-            GameOver(realPercent);
+            hasFallen = true;
+            StartCoroutine(DelayGameOver(realPercent, 0.5f));
         }
     }
 
@@ -280,7 +298,8 @@ public class GameManager : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Obstacle") && !isGameOver && !isDeathDisabled)
         {
-            GameOver(realPercent);
+            hasHitObstacle = true;
+            StartCoroutine(DelayGameOver(realPercent, 0.1f));
         } else if (other.gameObject.CompareTag("DiamondCollision") && !isGameOver) {
             GameObject diamondParent = other.gameObject.transform.parent.gameObject;
             SoundPlayer snd = diamondParent.GetComponent<SoundPlayer>();
@@ -292,13 +311,16 @@ public class GameManager : MonoBehaviour
             diamond1stChild.SetActive(false);
         } else if (other.gameObject.CompareTag("MoverArrowCollision") && !isGameOver) {
             Vector3 direction = Vector3.zero;
-            if (other.gameObject.transform.rotation.eulerAngles.y == 0f) {
+            GameObject otherParent = other.gameObject.transform.parent.gameObject;
+            GameObject otherActive = otherParent.transform.GetChild(0).gameObject;
+            GameObject otherNormal = otherParent.transform.GetChild(1).gameObject;
+            if (otherNormal.transform.rotation.eulerAngles.y == 0f) {
                 direction = Vector3.forward;
-            } else if (other.gameObject.transform.rotation.eulerAngles.y == 90f) {
+            } else if (otherNormal.transform.rotation.eulerAngles.y == 90f) {
                 direction = Vector3.right;
-            } else if (other.gameObject.transform.rotation.eulerAngles.y == 180f) {
+            } else if (otherNormal.transform.rotation.eulerAngles.y == 180f) {
                 direction = Vector3.back;
-            } else if (other.gameObject.transform.rotation.eulerAngles.y == 270f) {
+            } else if (otherNormal.transform.rotation.eulerAngles.y == 270f) {
                 direction = Vector3.left;
             }
             GameObject[] moverTiles = GameObject.FindGameObjectsWithTag("MoverCollisionGroup1");
@@ -322,9 +344,6 @@ public class GameManager : MonoBehaviour
                     break;
                 }
             }
-            GameObject otherParent = other.gameObject.transform.parent.gameObject;
-            GameObject otherActive = otherParent.transform.GetChild(0).gameObject;
-            GameObject otherNormal = otherParent.transform.GetChild(1).gameObject;
             //otherParent.transform.Translate(direction);
             otherActive.SetActive(true);
             otherNormal.SetActive(false);
@@ -449,6 +468,13 @@ public class GameManager : MonoBehaviour
         settingsPanel.SetActive(false);
     }
 
+    public IEnumerator DelayGameOver(string percent, float delay) {
+        delayed = true;
+        yield return new WaitForSeconds(delay);
+        GameOver(percent);
+        delayed = false;
+    }
+
     void GameOver(string percent)
     {
         isGameOver = true;
@@ -485,6 +511,7 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         sphm.isJumping = false;
+        hasFallen = false;
         objectPool.ClearAllPools();
         num_collectedGems = 0;
         string jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
@@ -554,6 +581,11 @@ public class GameManager : MonoBehaviour
         TextAsset theme2 = Resources.Load<TextAsset>("ThemeData/ThemeData");
         TextAsset config1 = Resources.Load<TextAsset>("LevelData/Config1");
         TextAsset geoBuffer1 = Resources.Load<TextAsset>("LevelData/GeoBuffer1");
+        TextAsset ground2 = Resources.Load<TextAsset>("LevelData/Ground2");
+        TextAsset enemies2 = Resources.Load<TextAsset>("LevelData/Enemies2");
+        TextAsset theme3 = Resources.Load<TextAsset>("LevelData/Themes2");
+        TextAsset config2 = Resources.Load<TextAsset>("LevelData/Config2");
+        TextAsset geoBuffer2 = Resources.Load<TextAsset>("LevelData/GeoBuffer2");
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "LevelData"));
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "ThemeData"));
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Backgrounds"));
@@ -578,6 +610,21 @@ public class GameManager : MonoBehaviour
         StreamWriter geoBufferWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer1.json"));
         geoBufferWriter.Write(geoBuffer1.text);
         geoBufferWriter.Close();
+        StreamWriter groundWriter2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Ground2.json"));
+        groundWriter2.Write(ground2.text);
+        groundWriter2.Close();
+        StreamWriter enemiesWriter2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Enemies2.json"));
+        enemiesWriter2.Write(enemies2.text);
+        enemiesWriter2.Close();
+        StreamWriter themeWriter2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Themes2.json"));
+        themeWriter2.Write(theme3.text);
+        themeWriter2.Close();
+        StreamWriter configWriter2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Config2.json"));
+        configWriter2.Write(config2.text);
+        configWriter2.Close();
+        StreamWriter geoBufferWriter2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer2.json"));
+        geoBufferWriter2.Write(geoBuffer2.text);
+        geoBufferWriter2.Close();
         Texture2D background1 = Resources.Load<Texture2D>("Backgrounds/Background1");
         byte[] data = background1.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Backgrounds/Background1.png"), data);
@@ -617,6 +664,9 @@ public class GameManager : MonoBehaviour
         AudioClip music1 = Resources.Load<AudioClip>("Music/Music1");
         byte[] mp3 = WavToMp3.ConvertWavToMp3(music1, 128);
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Music/Music1.mp3"), mp3);
+        AudioClip music2 = Resources.Load<AudioClip>("Music/Music2");
+        byte[] mp32 = WavToMp3.ConvertWavToMp3(music2, 128);
+        File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Music/Music2.mp3"), mp32);
         Texture2D worldShow1 = Resources.Load<Texture2D>("WorldShow/World1");
         byte[] worldShowData = worldShow1.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "WorldShow/World1.png"), worldShowData);
