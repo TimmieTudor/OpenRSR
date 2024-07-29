@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using OpenRSR.Animation;
 
 public class DebugModeScripts : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class DebugModeScripts : MonoBehaviour
     private LaserAnim laserAnim;
     private FloaterAnim floaterAnim;
     private SpotlightAnim spotlightAnim;
+    private TowerAnim towerAnim;
     private FrameAnim crusherAnimator1;
     private FrameAnim crusherAnimator2;
     private FrameAnim crusherAnimatorSus1;
@@ -55,6 +57,19 @@ public class DebugModeScripts : MonoBehaviour
     private FrameAnim floaterAnimator;
     private FrameAnim floaterAnimator2;
     private FrameAnim spotlightAnimator;
+    private FrameAnim towerAnimator;
+    private FrameAnim towerAnimator2;
+    private FrameAnim towerAnimator3;
+    private FrameAnim towerAnimator4;
+    private FrameAnim towerAnimator5;
+    private FrameAnim towerAnimator6;
+    private FrameAnim towerAnimator7;
+    private FrameAnim towerAnimator8;
+    private FrameAnim towerAnimator9;
+    private FrameAnim towerAnimator10;
+    private FrameAnim towerAnimator11;
+    private FrameAnim towerAnimator12;
+    private FrameAnim towerAnimator13;
     public float currentFrame;
     public int objectID = 1;
     private bool isPlaying = false;
@@ -78,41 +93,55 @@ public class DebugModeScripts : MonoBehaviour
         laserAnim = GameObject.Find("DeceBalus_Laser").GetComponent<LaserAnim>();
         floaterAnim = GameObject.Find("DeceBalus_Floater").GetComponent<FloaterAnim>();
         spotlightAnim = GameObject.Find("DeceBalus_Spotlight").GetComponent<SpotlightAnim>();
-        crusherAnimator1 = crusherAnim.animator;
-        crusherAnimator2 = crusherAnim.animator2;
-        crusherAnimatorSus1 = crusherAnimSus.animator;
-        crusherAnimatorSus2 = crusherAnimSus.animator2;
-        riserAnimator1 = riserAnim.animator;
-        riserAnimator2 = riserAnim.animator2;
-        hammerAnimator = hammerAnim.animator;
-        hammerAnimator2 = hammerAnim.animator2;
-        hammerLargeAnimator = hammerLargeAnim.animator;
-        largeTreeAnimator = largeTreeAnim.animator;
-        largeTreeAnimator2 = largeTreeAnim.animator2;
-        largeTreeAnimator3 = largeTreeAnim.animator3;
-        largeTreeAnimator4 = largeTreeAnim.animator4;
-        largeTreeAnimator5 = largeTreeAnim.animator5;
-        largeTreeAnimator6 = largeTreeAnim.animator6;
-        largeTreeAnimator7 = largeTreeAnim.animator7;
-        largeTreeAnimator8 = largeTreeAnim.animator8;
-        mediumTreeAnimator = mediumTreeAnim.animator;
-        mediumTreeAnimator2 = mediumTreeAnim.animator2;
-        mediumTreeAnimator3 = mediumTreeAnim.animator3;
-        mediumTreeAnimator4 = mediumTreeAnim.animator4;
-        mediumTreeAnimator5 = mediumTreeAnim.animator5;
-        smallTreeAnimator = smallTreeAnim.animator;
-        smallTreeAnimator2 = smallTreeAnim.animator2;
-        smallTreeAnimator3 = smallTreeAnim.animator3;
-        smallTreeAnimator4 = smallTreeAnim.animator4;
-        smallTreeAnimator5 = smallTreeAnim.animator5;
-        smallTreeAnimator6 = smallTreeAnim.animator6;
-        smallTreeAnimator7 = smallTreeAnim.animator7;
-        laserAnimator = laserAnim.animator;
-        laserAnimator2 = laserAnim.animator2;
-        laserAnimator3 = laserAnim.animator3;
-        floaterAnimator = floaterAnim.animator;
-        floaterAnimator2 = floaterAnim.animator2;
-        spotlightAnimator = spotlightAnim.animator;
+        towerAnim = GameObject.Find("DeceBalus_Tower").GetComponent<TowerAnim>();
+        crusherAnimator1 = crusherAnim.animators[0];
+        crusherAnimator2 = crusherAnim.animators[1];
+        crusherAnimatorSus1 = crusherAnimSus.animators[0];
+        crusherAnimatorSus2 = crusherAnimSus.animators[1];
+        riserAnimator1 = riserAnim.animators[0];
+        riserAnimator2 = riserAnim.animators[1];
+        hammerAnimator = hammerAnim.animators[0];
+        hammerAnimator2 = hammerAnim.animators[1];
+        hammerLargeAnimator = hammerLargeAnim.animators[0];
+        largeTreeAnimator = largeTreeAnim.animators[0];
+        largeTreeAnimator2 = largeTreeAnim.animators[1];
+        largeTreeAnimator3 = largeTreeAnim.animators[2];
+        largeTreeAnimator4 = largeTreeAnim.animators[3];
+        largeTreeAnimator5 = largeTreeAnim.animators[4];
+        largeTreeAnimator6 = largeTreeAnim.animators[5];
+        largeTreeAnimator7 = largeTreeAnim.animators[6];
+        largeTreeAnimator8 = largeTreeAnim.animators[7];
+        mediumTreeAnimator = mediumTreeAnim.animators[0];
+        mediumTreeAnimator2 = mediumTreeAnim.animators[1];
+        mediumTreeAnimator3 = mediumTreeAnim.animators[2];
+        mediumTreeAnimator4 = mediumTreeAnim.animators[3];
+        mediumTreeAnimator5 = mediumTreeAnim.animators[4];
+        smallTreeAnimator = smallTreeAnim.animators[0];
+        smallTreeAnimator2 = smallTreeAnim.animators[1];
+        smallTreeAnimator3 = smallTreeAnim.animators[2];
+        smallTreeAnimator4 = smallTreeAnim.animators[3];
+        smallTreeAnimator5 = smallTreeAnim.animators[4];
+        smallTreeAnimator6 = smallTreeAnim.animators[5];
+        smallTreeAnimator7 = smallTreeAnim.animators[6];
+        laserAnimator = laserAnim.animators[0];
+        laserAnimator2 = laserAnim.animators[1];
+        laserAnimator3 = laserAnim.animators[2];
+        floaterAnimator = floaterAnim.animators[0];
+        floaterAnimator2 = floaterAnim.animators[1];
+        spotlightAnimator = spotlightAnim.animators[0];
+        towerAnimator = towerAnim.animators[0];
+        towerAnimator2 = towerAnim.animators[1];
+        towerAnimator3 = towerAnim.animators[2];
+        towerAnimator4 = towerAnim.animators[3];
+        towerAnimator5 = towerAnim.animators[4];
+        towerAnimator6 = towerAnim.animators[5];
+        towerAnimator7 = towerAnim.animators[6];
+        towerAnimator8 = towerAnim.animators[7];
+        towerAnimator9 = towerAnim.animators[8];
+        towerAnimator10 = towerAnim.animators[9];
+        towerAnimator11 = towerAnim.animators[10];
+        towerAnimator12 = towerAnim.animators[11];
+        towerAnimator13 = towerAnim.animators[12];
         crusherAnim.enabled = false;
         crusherAnimSus.enabled = false;
         riserAnim.enabled = false;
@@ -124,6 +153,7 @@ public class DebugModeScripts : MonoBehaviour
         laserAnim.enabled = false;
         floaterAnim.enabled = false;
         spotlightAnim.enabled = false;
+        towerAnim.enabled = false;
         crusherAnimator1.SetFrame(1, 0f);
         crusherAnimator2.SetFrame(1, 0f);
         crusherAnimatorSus1.SetFrame(1, 0f);
@@ -159,6 +189,19 @@ public class DebugModeScripts : MonoBehaviour
         floaterAnimator.SetFrame(1, 0f);
         floaterAnimator2.SetFrame(1, 0f);
         spotlightAnimator.SetFrame(1, 0f);
+        towerAnimator.SetFrame(1, 0f);
+        towerAnimator2.SetFrame(1, 0f);
+        towerAnimator3.SetFrame(1, 0f);
+        towerAnimator4.SetFrame(1, 0f);
+        towerAnimator5.SetFrame(1, 0f);
+        towerAnimator6.SetFrame(1, 0f);
+        towerAnimator7.SetFrame(1, 0f);
+        towerAnimator8.SetFrame(1, 0f);
+        towerAnimator9.SetFrame(1, 0f);
+        towerAnimator10.SetFrame(1, 0f);
+        towerAnimator11.SetFrame(1, 0f);
+        towerAnimator12.SetFrame(1, 0f);
+        towerAnimator13.SetFrame(1, 0f);
         }
     }
 
@@ -327,8 +370,40 @@ public class DebugModeScripts : MonoBehaviour
                 return;
             }
             spotlightAnimator.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
+        } else if (objectID == 13) {
+            if (currentFrame >= towerAnimator.frames.Count - 1) {
+                currentFrame = 0;
+                towerAnimator.SetFrame(1, 0f);
+                towerAnimator2.SetFrame(1, 0f);
+                towerAnimator3.SetFrame(1, 0f);
+                towerAnimator4.SetFrame(1, 0f);
+                towerAnimator5.SetFrame(1, 0f);
+                towerAnimator6.SetFrame(1, 0f);
+                towerAnimator7.SetFrame(1, 0f);
+                towerAnimator8.SetFrame(1, 0f);
+                towerAnimator9.SetFrame(1, 0f);
+                towerAnimator10.SetFrame(1, 0f);
+                towerAnimator11.SetFrame(1, 0f);
+                towerAnimator12.SetFrame(1, 0f);
+                towerAnimator13.SetFrame(1, 0f);
+                isPlaying = false;
+                return;
+            }
+            towerAnimator.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
+            towerAnimator2.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
+            towerAnimator3.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
+            towerAnimator4.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
+            towerAnimator5.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
+            towerAnimator6.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
+            towerAnimator7.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
+            towerAnimator8.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
+            towerAnimator9.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
+            towerAnimator10.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
+            towerAnimator11.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
+            towerAnimator12.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
+            towerAnimator13.SetFrame((int)currentFrame + 1, currentFrame - (int)currentFrame);
         }
-        currentFrame += 0.1f;
+        currentFrame += 1f;
         }
     }
 

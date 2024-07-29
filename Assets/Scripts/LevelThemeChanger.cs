@@ -19,7 +19,7 @@ public class LevelThemeChanger : MonoBehaviour
     {
         ball = GameObject.FindGameObjectWithTag("Balus");
         themeChanger = GetComponent<ThemeChanger>();
-        gameManager = ball.GetComponent<GameManager>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         if (gameManager.isDataDownloaded)
         {

@@ -37,6 +37,13 @@ TagManager:
   - MoverCollisionGroup2
   - MoverGroup3
   - MoverCollisionGroup3
+  - MoverAutoGroup1
+  - MoverAutoCollisionGroup1
+  - MoverAutoGroup2
+  - MoverAutoCollisionGroup2
+  - MoverAutoGroup3
+  - MoverAutoCollisionGroup3
+  - MoverAutoArrowCollision
   layers:
   - Default
   - TransparentFX

@@ -9,9 +9,10 @@
 			"display_crowns": 0,
 			"display_author": false,
 			"display_progress": true,
+			"display_background": 0,
 			"level_difficulty_easy": 0.7,
 			"level_difficulty_hard": 0.9,
-			"level_id": 1
+			"level_id": "valea"
 		},
 		{
 			"display_title": "Sky",
@@ -19,9 +20,10 @@
 			"display_crowns": 0,
 			"display_author": false,
 			"display_progress": true,
+			"display_background": 1,
 			"level_difficulty_easy": 2.2,
 			"level_difficulty_hard": 2.5,
-			"level_id": 2
+			"level_id": "aperta"
 		}
 	]
 }

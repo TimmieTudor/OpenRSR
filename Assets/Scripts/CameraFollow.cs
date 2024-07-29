@@ -4,6 +4,8 @@ public class CameraFollow : MonoBehaviour
 {
     public Transform target;
     public float smoothSpeed = 0.125f;
+    public float divideCoefficient = 2f;
+    public bool lockY = true;
     public Vector3 offset;
     public Quaternion fixedRotation;
     Vector3 desiredPosition;
@@ -11,8 +13,10 @@ public class CameraFollow : MonoBehaviour
     private void LateUpdate()
     {
         Vector3 newPosition = target.position;
-        newPosition.y = 0.6f;
-        newPosition.x /= 2f;
+        if (lockY) {
+            newPosition.y = 0.6f;
+        }
+        newPosition.x /= divideCoefficient;
         desiredPosition = newPosition + offset;
         Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
 

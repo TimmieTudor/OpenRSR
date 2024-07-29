@@ -34,7 +34,7 @@ public class LevelConfigurator : MonoBehaviour
     public string musicPath;
     public string worldshowPath;
     public bool startPortal;
-    private GameObject balus;
+    public GameObject balus;
     private Rigidbody rb;
     private GameManager gameManager;
     public GameObject levelConfigPanel;
@@ -57,9 +57,9 @@ public class LevelConfigurator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        balus = GameObject.FindGameObjectWithTag("Balus");
+        //balus = GameObject.FindGameObjectWithTag("Balus");
         rb = balus.GetComponent<Rigidbody>();
-        gameManager = balus.GetComponent<GameManager>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         if (gameManager.isDataDownloaded) {
             jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
             Debug.Log("Data downloaded");
@@ -83,10 +83,10 @@ public class LevelConfigurator : MonoBehaviour
     public void LoadLevelConfig() {
         if (gameManager.isDataDownloaded) {
             jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
-            Debug.Log("Data downloaded");
+            //Debug.Log("Data downloaded");
         } else {
             jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
-            Debug.Log("Data not downloaded");
+            //Debug.Log("Data not downloaded");
         }
         LevelConfigJson config = JsonConvert.DeserializeObject<LevelConfigJson>(jsonString);
         levelName = config.level_name;

@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using OpenRSR.Animation;
 public class SphereMovement : MonoBehaviour
 {
     // The speed of the sphere
@@ -43,7 +44,7 @@ public class SphereMovement : MonoBehaviour
     {
         // Get the Rigidbody component of the sphere
         rb = GetComponent<Rigidbody>();
-        manager = GetComponent<GameManager>();
+        manager = GameObject.Find("GameManager").GetComponent<GameManager>();
          // Create a new instance of the MethFunction
         MethFunction meth = new MethFunction();
          // Modify the speed of the sphere using the MethFunction
@@ -83,23 +84,23 @@ public class SphereMovement : MonoBehaviour
             Vector3 direction = Vector3.forward;
             Vector3 movement = direction.normalized * speed;
             // Move the sphere according to the movement Vector3
-            rb.MovePosition(transform.position + movement * Time.fixedDeltaTime);
+            transform.Translate(movement * Time.fixedDeltaTime);
             if (!isNotFalling && !manager.isDeathDisabled && !manager.isGameOver) {
                 rb.useGravity = true;
             }
             // If the sphere is jumping, call the Jump() method
             if (jumpTile != null && isJumping)
             {
-                Jump(3.8f, jumpTile);
+                Jump(3.875f, jumpTile);
                 rb.useGravity = false;
                 FallingGlass();
             }
-            else if (CheckIfObjectIsNotAboveAnyOtherObject() && !isJumping && !isNotFalling && !manager.isDeathDisabled && !manager.isGameOver)
+            else if (CheckIfObjectIsNotAboveAnyOtherObject() && !isJumping && !manager.isDeathDisabled && !manager.isGameOver)
             {
                 exponential_falus();
             } else if (glassTiles.Count > 0) {
                 FallingGlass();
-            } else if (manager.levelConfig.startPortal && isJumping && rb.position.z < manager.levelConfig.startPos + speed) {
+            } else if (manager.levelConfig.startPortal && isJumping && rb.position.z < manager.levelConfig.startPos + 3.8f) {
                 rb.useGravity = false;
                 isNotFalling = true;
                 Jump(4f, new Vector3(0f, 0f, manager.levelConfig.startPos));
@@ -216,160 +217,19 @@ public class SphereMovement : MonoBehaviour
         }
     }
 
-    public void PrepareMoverTilesG1(GameObject currentMoverTile) {
-        if (hitGroup1) return;
-        GameObject currentMoverTileParent = currentMoverTile.transform.parent.gameObject;
-        moverGroup1.Add(currentMoverTile);
-        List<GameObject> c_risers = GameObject.FindGameObjectsWithTag("Riser").ToList();
-        if (c_risers.Any(c_riser => c_riser.transform.position.z == currentMoverTileParent.transform.position.z && c_riser.transform.position.x == currentMoverTileParent.transform.position.x)) {
-        foreach (GameObject c_riser in c_risers) {
-            if (c_riser.transform.position.z == currentMoverTileParent.transform.position.z && c_riser.transform.position.x == currentMoverTileParent.transform.position.x) {
-                movingObstaclesGroup1.Add(c_riser);
-                break;
-            }
-        }
-        }
-        List<GameObject> c_moverTiles = GameObject.FindGameObjectsWithTag("MoverCollisionGroup1").ToList();
-        foreach (GameObject c_moverTile in c_moverTiles) {
-            if (!moverGroup1.Contains(c_moverTile)) {
-                if (Mathf.Abs(c_moverTile.transform.position.z - currentMoverTileParent.transform.position.z) == 1f && Mathf.Abs(c_moverTile.transform.position.x - currentMoverTileParent.transform.position.x) == 1f) {
-                    continue;
-                }
-                if (Mathf.Abs(c_moverTile.transform.position.z - currentMoverTileParent.transform.position.z) <= 1f && Mathf.Abs(c_moverTile.transform.position.x - currentMoverTileParent.transform.position.x) <= 1f) {
-                    PrepareMoverTilesG1(c_moverTile);
-                }
-            }
-        }
-    }
-
-    public void PrepareMoverTilesG2(GameObject currentMoverTile) {
-        if (hitGroup2) return;
-        GameObject currentMoverTileParent = currentMoverTile.transform.parent.gameObject;
-        moverGroup2.Add(currentMoverTile);
-        List<GameObject> c_risers = GameObject.FindGameObjectsWithTag("Riser").ToList();
-        if (c_risers.Any(c_riser => c_riser.transform.position.z == currentMoverTileParent.transform.position.z && c_riser.transform.position.x == currentMoverTileParent.transform.position.x)) {
-        foreach (GameObject c_riser in c_risers) {
-            if (c_riser.transform.position.z == currentMoverTileParent.transform.position.z && c_riser.transform.position.x == currentMoverTileParent.transform.position.x) {
-                movingObstaclesGroup2.Add(c_riser);
-                break;
-            }
-        }
-        }
-        List<GameObject> c_moverTiles = GameObject.FindGameObjectsWithTag("MoverCollisionGroup2").ToList();
-        foreach (GameObject c_moverTile in c_moverTiles) {
-            if (!moverGroup2.Contains(c_moverTile)) {
-                if (Mathf.Abs(c_moverTile.transform.position.z - currentMoverTileParent.transform.position.z) == 1f && Mathf.Abs(c_moverTile.transform.position.x - currentMoverTileParent.transform.position.x) == 1f) {
-                    continue;
-                }
-                if (Mathf.Abs(c_moverTile.transform.position.z - currentMoverTileParent.transform.position.z) <= 1f && Mathf.Abs(c_moverTile.transform.position.x - currentMoverTileParent.transform.position.x) <= 1f) {
-                    PrepareMoverTilesG2(c_moverTile);
-                }
-            }
-        }
-    }
-
-    public void PrepareMoverTilesG3(GameObject currentMoverTile) {
-        if (hitGroup3) return;
-        GameObject currentMoverTileParent = currentMoverTile.transform.parent.gameObject;
-        moverGroup3.Add(currentMoverTile);
-        List<GameObject> c_risers = GameObject.FindGameObjectsWithTag("Riser").ToList();
-        if (c_risers.Any(c_riser => c_riser.transform.position.z == currentMoverTileParent.transform.position.z && c_riser.transform.position.x == currentMoverTileParent.transform.position.x)) {
-        foreach (GameObject c_riser in c_risers) {
-            if (c_riser.transform.position.z == currentMoverTileParent.transform.position.z && c_riser.transform.position.x == currentMoverTileParent.transform.position.x) {
-                movingObstaclesGroup3.Add(c_riser);
-                break;
-            }
-        }
-        }
-        List<GameObject> c_moverTiles = GameObject.FindGameObjectsWithTag("MoverCollisionGroup3").ToList();
-        foreach (GameObject c_moverTile in c_moverTiles) {
-            if (!moverGroup3.Contains(c_moverTile)) {
-                if (Mathf.Abs(c_moverTile.transform.position.z - currentMoverTileParent.transform.position.z) == 1f && Mathf.Abs(c_moverTile.transform.position.x - currentMoverTileParent.transform.position.x) == 1f) {
-                    continue;
-                }
-                if (Mathf.Abs(c_moverTile.transform.position.z - currentMoverTileParent.transform.position.z) <= 1f && Mathf.Abs(c_moverTile.transform.position.x - currentMoverTileParent.transform.position.x) <= 1f) {
-                    PrepareMoverTilesG3(c_moverTile);
-                }
-            }
-        }
-    }
-
-    public void ActivateMoverTilesG1(Vector3 direction) {
-        foreach (GameObject c_moverTile in moverGroup1) {
-            if (c_moverTile == null) continue;
-            GameObject currentMoverTileParent = c_moverTile.transform.parent.gameObject;
-            currentMoverTileParent.transform.Translate(direction);
-        }
-        foreach (GameObject c_Riser in movingObstaclesGroup1) {
-            if (c_Riser == null) continue;
-            c_Riser.transform.Translate(direction);
-            if (c_Riser.TryGetComponent<RiserAnim>(out RiserAnim riserAnim)) {
-                foreach (Frame frame in riserAnim.animator.frames) {
-                    frame.position = new Vector3(frame.position.x, frame.position.y, frame.position.z) + direction;
-                }
-                foreach (Frame frame in riserAnim.animator2.frames) {
-                    frame.position = new Vector3(frame.position.x, frame.position.y, frame.position.z) + direction;
-                }
-            }
-        }
-        moverGroup1.Clear();
-        movingObstaclesGroup1.Clear();
-    }
-
-    public void ActivateMoverTilesG2(Vector3 direction) {
-        foreach (GameObject c_moverTile in moverGroup2) {
-            if (c_moverTile == null) continue;
-            GameObject currentMoverTileParent = c_moverTile.transform.parent.gameObject;
-            currentMoverTileParent.transform.Translate(direction);
-        }
-        foreach (GameObject c_Riser in movingObstaclesGroup2) {
-            if (c_Riser == null) continue;
-            c_Riser.transform.Translate(direction);
-            if (c_Riser.TryGetComponent<RiserAnim>(out RiserAnim riserAnim)) {
-                foreach (Frame frame in riserAnim.animator.frames) {
-                    frame.position = new Vector3(frame.position.x, frame.position.y, frame.position.z) + direction;
-                }
-                foreach (Frame frame in riserAnim.animator2.frames) {
-                    frame.position = new Vector3(frame.position.x, frame.position.y, frame.position.z) + direction;
-                }
-            }
-        }
-        moverGroup2.Clear();
-        movingObstaclesGroup2.Clear();
-    }
-
-    public void ActivateMoverTilesG3(Vector3 direction) {
-        foreach (GameObject c_moverTile in moverGroup3) {
-            if (c_moverTile == null) continue;
-            GameObject currentMoverTileParent = c_moverTile.transform.parent.gameObject;
-            currentMoverTileParent.transform.Translate(direction);
-        }
-        foreach (GameObject c_Riser in movingObstaclesGroup3) {
-            if (c_Riser == null) continue;
-            c_Riser.transform.Translate(direction);
-            if (c_Riser.TryGetComponent<RiserAnim>(out RiserAnim riserAnim)) {
-                foreach (Frame frame in riserAnim.animator.frames) {
-                    frame.position = new Vector3(frame.position.x, frame.position.y, frame.position.z) + direction;
-                }
-                foreach (Frame frame in riserAnim.animator2.frames) {
-                    frame.position = new Vector3(frame.position.x, frame.position.y, frame.position.z) + direction;
-                }
-            }
-        }
-        moverGroup3.Clear();
-        movingObstaclesGroup3.Clear();
-    }
-
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject != null && gameObject != null && manager != null) {
             isNotFalling = true;
-            if (manager.levelConfig.startPortal && rb.position.z < manager.levelConfig.startPos + 4f) return;
+            if (manager.levelConfig.startPortal && transform.position.z < manager.levelConfig.startPos + 4f) return;
+            //isJumping = false;
+            transform.Translate(new Vector3(0f, -1f * (transform.position.y - 0.5f), 0f));
             // Check if the sphere has collided with a jumpTile
             if (collision.gameObject.tag == "JumpCollision")
             {
                 // Set isJumping to true to indicate that the sphere is jumping 
-                isJumping = true; 
+                isJumping = true;
+                isNotFalling = true;
                 // Disable gravity for the sphere 
                 rb.useGravity = false; 
                 // Set the jumpTile to the GameObject the sphere has collided with 
@@ -380,7 +240,7 @@ public class SphereMovement : MonoBehaviour
                 hitGroup2 = false;
                 hitGroup3 = false;
             }
-            else if (collision.gameObject.tag == "NormalCollision" || collision.gameObject.tag == "NormalEndCollision")
+            else if (collision.gameObject.tag == "NormalCollision" || collision.gameObject.tag == "NormalEndCollision" || collision.gameObject.tag == "MoverAutoCollisionGroup1" || collision.gameObject.tag == "MoverAutoCollisionGroup2" || collision.gameObject.tag == "MoverAutoCollisionGroup3")
             {
                 normalTile = null;
                 glassTile = null;
@@ -388,7 +248,7 @@ public class SphereMovement : MonoBehaviour
                 isJumping = false;
                 jumpTile = null;
                 if (!isJumping && rb != null) {
-                    rb.velocity = new Vector3(0f, 0f, 0f);
+                    //rb.velocity = new Vector3(0f, 0f, 0f);
                 }
                 hitGroup1 = false;
                 hitGroup2 = false;
@@ -411,7 +271,7 @@ public class SphereMovement : MonoBehaviour
                     }
                 }
                 if (!isJumping && rb != null) {
-                    rb.velocity = new Vector3(0f, 0f, 0f);
+                    //rb.velocity = new Vector3(0f, 0f, 0f);
                 }
                 hitGroup1 = false;
                 hitGroup2 = false;
@@ -421,7 +281,7 @@ public class SphereMovement : MonoBehaviour
                 hitGroup1 = true;
                 isJumping = false;
                 if (!isJumping && rb != null) {
-                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                    //rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
                 }
                 hitGroup2 = false;
                 hitGroup3 = false;
@@ -430,7 +290,7 @@ public class SphereMovement : MonoBehaviour
                 hitGroup2 = true;
                 isJumping = false;
                 if (!isJumping && rb != null) {
-                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                    //rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
                 }
                 hitGroup1 = false;
                 hitGroup3 = false;
@@ -439,7 +299,7 @@ public class SphereMovement : MonoBehaviour
                 hitGroup3 = true;
                 isJumping = false;
                 if (!isJumping && rb != null) {
-                    rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                    //rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
                 }
                 hitGroup1 = false;
                 hitGroup2 = false;
@@ -449,9 +309,8 @@ public class SphereMovement : MonoBehaviour
                 collisionZ = 0f;
                 jumpTile = null;
                 if (!isJumping && rb != null) {
-                    rb.velocity = new Vector3(0f, 0f, 0f);
+                    //rb.velocity = new Vector3(0f, 0f, 0f);
                 }
-                PrepareMoverTilesG1(collision.gameObject);
                 hitGroup1 = true;
                 hitGroup2 = false;
                 hitGroup3 = false;
@@ -461,9 +320,8 @@ public class SphereMovement : MonoBehaviour
                 collisionZ = 0f;
                 jumpTile = null;
                 if (!isJumping && rb != null) {
-                    rb.velocity = new Vector3(0f, 0f, 0f);
+                    //rb.velocity = new Vector3(0f, 0f, 0f);
                 }
-                PrepareMoverTilesG2(collision.gameObject);
                 hitGroup1 = false;
                 hitGroup2 = true;
                 hitGroup3 = false;
@@ -473,24 +331,11 @@ public class SphereMovement : MonoBehaviour
                 collisionZ = 0f;
                 jumpTile = null;
                 if (!isJumping && rb != null) {
-                    rb.velocity = new Vector3(0f, 0f, 0f);
+                    //rb.velocity = new Vector3(0f, 0f, 0f);
                 }
-                PrepareMoverTilesG3(collision.gameObject);
                 hitGroup1 = false;
                 hitGroup2 = false;
                 hitGroup3 = true;
-            } else if (collision.gameObject.tag == "NormalEndCollision") {
-                normalTile = null;
-                glassTile = null;
-                collisionZ = 0f;
-                isNotFalling = true;
-                jumpTile = null;
-                if (!isJumping && rb != null) {
-                    rb.velocity = new Vector3(0f, 0f, 0f);
-                }
-                hitGroup1 = false;
-                hitGroup2 = false;
-                hitGroup3 = false;
             }
         }
     }
@@ -511,18 +356,22 @@ public class SphereMovement : MonoBehaviour
             glassTile = null;
             collisionZ = transform.position.z;
         }
-        if (collision.gameObject.tag == "DiamondCollision") {
-            rb.MovePosition(rb.position + Vector3.down * 5f * Time.fixedDeltaTime);
-        }
+        //if (collision.gameObject.tag == "DiamondCollision") {
+        //    rb.MovePosition(rb.position + Vector3.down * 5f * Time.fixedDeltaTime);
+        //}
         isNotFalling = true;
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        if (manager.levelConfig.startPortal && rb.position.z < manager.levelConfig.startPos + 4f) {
+        if (manager == null) return;
+        if (manager.currentScene.name == "SampleScene") {
+        if (manager.levelConfig.startPortal && rb.position.z < manager.levelConfig.startPos + 3.99f) {
             return;
         }
-        if (collision.gameObject.tag == "NormalCollision")
+        }
+        if (collision.gameObject != null && gameObject != null && manager != null) {
+        if (collision.gameObject.tag == "NormalCollision" || collision.gameObject.tag == "MoverAutoCollisionGroup1" || collision.gameObject.tag == "MoverAutoCollisionGroup2" || collision.gameObject.tag == "MoverAutoCollisionGroup3")
         {
             normalTile = collision.gameObject;
             glassTile = collision.gameObject;
@@ -639,6 +488,7 @@ public class SphereMovement : MonoBehaviour
                 rb.MovePosition(rb.position + Vector3.down * 0.25f);
             } */
         }
+        }
     }
 
     bool CheckIfObjectIsNotAboveAnyOtherObject()
@@ -680,138 +530,21 @@ public class SphereMovement : MonoBehaviour
             GlassObject obstacleGlassObject = riser.GetComponent<GlassObject>();
             if (obstacleGlassObject != null) {
                 float fallCoefficient = obstacleGlassObject.fallCoefficient / 2f;
-                if (riser.TryGetComponent<RiserAnim>(out RiserAnim riserAnim)) {
-                    foreach (Frame frame in riserAnim.animator.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in riserAnim.animator2.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                } else if (riser.TryGetComponent<CrusherAnim>(out CrusherAnim crusherAnim)) {
-                    foreach (Frame frame in crusherAnim.animator.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in crusherAnim.animator2.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                } else if (riser.TryGetComponent<LeftHammerAnim>(out LeftHammerAnim hammerAnim)) {
-                    foreach (Frame frame in hammerAnim.animator.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in hammerAnim.animator2.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                } else if (riser.TryGetComponent<RightHammerAnim>(out RightHammerAnim hammerAnim2)) {
-                    foreach (Frame frame in hammerAnim2.animator.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in hammerAnim2.animator2.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                } else if (riser.TryGetComponent<LeftHammerLargeAnim>(out LeftHammerLargeAnim hammerLargeAnim)) {
-                    foreach (Frame frame in hammerLargeAnim.animator.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                } else if (riser.TryGetComponent<RightHammerLargeAnim>(out RightHammerLargeAnim hammerLargeAnim2)) {
-                    foreach (Frame frame in hammerLargeAnim2.animator.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                } else if (riser.TryGetComponent<LargeTreeAnim>(out LargeTreeAnim largeTreeAnim)) {
-                    foreach (Frame frame in largeTreeAnim.animator.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in largeTreeAnim.animator2.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in largeTreeAnim.animator3.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in largeTreeAnim.animator4.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in largeTreeAnim.animator5.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in largeTreeAnim.animator6.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in largeTreeAnim.animator7.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in largeTreeAnim.animator8.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                } else if (riser.TryGetComponent<MediumTreeAnim>(out MediumTreeAnim mediumTreeAnim)) {
-                    foreach (Frame frame in mediumTreeAnim.animator.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in mediumTreeAnim.animator2.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in mediumTreeAnim.animator3.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in mediumTreeAnim.animator4.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in mediumTreeAnim.animator5.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                } else if (riser.TryGetComponent<SmallTreeAnim>(out SmallTreeAnim smallTreeAnim)) {
-                    foreach (Frame frame in smallTreeAnim.animator.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in smallTreeAnim.animator2.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in smallTreeAnim.animator3.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in smallTreeAnim.animator4.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in smallTreeAnim.animator5.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in smallTreeAnim.animator6.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in smallTreeAnim.animator7.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                } else if (riser.TryGetComponent<LaserAnim>(out LaserAnim laserAnim)) {
-                    foreach (Frame frame in laserAnim.animator.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in laserAnim.animator2.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in laserAnim.animator3.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    GameObject laserBaseObject = riser.transform.Find("DeceBalus_Laser_Base").gameObject;
-                    laserBaseObject.transform.position = new Vector3(laserBaseObject.transform.position.x, laserBaseObject.transform.position.y - fallCoefficient, laserBaseObject.transform.position.z);
-                } else if (riser.TryGetComponent<FloaterAnim>(out FloaterAnim floaterAnim)) {
-                    foreach (Frame frame in floaterAnim.animator.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    foreach (Frame frame in floaterAnim.animator2.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
-                    }
-                    
-                } else if (riser.TryGetComponent<SpotlightAnim>(out SpotlightAnim spotlightAnim)) {
-                    foreach (Frame frame in spotlightAnim.animator.frames) {
-                        frame.position = new Vector3(frame.position.x, frame.position.y - fallCoefficient, frame.position.z);
+                if (riser.TryGetComponent<BaseAnim>(out BaseAnim baseAnim)) {
+                    foreach (FrameAnim animator in baseAnim.animators) {
+                        foreach (Frame frame in animator.frames) {
+                            frame.position = new Vector3(riser.transform.position.x, frame.position.y - fallCoefficient / 2f, frame.position.z);
+                        }
                     }
                 }
-                riser.transform.position = new Vector3(riser.transform.position.x, riser.transform.position.y - fallCoefficient, riser.transform.position.z);
+                riser.transform.position = new Vector3(riser.transform.position.x, riser.transform.position.y - fallCoefficient / 2f, riser.transform.position.z);
                 obstacleGlassObject.fallCoefficient += 0.025f;
             }
         }
     }
 
     private float jumpFunction(float x, float div_coeff) {
-        return Mathf.Sqrt(2f) * speed * -x / div_coeff;
+        return speed * -x / div_coeff;
     }
 
     public void Jump(float distance, GameObject jumpTile) 
@@ -827,8 +560,8 @@ public class SphereMovement : MonoBehaviour
         /*float h = 0f;
         float k = 6.12f;
         float jumpCalc = p * ((float)Math.Pow(z - h, 2)) + k; */
-        float jumpCalc = jumpFunction(z - (distance / (2f)), distance / 4f);
-        if (z < 0f) {
+        float jumpCalc = jumpFunction(z - (distance / (2f)), distance / 5f);
+        if (z < -0.025f) {
             jumpCalc = 0f;
         }
         isJumping = true;
@@ -850,12 +583,13 @@ public class SphereMovement : MonoBehaviour
             }
             if (isJumping)
             {
-                rb.MovePosition(rb.position + movement2 * Time.fixedDeltaTime);
+                transform.Translate(movement2 * Time.fixedDeltaTime);
                 //collisionZ += 0.075f;
             }
             // If the zDiff is greater than the distance, set the jumpTile to null and enable gravity for the sphere 
             if (z >= distance) 
             {
+                //Debug.Log("JUMP");
                 newPosition = new Vector3(jumpTile.transform.position.x, 0f, jumpTile.transform.position.z);
                 jumpTileActive.transform.position = newPosition;
                 jumpTile = null;
@@ -877,7 +611,7 @@ public class SphereMovement : MonoBehaviour
         /*float h = 0f;
         float k = 6.12f;
         float jumpCalc = p * ((float)Math.Pow(z - h, 2)) + k; */
-        float jumpCalc = jumpFunction(z - (distance / (2f)), distance / 4f);
+        float jumpCalc = jumpFunction(z - (distance / (2f)), distance / 5f);
         if (z < 0f) {
             jumpCalc = 0f;
         }
@@ -888,13 +622,13 @@ public class SphereMovement : MonoBehaviour
         {
             if (isJumping)
             {
-                rb.MovePosition(rb.position + movement2 * Time.fixedDeltaTime);
+                transform.Translate(movement2 * Time.fixedDeltaTime);
                 //collisionZ += 0.075f;
             }
             // If the zDiff is greater than the distance, set the jumpTile to null and enable gravity for the sphere 
             if (z >= distance) 
             {
-                //jumpCalc = 0f;
+                jumpCalc = 0f;
                 isJumping = false;
                 collisionZ = transform.position.z;
             } 
@@ -908,9 +642,9 @@ public class SphereMovement : MonoBehaviour
     {
         if (!manager.isGameOver) {
             float z = transform.position.z - collisionZ;
-            float downY = jumpFunction(z + 2f, 1f) * -1f;
+            float downY = jumpFunction(z + 2f, 4f / 5f) * -1f;
             Vector3 downVector = Vector3.down * downY;
-            rb.MovePosition(rb.position + downVector * Time.fixedDeltaTime);
+            transform.Translate(downVector * Time.fixedDeltaTime);
             hitGroup1 = false;
             hitGroup2 = false;
             hitGroup3 = false;

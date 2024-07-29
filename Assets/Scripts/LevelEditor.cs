@@ -22,7 +22,7 @@ public class LevelEditor : MonoBehaviour
     private string realPercent;
     public EnemyRenderer ere;
     public int gridSize = 10;
-    private bool isInEditor = false;
+    public bool isInEditor = false;
     private bool isPopupOpen = false;
     private GameObject themeText;
     private LevelThemeChanger themeChanger;
@@ -55,7 +55,7 @@ public class LevelEditor : MonoBehaviour
         sphm = GetComponent<SphereMovement>();
         themeChanger2 = levelRenderer.GetComponent<ThemeChanger>();
         levelConfig = levelRenderer.GetComponent<LevelConfigurator>();
-        manager = balus.GetComponent<GameManager>();
+        manager = GameObject.Find("GameManager").GetComponent<GameManager>();
         if (!manager.isDataDownloaded) {
             groundJsonString = Resources.Load<TextAsset>("LevelData/Ground1").text;
             enemyJsonString = Resources.Load<TextAsset>("LevelData/Enemies1").text;
@@ -81,6 +81,9 @@ public class LevelEditor : MonoBehaviour
         GameObject[] moverTilesGroup1 = GameObject.FindGameObjectsWithTag("MoverGroup1");
         GameObject[] moverTilesGroup2 = GameObject.FindGameObjectsWithTag("MoverGroup2");
         GameObject[] moverTilesGroup3 = GameObject.FindGameObjectsWithTag("MoverGroup3");
+        GameObject[] moverAutoTilesGroup1 = GameObject.FindGameObjectsWithTag("MoverAutoGroup1");
+        GameObject[] moverAutoTilesGroup2 = GameObject.FindGameObjectsWithTag("MoverAutoGroup2");
+        GameObject[] moverAutoTilesGroup3 = GameObject.FindGameObjectsWithTag("MoverAutoGroup3");
         GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
         Vector3 jumpTilePos = new Vector3(-32f, 0.2f, -2f);
         Vector3 glassTilePos = new Vector3(-46f, 0f, 0f);
@@ -88,8 +91,11 @@ public class LevelEditor : MonoBehaviour
         Vector3 glassGroup2Pos = new Vector3(-50f, 0f, 0f);
         Vector3 glassGroup3Pos = new Vector3(-51f, 0f, 0f);
         Vector3 moverGroup1Pos = new Vector3(-99f, 0f, 0f);
-        Vector3 moverGroup2Pos = new Vector3(-100f, 0f, 0f);
-        Vector3 moverGroup3Pos = new Vector3(-101f, 0f, 0f);
+        Vector3 moverGroup2Pos = new Vector3(-101f, 0f, 0f);
+        Vector3 moverGroup3Pos = new Vector3(-103f, 0f, 0f);
+        Vector3 moverAutoGroup1Pos = new Vector3(-107f, 0f, 0f);
+        Vector3 moverAutoGroup2Pos = new Vector3(-109f, 0f, 0f);
+        Vector3 moverAutoGroup3Pos = new Vector3(-111f, 0f, 0f);
         Vector3 normalTilePos = new Vector3(-35f, 0.2f, 0.08f);
         List<Vector3> ObstaclePoses = new List<Vector3>();
         ObstaclePoses.Add(new Vector3(-33f, 0f, 0f));
@@ -110,8 +116,13 @@ public class LevelEditor : MonoBehaviour
         ObstaclePoses.Add(new Vector3(-83f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-97f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-102f, 0f, 0f));
-        ObstaclePoses.Add(new Vector3(-103f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-100f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-104f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-106f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-108f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-110f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-112f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-114f, 0f, 0f));
         foreach (GameObject tile in normalTiles) {
             if (tile.transform.position == normalTilePos) {
                 continue;
@@ -162,6 +173,24 @@ public class LevelEditor : MonoBehaviour
         }
         foreach (GameObject tile in moverTilesGroup3) {
             if (tile.transform.position == moverGroup3Pos) {
+                continue;
+            }
+            Destroy(tile);
+        }
+        foreach (GameObject tile in moverAutoTilesGroup1) {
+            if (tile.transform.position == moverAutoGroup1Pos) {
+                continue;
+            }
+            Destroy(tile);
+        }
+        foreach (GameObject tile in moverAutoTilesGroup2) {
+            if (tile.transform.position == moverAutoGroup2Pos) {
+                continue;
+            }
+            Destroy(tile);
+        }
+        foreach (GameObject tile in moverAutoTilesGroup3) {
+            if (tile.transform.position == moverAutoGroup3Pos) {
                 continue;
             }
             Destroy(tile);
@@ -296,7 +325,7 @@ public class LevelEditor : MonoBehaviour
                         canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                         canvasObject.transform.position = new Vector3(x, 1f, z);
                     }
-                } else if (hasPrefab == 9) {
+                } else if (hasPrefab == 9 || hasPrefab == 12) {
                     GameObject canvasObject = new GameObject("Text_Canvas");
                     Canvas canvas = canvasObject.AddComponent<Canvas>();
                     GameObject textObject = new GameObject("Text");
@@ -312,7 +341,7 @@ public class LevelEditor : MonoBehaviour
                     canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                     canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                     canvasObject.transform.position = new Vector3(x, 1f, z);
-                } else if (hasPrefab == 10) {
+                } else if (hasPrefab == 10 || hasPrefab == 13) {
                     GameObject canvasObject = new GameObject("Text_Canvas");
                     Canvas canvas = canvasObject.AddComponent<Canvas>();
                     GameObject textObject = new GameObject("Text");
@@ -328,7 +357,7 @@ public class LevelEditor : MonoBehaviour
                     canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                     canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                     canvasObject.transform.position = new Vector3(x, 1f, z);
-                } else if (hasPrefab == 11) {
+                } else if (hasPrefab == 11 || hasPrefab == 14) {
                     GameObject canvasObject = new GameObject("Text_Canvas");
                     Canvas canvas = canvasObject.AddComponent<Canvas>();
                     GameObject textObject = new GameObject("Text");
@@ -372,7 +401,7 @@ public class LevelEditor : MonoBehaviour
                 float x = j - 2;
                 float z = i * ere.prefabSpacing;
                 Vector3 spawnPosition = new Vector3(x, 0.55f, z);
-                if (hasPrefab == 4 || hasPrefab == 5 || (hasPrefab >= 10 && hasPrefab <= 15)) {
+                if (hasPrefab == 4 || hasPrefab == 5 || (hasPrefab >= 10 && hasPrefab <= 15) || hasPrefab == 27) {
                     spawnPosition = new Vector3(x, 0f, z);
                 } else if (hasPrefab == 6 || hasPrefab == 7) {
                     spawnPosition = new Vector3(x, 0.2f, z);
@@ -625,6 +654,9 @@ public class LevelEditor : MonoBehaviour
         GameObject[] moverTilesGroup1 = GameObject.FindGameObjectsWithTag("MoverGroup1");
         GameObject[] moverTilesGroup2 = GameObject.FindGameObjectsWithTag("MoverGroup2");
         GameObject[] moverTilesGroup3 = GameObject.FindGameObjectsWithTag("MoverGroup3");
+        GameObject[] moverAutoTilesGroup1 = GameObject.FindGameObjectsWithTag("MoverAutoGroup1");
+        GameObject[] moverAutoTilesGroup2 = GameObject.FindGameObjectsWithTag("MoverAutoGroup2");
+        GameObject[] moverAutoTilesGroup3 = GameObject.FindGameObjectsWithTag("MoverAutoGroup3");
         if (objectLayer == 0) {
             foreach (GameObject tile in normalTiles) {
                 if (tile.transform.position == new Vector3(x, 0f, z)) {
@@ -675,6 +707,24 @@ public class LevelEditor : MonoBehaviour
                 }
             }
             foreach (GameObject tile in moverTilesGroup3) {
+                if (tile.transform.position == new Vector3(x, 0f, z)) {
+                    Destroy(tile);
+                    break;
+                }
+            }
+            foreach (GameObject tile in moverAutoTilesGroup1) {
+                if (tile.transform.position == new Vector3(x, 0f, z)) {
+                    Destroy(tile);
+                    break;
+                }
+            }
+            foreach (GameObject tile in moverAutoTilesGroup2) {
+                if (tile.transform.position == new Vector3(x, 0f, z)) {
+                    Destroy(tile);
+                    break;
+                }
+            }
+            foreach (GameObject tile in moverAutoTilesGroup3) {
                 if (tile.transform.position == new Vector3(x, 0f, z)) {
                     Destroy(tile);
                     break;
@@ -772,7 +822,7 @@ public class LevelEditor : MonoBehaviour
                     canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                     canvasObject.transform.position = new Vector3(x, 1f, z);
                 }
-            } else if (hasPrefab == 9) {
+            } else if (hasPrefab == 9 || hasPrefab == 12) {
                 GameObject canvasObject = new GameObject("Text_Canvas");
                 Canvas canvas = canvasObject.AddComponent<Canvas>();
                 GameObject textObject = new GameObject("Text");
@@ -788,7 +838,7 @@ public class LevelEditor : MonoBehaviour
                 canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                 canvasObject.transform.position = new Vector3(x, 1f, z);
-            } else if (hasPrefab == 10) {
+            } else if (hasPrefab == 10 || hasPrefab == 13) {
                     GameObject canvasObject = new GameObject("Text_Canvas");
                     Canvas canvas = canvasObject.AddComponent<Canvas>();
                     GameObject textObject = new GameObject("Text");
@@ -804,7 +854,7 @@ public class LevelEditor : MonoBehaviour
                     canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                     canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                     canvasObject.transform.position = new Vector3(x, 1f, z);
-                } else if (hasPrefab == 11) {
+                } else if (hasPrefab == 11 || hasPrefab == 14) {
                     GameObject canvasObject = new GameObject("Text_Canvas");
                     Canvas canvas = canvasObject.AddComponent<Canvas>();
                     GameObject textObject = new GameObject("Text");
@@ -841,7 +891,7 @@ public class LevelEditor : MonoBehaviour
             }
             int hasPrefab = edata.positions[i][j];
             Vector3 spawnPosition = new Vector3(x, 0.55f, z);
-            if (hasPrefab == 4 || hasPrefab == 5 || (hasPrefab >= 10 && hasPrefab <= 15)) {
+            if (hasPrefab == 4 || hasPrefab == 5 || (hasPrefab >= 10 && hasPrefab <= 15) || hasPrefab == 27) {
                 spawnPosition = new Vector3(x, 0f, z);
             } else if (hasPrefab == 6 || hasPrefab == 7) {
                 spawnPosition = new Vector3(x, 0.2f, z);

@@ -14,7 +14,7 @@ public class ToggleUtils : MonoBehaviour
     {
         m_Toggle = GetComponent<Toggle>();
         balus = GameObject.Find("Balus");
-        gameManager = balus.GetComponent<GameManager>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         levelEditor = balus.GetComponent<LevelEditor>();
         if (gameObject.name == "DisableDeathToggle") {
             m_Toggle.onValueChanged.AddListener(delegate { ToggleValueChanged_DisableDeath(m_Toggle); });

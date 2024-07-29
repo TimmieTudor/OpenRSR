@@ -62,7 +62,7 @@ public class ThemeChanger : MonoBehaviour
     private void Start()
     {
         balus = GameObject.Find("Balus");
-        gameManager = balus.GetComponent<GameManager>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         if (gameManager.isDataDownloaded) {
             jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, jsonFilePath + ".json"));
             List<ThemeJson> data = JsonConvert.DeserializeObject<List<ThemeJson>>(jsonString);
@@ -112,9 +112,9 @@ public class ThemeChanger : MonoBehaviour
             Theme currentTheme = themes[themeID];
             Renderer balusRenderer = balus.GetComponent<Renderer>();
             if (balusRenderer != null) {
-                balusRenderer.material.color = currentTheme.ballColor;
+                balusRenderer.sharedMaterial.color = currentTheme.ballColor;
             }
-            Material gemMaterial = GameObject.Find("DeceBalus_Gem").transform.GetChild(0).gameObject.GetComponent<Renderer>().sharedMaterial;
+            Material gemMaterial = GameObject.Find("DeceBalus_Gem_Prefab").transform.GetChild(0).gameObject.GetComponent<Renderer>().sharedMaterial;
             gemMaterial.color = currentTheme.gemColor;
             Material backgroundMaterial = GameObject.Find("Background").GetComponent<Renderer>().sharedMaterial;
             backgroundMaterial.mainTexture = currentTheme.background;

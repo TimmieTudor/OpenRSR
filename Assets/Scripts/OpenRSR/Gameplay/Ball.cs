@@ -14,7 +14,9 @@ namespace OpenRSR {
                 rb = GetComponent<Rigidbody>();
                 sphm = GetComponent<SphereMovement>();
                 controls = GetComponent<SphereDragger>();
+                if (sphm != null) {
                 speed = sphm.speed;
+                }
             }
 
             public void Jump(float distance, Vector3 startPosition) {

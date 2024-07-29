@@ -2,27 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using OpenRSR.Animation;
 
-public class LaserAnim : MonoBehaviour
+public class LaserAnim : BaseAnim
 {
-    public GameObject balus;
-    public float animationOffset = 13.9f;
-    public FrameAnim animator;
-    public FrameAnim animator2;
-    public FrameAnim animator3;
-    private List<Frame> frames;
-    private List<Frame> frames2;
-    private List<Frame> frames3;
     public GameObject laserObject;
-    private int currentFrame = 0;
-    // Start is called before the first frame update
-    void Start()
-    {
-        Transform cannonTransform = gameObject.transform.Find("DeceBalus_Laser_Cannon");
-        ResetAnimation(cannonTransform.position);
-    }
 
-    public void ResetAnimation(Vector3 newPos) {
+    public override void ResetAnimation(Vector3 newPos) {
         Transform cannonTransform = gameObject.transform.Find("DeceBalus_Laser_Cannon");
         Transform lid1Transform = gameObject.transform.Find("DeceBalus_Laser_Cannon_Lid1");
         Transform lid2Transform = gameObject.transform.Find("DeceBalus_Laser_Cannon_Lid2");
@@ -31,14 +17,14 @@ public class LaserAnim : MonoBehaviour
         GameObject lid1Object = lid1Transform.gameObject;
         GameObject lid2Object = lid2Transform.gameObject;
         laserObject = laserTransform.gameObject;
-        laserObject.transform.position = newPos;
+        //laserObject.transform.position = newPos;
         laserObject.SetActive(false);
         Frame initialFrame = new Frame(new Vector3(newPos.x, 0f, newPos.z), Quaternion.identity, new Vector3(1f, 1f, 1f), cannonTransform.gameObject);
-        frames = new List<Frame>();
-        frames.Add(initialFrame);
-        frames.Add(initialFrame);
-        frames2 = new List<Frame>();
-        frames3 = new List<Frame>();
+        List<Frame> frames1 = new List<Frame>();
+        frames1.Add(initialFrame);
+        frames1.Add(initialFrame);
+        List<Frame> frames2 = new List<Frame>();
+        List<Frame> frames3 = new List<Frame>();
         Frame lid1Frame = new Frame(new Vector3(newPos.x, 0f, newPos.z), Quaternion.identity, new Vector3(1f, 1f, 1f), lid1Transform.gameObject);
         Frame lid2Frame = new Frame(new Vector3(newPos.x, 0f, newPos.z), Quaternion.identity, new Vector3(1f, 1f, 1f), lid2Transform.gameObject);
         frames2.Add(lid1Frame);
@@ -54,19 +40,19 @@ public class LaserAnim : MonoBehaviour
             y += Mathf.Sin((float)i / 2f) * 0.01f;
             lid1RotationY += 0.2f;
             lid2RotationY -= 0.2f;
-            frames.Add(new Frame(new Vector3(newPos.x, y, newPos.z), Quaternion.identity, new Vector3(1f, 1f, 1f), cannonTransform.gameObject));
+            frames1.Add(new Frame(new Vector3(newPos.x, y, newPos.z), Quaternion.identity, new Vector3(1f, 1f, 1f), cannonTransform.gameObject));
             frames2.Add(new Frame(new Vector3(newPos.x, y, newPos.z), Quaternion.Euler(0f, lid1RotationY, 0f), new Vector3(1f, 1f, 1f), lid1Transform.gameObject));
             frames3.Add(new Frame(new Vector3(newPos.x, y, newPos.z), Quaternion.Euler(0f, lid2RotationY, 0f), new Vector3(1f, 1f, 1f), lid2Transform.gameObject));
         }
         float z = newPos.z;
         for (int i = 0; i < 10; i++) {
             z += 0.02f;
-            frames.Add(new Frame(new Vector3(newPos.x, y, z), Quaternion.identity, new Vector3(1f, 1f, 1f), cannonTransform.gameObject));
+            frames1.Add(new Frame(new Vector3(newPos.x, y, z), Quaternion.identity, new Vector3(1f, 1f, 1f), cannonTransform.gameObject));
             frames2.Add(new Frame(new Vector3(newPos.x, y, z), Quaternion.Euler(0f, 90f, 0f), new Vector3(1f, 1f, 1f), lid1Transform.gameObject));
             frames3.Add(new Frame(new Vector3(newPos.x, y, z), Quaternion.Euler(0f, -90f, 0f), new Vector3(1f, 1f, 1f), lid2Transform.gameObject));
         }
         for (int i = 0; i < 20; i++) {
-            frames.Add(new Frame(new Vector3(newPos.x, y, z), Quaternion.identity, new Vector3(1f, 1f, 1f), cannonTransform.gameObject));
+            frames1.Add(new Frame(new Vector3(newPos.x, y, z), Quaternion.identity, new Vector3(1f, 1f, 1f), cannonTransform.gameObject));
             frames2.Add(new Frame(new Vector3(newPos.x, y, z), Quaternion.Euler(0f, 90f, 0f), new Vector3(1f, 1f, 1f), lid1Transform.gameObject));
             frames3.Add(new Frame(new Vector3(newPos.x, y, z), Quaternion.Euler(0f, -90f, 0f), new Vector3(1f, 1f, 1f), lid2Transform.gameObject));
         }
@@ -76,17 +62,23 @@ public class LaserAnim : MonoBehaviour
             z -= 0.02f;
             lid1RotationY -= 9f;
             lid2RotationY += 9f;
-            frames.Add(new Frame(new Vector3(newPos.x, y, z), Quaternion.identity, new Vector3(1f, 1f, 1f), cannonTransform.gameObject));
+            frames1.Add(new Frame(new Vector3(newPos.x, y, z), Quaternion.identity, new Vector3(1f, 1f, 1f), cannonTransform.gameObject));
             frames2.Add(new Frame(new Vector3(newPos.x, y, z), Quaternion.Euler(0f, lid1RotationY, 0f), new Vector3(1f, 1f, 1f), lid1Transform.gameObject));
             frames3.Add(new Frame(new Vector3(newPos.x, y, z), Quaternion.Euler(0f, lid2RotationY, 0f), new Vector3(1f, 1f, 1f), lid2Transform.gameObject));
         }
-        animator = new FrameAnim(frames);
-        animator2 = new FrameAnim(frames2);
-        animator3 = new FrameAnim(frames3);
+        frames.Add(frames1);
+        frames.Add(frames2);
+        frames.Add(frames3);
+        FrameAnim animator = new FrameAnim(frames1);
+        FrameAnim animator2 = new FrameAnim(frames2);
+        FrameAnim animator3 = new FrameAnim(frames3);
+        animators.Add(animator);
+        animators.Add(animator2);
+        animators.Add(animator3);
     }
 
     // Update is called once per frame
-    void Update()
+    new public void Update()
     {
         currentFrame = (int)Math.Floor((balus.transform.position.z - gameObject.transform.position.z + animationOffset) * 5f);
         float curFrame2 = (balus.transform.position.z - gameObject.transform.position.z + animationOffset) * 5f;
@@ -94,28 +86,28 @@ public class LaserAnim : MonoBehaviour
         if (currentFrame < 0)
         {
             currentFrame = 0;
-            animator.SetFrame(1, 0f);
-            animator2.SetFrame(1, 0f);
-            animator3.SetFrame(1, 0f);
+            foreach (FrameAnim animator in animators) {
+                animator.SetFrame(1, 0f);
+            }
         }
         else if (currentFrame >= 80 && currentFrame < 120) {
-            animator.SetFrame(currentFrame + 1, t);
-            animator2.SetFrame(currentFrame + 1, t);
-            animator3.SetFrame(currentFrame + 1, t);
+            foreach (FrameAnim animator in animators) {
+                animator.SetFrame(currentFrame + 1, 0.99f);
+            }
             laserObject.SetActive(true);
         }
         else if (currentFrame >= 120)
         {
-            animator.SetFrame(120, 0.99f);
-            animator2.SetFrame(120, 0.99f);
-            animator3.SetFrame(120, 0.99f);
+            foreach (FrameAnim animator in animators) {
+                animator.SetFrame(1, 0f);
+            }
             laserObject.SetActive(false);
         }
         else
         {
-            animator.SetFrame(currentFrame + 1, t);
-            animator2.SetFrame(currentFrame + 1, t);
-            animator3.SetFrame(currentFrame + 1, t);
+            foreach (FrameAnim animator in animators) {
+                animator.SetFrame(currentFrame + 1, t);
+            }
         }
     }
 }

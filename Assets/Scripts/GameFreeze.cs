@@ -23,7 +23,7 @@ public class GameFreeze : MonoBehaviour
         sphm = balus.GetComponent<SphereMovement>();
         sphd = balus.GetComponent<SphereDragger>();
         audioPlayer = balus.GetComponent<AudioPlayer>();
-        manager = balus.GetComponent<GameManager>();
+        manager = GameObject.Find("GameManager").GetComponent<GameManager>();
         gamePaused = true;
         pausedText = GameObject.Find("PausedText");
         pauseButton = GameObject.Find("PauseButton");
@@ -36,7 +36,9 @@ public class GameFreeze : MonoBehaviour
     {
         if (gamePaused)
         {
+            if (sphm != null) {
             sphm.enabled = false;
+            }
             sphd.enabled = false;
             if (pausedText != null && editButton != null && settingsButton != null) {
             pausedText.SetActive(true);
@@ -71,14 +73,21 @@ public class GameFreeze : MonoBehaviour
             if (timer >= 1f) {
                 gamePaused = false;
                 manager.isGamePaused = false;
-                audioPlayer.PlayAudio();
-                sphm.enabled = true;
-                sphd.enabled = true;
+                if (GameManager.instance != null) {
+                    if (GameManager.instance.currentScene.name == "DebugScene") {
+                        //sphm.enabled = false;
+                        sphd.enabled = false;
+                    } else {
+                        audioPlayer.PlayAudio();
+                        sphm.enabled = true;
+                        sphd.enabled = true;
+                    }
+                }
             }
         }
     }
 
-    public void PauseGame()
+    public void PauseGame(bool stopAudio = true)
     {
         gamePaused = true;
         if (sphm != null && sphd != null) {
@@ -87,7 +96,7 @@ public class GameFreeze : MonoBehaviour
             sphd.enabled = false;
         }
         timer = 0f;
-        if (audioPlayer != null) {
+        if (audioPlayer != null && stopAudio) {
             audioPlayer.PauseAudio();
         }
     }

@@ -48,9 +48,10 @@ public class MenuLevelJson {
     public int display_crowns;
     public bool display_author;
     public bool display_progress;
+    public int display_background;
     public float level_difficulty_easy;
     public float level_difficulty_hard;
-    public int level_id;
+    public string level_id;
 }
 
 [System.Serializable]
@@ -80,6 +81,9 @@ public class MainMenuScripts : MonoBehaviour
     private GameObject levelItem;
     private GameObject leftButton;
     private GameObject rightButton;
+    private GameObject createLevelPanel;
+    private TMP_InputField levelNameInputField;
+    private GameObject createLevelButton;
     private int menuIdx = 0;
     private bool isMovingLeft = false;
     private bool isMovingRight = false;
@@ -88,30 +92,33 @@ public class MainMenuScripts : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        gameManager = GetComponent<GameManager>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         instance = this;
         mainMenuCanvas = GameObject.Find("MainMenu");
         leftButton = mainMenuCanvas.transform.Find("LeftButton").gameObject;
         rightButton = mainMenuCanvas.transform.Find("RightButton").gameObject;
         leftButton.SetActive(false);
         rightButton.SetActive(false);
+        createLevelPanel = mainMenuCanvas.transform.Find("NewLevelPanel").gameObject;
+        levelNameInputField = createLevelPanel.transform.Find("LevelIDInput").gameObject.GetComponent<TMP_InputField>();
+        createLevelButton = createLevelPanel.transform.Find("CreateButton").gameObject;
         titleText = GameObject.Find("TitleImage");
         levelUIComponent = GameObject.Find("LevelUI");
         levelItem = levelUIComponent.transform.Find("LevelItem").gameObject;
         menuData = JsonConvert.DeserializeObject<MenuDataJson>(File.ReadAllText(Path.Combine(Application.persistentDataPath, "MenuData/MenuData.json")));
         CreateLevelObjects();
         foreach (MenuLevelJson level in menuData.level_list) {
-            GameObject levelCoverObject = GameObject.Find($"Level{level.level_id}Cover_Button");
+            GameObject levelCoverObject = GameObject.Find($"Level_{level.level_id}_Cover_Button");
             levelCoverObject.GetComponent<Button>().onClick.AddListener(() => {
                 gameManager.LoadLevel(level.level_id);
                 mainMenuCanvas.SetActive(false);
             });
-            GameObject levelTitleObject = GameObject.Find($"Level{level.level_id}Title");
+            GameObject levelTitleObject = GameObject.Find($"Level_{level.level_id}_Title");
             levelTitleObject.GetComponent<TextMeshProUGUI>().text = level.display_title;
-            GameObject levelCoverObjectImage = GameObject.Find($"Level{level.level_id}Cover");
+            GameObject levelCoverObjectImage = GameObject.Find($"Level_{level.level_id}_Cover");
             try {
-                byte[] levelCoverBytes = File.ReadAllBytes(Path.Combine(Application.persistentDataPath, $"WorldShow/World{level.level_id}.png"));
-                Texture2D levelCoverTexture = new Texture2D(1024, 2048);
+                byte[] levelCoverBytes = File.ReadAllBytes(Path.Combine(Application.persistentDataPath, $"WorldShow/World_{level.level_id}.png"));
+                Texture2D levelCoverTexture = new Texture2D(1080, 1920);
                 levelCoverTexture.LoadImage(levelCoverBytes);
                 Image levelCoverImage = levelCoverObjectImage.GetComponent<Image>();
                 levelCoverImage.sprite = Sprite.Create(levelCoverTexture, new Rect(0, 0, levelCoverTexture.width, levelCoverTexture.height), new Vector2(0.5f, 0.5f));
@@ -119,9 +126,9 @@ public class MainMenuScripts : MonoBehaviour
                 levelCoverObjectImage.GetComponent<Image>().sprite = Sprite.Create(Resources.Load<Texture2D>("WorldShow/default_world"), new Rect(0, 0, 256, 512), new Vector2(0.5f, 0.5f), 100f);
             }
 
-            GameObject levelPercentObject = GameObject.Find($"Level{level.level_id}Percent");
+            GameObject levelPercentObject = GameObject.Find($"Level_{level.level_id}_Percent");
             levelPercentObject.GetComponent<TextMeshProUGUI>().text = "0%";
-            GameObject levelGemCountObject = GameObject.Find($"Level{level.level_id}Gems");
+            GameObject levelGemCountObject = GameObject.Find($"Level_{level.level_id}_Gems");
             levelGemCountObject.GetComponent<TextMeshProUGUI>().text = $"0/{level.display_gems.ToString()}";
         }
         levelCount = menuData.level_list.Count;
@@ -146,7 +153,7 @@ public class MainMenuScripts : MonoBehaviour
         GameObject newLevelThumbnail = newLevelItem.transform.GetChild(0).gameObject;
         newLevelThumbnail.transform.GetChild(0).gameObject.GetComponent<Image>().sprite = Sprite.Create(Resources.Load<Texture2D>("WorldShow/default_world"), new Rect(0, 0, 256, 512), new Vector2(0.5f, 0.5f), 100f);
         newLevelThumbnail.GetComponent<Button>().onClick.AddListener(() => { 
-            CreateNewLevel();
+            ShowCreateLevelPanel();
         });
         GameObject newLevelTitle = newLevelItem.transform.GetChild(1).gameObject;
         newLevelTitle.GetComponent<TextMeshProUGUI>().text = "New";
@@ -159,28 +166,36 @@ public class MainMenuScripts : MonoBehaviour
     public void ResetMenu() {
         menuIdx = 0;
         levelUIComponent.transform.localPosition = new Vector3(800f, 0f, 0f);
-        Debug.Log(levelUIComponent.transform.localPosition);
+        //Debug.Log(levelUIComponent.transform.localPosition);
         titleText.SetActive(true);
         isInTitleScreen = true;
         leftButton.SetActive(false);
         rightButton.SetActive(false);
     }
 
+    public void ShowCreateLevelPanel() {
+        createLevelPanel.SetActive(true);
+    }
+    public void CloseCreateLevelPanel() {
+        createLevelPanel.SetActive(false);
+    }
+
     public void CreateLevelObjects() {
-        foreach (MenuLevelJson level in menuData.level_list) {
+        for (int i = 0; i < menuData.level_list.Count; i++) {
+            MenuLevelJson level = menuData.level_list[i];
             GameObject mhn_levelItem = Instantiate(levelItem, new Vector3(levelItem.transform.localPosition.x, 0f, 0f), Quaternion.identity, levelUIComponent.transform);
-            mhn_levelItem.transform.localPosition = new Vector3(levelItem.transform.localPosition.x + 800f * (level.level_id + 1), 0f, 0f);
+            mhn_levelItem.transform.localPosition = new Vector3(levelItem.transform.localPosition.x + 800f * (i + 1 + 1), 0f, 0f);
             mhn_levelItem.transform.localRotation = Quaternion.identity;
             GameObject mhn_CoverObject = mhn_levelItem.transform.GetChild(0).gameObject;
-            mhn_CoverObject.name = $"Level{level.level_id}Cover_Button";
+            mhn_CoverObject.name = $"Level_{level.level_id}_Cover_Button";
             GameObject mhn_CoverObjectImage = mhn_CoverObject.transform.GetChild(0).gameObject;
-            mhn_CoverObjectImage.name = $"Level{level.level_id}Cover";
+            mhn_CoverObjectImage.name = $"Level_{level.level_id}_Cover";
             GameObject mhn_LevelTitle = mhn_levelItem.transform.GetChild(1).gameObject;
-            mhn_LevelTitle.name = $"Level{level.level_id}Title";
+            mhn_LevelTitle.name = $"Level_{level.level_id}_Title";
             GameObject mhn_LevelPercentage = mhn_levelItem.transform.GetChild(2).gameObject;
-            mhn_LevelPercentage.name = $"Level{level.level_id}Percent";
+            mhn_LevelPercentage.name = $"Level_{level.level_id}_Percent";
             GameObject mhn_LevelGems = mhn_levelItem.transform.GetChild(3).gameObject;
-            mhn_LevelGems.name = $"Level{level.level_id}Gems";
+            mhn_LevelGems.name = $"Level_{level.level_id}_Gems";
         }
     }
 
@@ -257,7 +272,8 @@ public class MainMenuScripts : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit))
             {
-                if (hit.transform == this.transform)
+                GameObject gameManagerObject = GameObject.Find("GameManager");
+                if (hit.transform == gameManagerObject.transform || hit.transform == this.transform)
                 {
                     // Add your code here to handle the click event
                     gameManager.SetIsInMainMenu(false);
@@ -270,15 +286,16 @@ public class MainMenuScripts : MonoBehaviour
         }
     }
 
-    public void LoadLevel(int level) {
+    public void LoadLevel(string level) {
         gameManager.LoadLevel(level);
         mainMenuCanvas.SetActive(false);
     }
 
     public void CreateNewLevel() {
-        gameManager.CreateNewLevel(levelCount);
+        gameManager.CreateNewLevel(levelNameInputField.text);
         mainMenuCanvas.SetActive(false);
         levelCount++;
+        CloseCreateLevelPanel();
     }
 
     private void MoveCamera(Vector3 targetPosition) {
@@ -304,6 +321,11 @@ public class MainMenuScripts : MonoBehaviour
         if (t >= 0.98f) { 
             levelUIComponent.transform.localPosition = new Vector3(800f * (float)(menuIdx - 1), 0f, 0f);
             menuIdx--;
+            try {
+                gameManager.themeChanger2.UpdateTheme(menuData.level_list[-menuIdx].display_background);
+            } catch (System.Exception e) {
+                gameManager.themeChanger2.UpdateTheme(0);
+            }
             t = 0f;
             isMovingRight = false;
         }
@@ -316,6 +338,11 @@ public class MainMenuScripts : MonoBehaviour
         if (t >= 0.98f) {
             levelUIComponent.transform.localPosition = new Vector3(800f * (float)(menuIdx + 1), 0f, 0f);
             menuIdx++;
+            try {
+                gameManager.themeChanger2.UpdateTheme(menuData.level_list[-menuIdx].display_background);
+            } catch (System.Exception e) {
+                gameManager.themeChanger2.UpdateTheme(0);
+            }
             t = 0f;
             isMovingLeft = false;
         }

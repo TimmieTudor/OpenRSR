@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PixelRect:
     serializedVersion: 2
-    x: 7.2000003
-    y: 30.4
-    width: 1521.6
-    height: 778.4
+    x: 296.80002
+    y: 138.40001
+    width: 640.8
+    height: 608.8
   m_ShowMode: 0
-  m_Title: NuGet For Unity
+  m_Title: Build Settings
   m_RootView: {fileID: 4}
-  m_MinSize: {x: 100, y: 121}
-  m_MaxSize: {x: 4000, y: 4021}
+  m_MinSize: {x: 641, y: 603}
+  m_MaxSize: {x: 4001, y: 4023}
   m_Maximized: 0
 --- !u!114 &2
 MonoBehaviour:
@@ -43,7 +43,7 @@ MonoBehaviour:
     width: 1536
     height: 772.8
   m_ShowMode: 4
-  m_Title: Console
+  m_Title: Project
   m_RootView: {fileID: 5}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -58,17 +58,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: NugetWindow
+  m_Name: BuildPlayerWindow
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1521.6
-    height: 778.4
-  m_MinSize: {x: 100, y: 121}
-  m_MaxSize: {x: 4000, y: 4021}
+    width: 640.8
+    height: 608.8
+  m_MinSize: {x: 640, y: 580}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 18}
   m_Panes:
   - {fileID: 18}
@@ -92,12 +92,12 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1521.6
-    height: 778.4
-  m_MinSize: {x: 100, y: 121}
-  m_MaxSize: {x: 4000, y: 4021}
+    width: 640.8
+    height: 608.8
+  m_MinSize: {x: 641, y: 603}
+  m_MaxSize: {x: 4001, y: 4023}
   vertical: 0
-  controlID: 388
+  controlID: 190
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -192,7 +192,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 1
-  controlID: 121
+  controlID: 33
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -217,7 +217,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 122
+  controlID: 34
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -242,7 +242,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 19
+  controlID: 35
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -267,7 +267,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 50}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 20
+  controlID: 36
 --- !u!114 &12
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -285,10 +285,10 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 384
+    width: 379.2
     height: 344.8
-  m_MinSize: {x: 201, y: 221}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 20}
   m_Panes:
   - {fileID: 20}
@@ -309,12 +309,12 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 384
+    x: 379.2
     y: 0
-    width: 410.40002
+    width: 415.2
     height: 344.8
-  m_MinSize: {x: 277, y: 71}
-  m_MaxSize: {x: 4002, y: 4021}
+  m_MinSize: {x: 275, y: 50}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 21}
   m_Panes:
   - {fileID: 21}
@@ -330,7 +330,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ConsoleWindow
+  m_Name: ProjectBrowser
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
@@ -339,14 +339,14 @@ MonoBehaviour:
     y: 344.8
     width: 794.4
     height: 378
-  m_MinSize: {x: 101, y: 121}
-  m_MaxSize: {x: 4001, y: 4021}
-  m_ActualView: {fileID: 23}
+  m_MinSize: {x: 231, y: 271}
+  m_MaxSize: {x: 10001, y: 10021}
+  m_ActualView: {fileID: 22}
   m_Panes:
   - {fileID: 22}
-  - {fileID: 23}
-  m_Selected: 1
-  m_LastSelected: 0
+  - {fileID: 19}
+  m_Selected: 0
+  m_LastSelected: 1
 --- !u!114 &15
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -371,7 +371,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 123
+  controlID: 78
 --- !u!114 &16
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -391,11 +391,11 @@ MonoBehaviour:
     y: 0
     width: 741.6
     height: 372.8
-  m_MinSize: {x: 201, y: 221}
-  m_MaxSize: {x: 4001, y: 4021}
-  m_ActualView: {fileID: 19}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
+  m_ActualView: {fileID: 23}
   m_Panes:
-  - {fileID: 19}
+  - {fileID: 23}
   m_Selected: 0
   m_LastSelected: 0
 --- !u!114 &17
@@ -417,8 +417,8 @@ MonoBehaviour:
     y: 372.8
     width: 741.6
     height: 350
-  m_MinSize: {x: 201, y: 221}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 24}
   m_Panes:
   - {fileID: 24}
@@ -433,22 +433,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f5cd2e0ccf7a56478ad918ff9829c5c, type: 3}
-  m_Name: NuGetForUnity
+  m_Script: {fileID: 12043, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 100, y: 100}
+  m_MinSize: {x: 640, y: 580}
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
-    m_Text: NuGet For Unity
+    m_Text: Build Settings
     m_Image: {fileID: 0}
     m_Tooltip: 
-    m_TextWithWhitespace: "NuGet For Unity\u200B"
+    m_TextWithWhitespace: "Build Settings\u200B"
   m_Pos:
     serializedVersion: 2
-    x: -25600
-    y: -25600
-    width: 1521.6
-    height: 757.4
+    x: 296.80002
+    y: 138.40001
+    width: 640.8
+    height: 587.8
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -460,186 +460,28 @@ MonoBehaviour:
     m_SaveData: []
     m_ContainerData: []
     m_OverlaysVisible: 1
-  defaultIcon: {fileID: 2800000, guid: 0efa0a38ec1ce484896502259d7ee8f7, type: 3}
-  hasRefreshed: 1
-  numberToSkip: 0
-  serializableAvailablePackages:
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <UserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: NScripto
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 0.9.2
-      <IsManuallyInstalled>k__BackingField: 1
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: 
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <UserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 0.9.2
-      - <FullVersion>k__BackingField: 0.9.1
-      - <FullVersion>k__BackingField: 0.9.0
-      <Authors>k__BackingField:
-      - rasmuskl
-      <Description>k__BackingField: NScripto is a lightweight, fast C# script engine
-        for enabling embedded C# scripting for advanced end users.
-      <TotalDownloads>k__BackingField: 18382
-      <LicenseUrl>k__BackingField: http://www.apache.org/licenses/LICENSE-2.0
-      <ProjectUrl>k__BackingField: http://github.com/rasmuskl/NScripto
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: NScripto
-      <DownloadUrl>k__BackingField: 
-  serializableToInstallPackages: []
-  serializableUpdatePackages:
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <UserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: NScripto
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 0.9.2
-      <IsManuallyInstalled>k__BackingField: 1
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: 
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <UserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 0.9.2
-      - <FullVersion>k__BackingField: 0.9.1
-      - <FullVersion>k__BackingField: 0.9.0
-      <Authors>k__BackingField:
-      - rasmuskl
-      <Description>k__BackingField: NScripto is a lightweight, fast C# script engine
-        for enabling embedded C# scripting for advanced end users.
-      <TotalDownloads>k__BackingField: 18382
-      <LicenseUrl>k__BackingField: http://www.apache.org/licenses/LICENSE-2.0
-      <ProjectUrl>k__BackingField: http://github.com/rasmuskl/NScripto
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: NScripto
-      <DownloadUrl>k__BackingField: 
+  m_TreeViewState:
+    scrollPos: {x: 0, y: 0}
+    m_SelectedIDs: 
+    m_LastClickedID: 0
+    m_ExpandedIDs: 
+    m_RenameOverlay:
+      m_UserAcceptedRename: 0
+      m_Name: 
+      m_OriginalName: 
+      m_EditFieldRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      m_UserData: 0
+      m_IsWaitingForDelay: 0
+      m_IsRenaming: 0
+      m_OriginalEventType: 11
+      m_IsRenamingFilename: 0
+      m_ClientGUIView: {fileID: 0}
+    m_SearchString: 
 --- !u!114 &19
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -649,23 +491,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 1
-  m_Script: {fileID: 12015, guid: 0000000000000000e000000000000000, type: 0}
+  m_Script: {fileID: 12003, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 200, y: 200}
+  m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
-    m_Text: Game
-    m_Image: {fileID: 4621777727084837110, guid: 0000000000000000d000000000000000,
+    m_Text: Console
+    m_Image: {fileID: -4950941429401207979, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
-    m_TextWithWhitespace: "Game\u200B"
+    m_TextWithWhitespace: "Console\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 794.4
-    y: 73.6
-    width: 740.6
-    height: 351.8
+    x: 0
+    y: 418.4
+    width: 793.4
+    height: 357
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -677,70 +519,6 @@ MonoBehaviour:
     m_SaveData: []
     m_ContainerData: []
     m_OverlaysVisible: 1
-  m_SerializedViewNames: []
-  m_SerializedViewValues: []
-  m_PlayModeViewName: GameView
-  m_ShowGizmos: 0
-  m_TargetDisplay: 0
-  m_ClearColor: {r: 0, g: 0, b: 0, a: 0}
-  m_TargetSize: {x: 735, y: 413.5}
-  m_TextureFilterMode: 0
-  m_TextureHideFlags: 61
-  m_RenderIMGUI: 1
-  m_EnterPlayModeBehavior: 0
-  m_UseMipMap: 0
-  m_VSyncEnabled: 0
-  m_Gizmos: 0
-  m_Stats: 0
-  m_SelectedSizes: 0000000000000000000000000e000000000000000000000000000000000000000000000000000000
-  m_ZoomArea:
-    m_HRangeLocked: 0
-    m_VRangeLocked: 0
-    hZoomLockedByDefault: 0
-    vZoomLockedByDefault: 0
-    m_HBaseRangeMin: -294
-    m_HBaseRangeMax: 294
-    m_VBaseRangeMin: -165.40001
-    m_VBaseRangeMax: 165.40001
-    m_HAllowExceedBaseRangeMin: 1
-    m_HAllowExceedBaseRangeMax: 1
-    m_VAllowExceedBaseRangeMin: 1
-    m_VAllowExceedBaseRangeMax: 1
-    m_ScaleWithWindow: 0
-    m_HSlider: 0
-    m_VSlider: 0
-    m_IgnoreScrollWheelUntilClicked: 0
-    m_EnableMouseInput: 1
-    m_EnableSliderZoomHorizontal: 0
-    m_EnableSliderZoomVertical: 0
-    m_UniformScale: 1
-    m_UpDirection: 1
-    m_DrawArea:
-      serializedVersion: 2
-      x: 0
-      y: 21
-      width: 740.6
-      height: 330.8
-    m_Scale: {x: 0.99999994, y: 0.9999999}
-    m_Translation: {x: 370.3, y: 165.4}
-    m_MarginLeft: 0
-    m_MarginRight: 0
-    m_MarginTop: 0
-    m_MarginBottom: 0
-    m_LastShownAreaInsideMargins:
-      serializedVersion: 2
-      x: -370.30002
-      y: -165.40001
-      width: 740.60004
-      height: 330.80002
-    m_MinimalGUI: 1
-  m_defaultScale: 0.9999999
-  m_LastWindowPixelSize: {x: 925.75, y: 439.75}
-  m_ClearInEditMode: 1
-  m_NoCameraWarning: 1
-  m_LowResolutionForAspectRatios: 01000000000000000000
-  m_XRRenderMode: 0
-  m_RenderTexture: {fileID: 0}
 --- !u!114 &20
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -765,7 +543,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 73.6
-    width: 383
+    width: 378.2
     height: 323.8
   m_SerializedDataModeController:
     m_DataMode: 0
@@ -1140,9 +918,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 2.8954902, y: -2.4819677, z: 7.8470697}
+    m_Target: {x: -0.014728099, y: 0.6, z: 20.743252}
     speed: 2
-    m_Value: {x: 2.8954902, y: -2.4819677, z: 7.8470697}
+    m_Value: {x: -0.014728099, y: 0.6, z: 20.743252}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1188,13 +966,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: 0.18373701, y: 0.16586176, z: -0.029996336, w: 0.96867406}
+    m_Target: {x: 0.31598338, y: -0.030838162, z: 0.011318613, w: 0.94850457}
     speed: 2
-    m_Value: {x: 0.18369122, y: 0.16582042, z: -0.02998886, w: 0.96843266}
+    m_Value: {x: 0.31589094, y: -0.030829139, z: 0.011315301, w: 0.94822705}
   m_Size:
-    m_Target: 6.419951
+    m_Target: 2.182593
     speed: 2
-    m_Value: 6.419951
+    m_Value: 2.182593
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -1241,9 +1019,9 @@ MonoBehaviour:
     m_TextWithWhitespace: "Inspector\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 384
+    x: 379.2
     y: 73.6
-    width: 408.40002
+    width: 413.2
     height: 323.8
   m_SerializedDataModeController:
     m_DataMode: 0
@@ -1317,7 +1095,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scripts
+    - Assets/Plugins/KeraLua/runtimes/ios/native
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -1327,16 +1105,16 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Scripts
+  - Assets/Plugins/KeraLua/runtimes/ios/native
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\Users\tudor\Downloads\DeceBalus-main\DeceBalus-main
   m_LockTracker:
-    m_IsLocked: 0
+    m_IsLocked: 1
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 475}
-    m_SelectedIDs: 22790000
-    m_LastClickedID: 31010
-    m_ExpandedIDs: 0000000016790000187900001a7900001c7900001e79000020790000227900002479000026790000287900002a7900002c7900002e79000030790000327900003479000036790000387900005e9a0000629a000000ca9a3bffffff7f
+    scrollPos: {x: 0, y: 303}
+    m_SelectedIDs: 68610000
+    m_LastClickedID: 24936
+    m_ExpandedIDs: 00000000f4600000f86000000c6100001061000018610000206100002861000034610000386100003c61000040610000486100004c61000046770000487700004a7700004c7700004e7700005477000056770000587700005a7700005c7700005e77000060770000627700006477000066770000687700006a7700006c7700006e77000070770000727700007477000076770000787700007a7700007c7700007e77000080770000827700008477000086770000887700008a7700008c7700008e7700009077000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1364,7 +1142,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 0000000016790000187900001a7900001c7900001e79000020790000227900002479000026790000287900002a7900002c7900002e7900003079000032790000347900003679000038790000
+    m_ExpandedIDs: 0000000046770000487700004a7700004c7700004e77000050770000527700005477000056770000587700005a7700005c7700005e77000060770000627700006477000066770000687700006a7700006c7700006e77000070770000727700007477000076770000787700007a7700007c7700007e77000080770000827700008477000086770000887700008a7700008c7700008e77000090770000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1389,10 +1167,10 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: c26a0000
-    m_LastClickedInstanceID: 27330
-    m_HadKeyboardFocusLastEvent: 0
-    m_ExpandedInstanceIDs: c6230000545b000000000000a4ae000066140100
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
+    m_HadKeyboardFocusLastEvent: 1
+    m_ExpandedInstanceIDs: c6230000545b000000000000a4ae000066140100d48a0200
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1416,10 +1194,10 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 362}
+    m_ScrollPosition: {x: 0, y: 0}
     m_GridSize: 64
   m_SkipHiddenPackages: 0
-  m_DirectoriesAreaWidth: 207
+  m_DirectoriesAreaWidth: 210
 --- !u!114 &23
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -1429,23 +1207,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 1
-  m_Script: {fileID: 12003, guid: 0000000000000000e000000000000000, type: 0}
+  m_Script: {fileID: 12015, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 100, y: 100}
+  m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
-    m_Text: Console
-    m_Image: {fileID: -4950941429401207979, guid: 0000000000000000d000000000000000,
+    m_Text: Game
+    m_Image: {fileID: 4621777727084837110, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
-    m_TextWithWhitespace: "Console\u200B"
+    m_TextWithWhitespace: "Game\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 0
-    y: 418.4
-    width: 793.4
-    height: 357
+    x: 794.4
+    y: 73.6
+    width: 740.6
+    height: 351.8
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -1457,6 +1235,70 @@ MonoBehaviour:
     m_SaveData: []
     m_ContainerData: []
     m_OverlaysVisible: 1
+  m_SerializedViewNames: []
+  m_SerializedViewValues: []
+  m_PlayModeViewName: GameView
+  m_ShowGizmos: 0
+  m_TargetDisplay: 0
+  m_ClearColor: {r: 0, g: 0, b: 0, a: 0}
+  m_TargetSize: {x: 735, y: 413.5}
+  m_TextureFilterMode: 0
+  m_TextureHideFlags: 61
+  m_RenderIMGUI: 1
+  m_EnterPlayModeBehavior: 0
+  m_UseMipMap: 0
+  m_VSyncEnabled: 0
+  m_Gizmos: 0
+  m_Stats: 0
+  m_SelectedSizes: 0100000000000000000000000e000000000000000000000000000000000000000000000000000000
+  m_ZoomArea:
+    m_HRangeLocked: 0
+    m_VRangeLocked: 0
+    hZoomLockedByDefault: 0
+    vZoomLockedByDefault: 0
+    m_HBaseRangeMin: -294
+    m_HBaseRangeMax: 294
+    m_VBaseRangeMin: -165.40001
+    m_VBaseRangeMax: 165.40001
+    m_HAllowExceedBaseRangeMin: 1
+    m_HAllowExceedBaseRangeMax: 1
+    m_VAllowExceedBaseRangeMin: 1
+    m_VAllowExceedBaseRangeMax: 1
+    m_ScaleWithWindow: 0
+    m_HSlider: 0
+    m_VSlider: 0
+    m_IgnoreScrollWheelUntilClicked: 0
+    m_EnableMouseInput: 1
+    m_EnableSliderZoomHorizontal: 0
+    m_EnableSliderZoomVertical: 0
+    m_UniformScale: 1
+    m_UpDirection: 1
+    m_DrawArea:
+      serializedVersion: 2
+      x: 0
+      y: 21
+      width: 740.6
+      height: 330.8
+    m_Scale: {x: 0.99999994, y: 0.9999999}
+    m_Translation: {x: 370.3, y: 165.4}
+    m_MarginLeft: 0
+    m_MarginRight: 0
+    m_MarginTop: 0
+    m_MarginBottom: 0
+    m_LastShownAreaInsideMargins:
+      serializedVersion: 2
+      x: -370.30002
+      y: -165.40001
+      width: 740.60004
+      height: 330.80002
+    m_MinimalGUI: 1
+  m_defaultScale: 0.9999999
+  m_LastWindowPixelSize: {x: 925.75, y: 439.75}
+  m_ClearInEditMode: 1
+  m_NoCameraWarning: 1
+  m_LowResolutionForAspectRatios: 01000000000000000000
+  m_XRRenderMode: 0
+  m_RenderTexture: {fileID: 0}
 --- !u!114 &24
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -1497,9 +1339,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: c26a0000
-      m_LastClickedID: 27330
-      m_ExpandedIDs: f2faffff
+      m_SelectedIDs: c6610000
+      m_LastClickedID: 0
+      m_ExpandedIDs: ccc0ffff1cc1ffffdec3ffff0af8ffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 

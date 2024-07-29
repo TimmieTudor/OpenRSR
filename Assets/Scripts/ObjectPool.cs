@@ -53,6 +53,10 @@ public class ObjectPool : MonoBehaviour
             activeObjects.Add(prefab, new HashSet<GameObject>());
         }
 
+        if (!maxPoolSizes.ContainsKey(prefab)) {
+            maxPoolSizes.Add(prefab, maxPoolSize);
+        }
+
         Queue<GameObject> pool = pooledObjects[prefab];
         if (pool.Count > 0) {
             GameObject obj = pool.Dequeue();
@@ -150,6 +154,7 @@ public class ObjectPool : MonoBehaviour
             }
             pooledObjects[prefab].Clear();
             activeObjects[prefab].Clear();
+            maxPoolSizes[prefab] = maxPoolSize;
         }
     }
     public void ClearAllPools() {
@@ -159,6 +164,7 @@ public class ObjectPool : MonoBehaviour
             }
             pooledObjects[prefab].Clear();
             activeObjects[prefab].Clear();
+            maxPoolSizes[prefab] = maxPoolSize;
         }
     }
 }

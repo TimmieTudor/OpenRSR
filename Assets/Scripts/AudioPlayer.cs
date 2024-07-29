@@ -20,7 +20,7 @@ public class AudioPlayer : MonoBehaviour
         levelConfig = levelRenderer.GetComponent<LevelConfigurator>();
         audioPath = levelConfig.musicPath;
         audioSource = GetComponent<AudioSource>();
-        gameManager = GetComponent<GameManager>();
+        gameManager = GameManager.instance;
 
         StartCoroutine(WaitASecond());
 

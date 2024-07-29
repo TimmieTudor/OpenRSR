@@ -10,7 +10,7 @@ public class SphereDragger : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        manager = GetComponent<GameManager>();
+        manager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     private void Update()

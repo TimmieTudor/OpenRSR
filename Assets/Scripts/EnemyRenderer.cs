@@ -5,6 +5,7 @@ using UnityEngine;
 using System.IO;
 using System;
 using Newtonsoft.Json;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public class EnemyPositionsData
@@ -28,7 +29,7 @@ public class EnemyRenderer : MonoBehaviour
     private GameObject balus;
     private Dictionary<Vector3, GameObject> prefabPositions = new Dictionary<Vector3, GameObject>();
     private GameManager gameManager;
-    private string jsonString;
+    public string jsonString;
     private EnemyPositionsData data;
     public GameObject groundRotor;
     public GameObject glassRotor;
@@ -36,6 +37,7 @@ public class EnemyRenderer : MonoBehaviour
     private bool shouldSpawnPrefabCache = true;
     private ObjectPool objectPool;
     private SphereMovement sphm;
+    private Scene currentScene;
 
     IEnumerator UpdateCache() {
         while (true)
@@ -56,9 +58,9 @@ public class EnemyRenderer : MonoBehaviour
 
     private void Update()
     {
-        if (lastPosition.z < balus.transform.position.z) {
-            lastPosition = balus.transform.position;
-        }
+        //if (lastPosition.z < balus.transform.position.z) {
+            //lastPosition = balus.transform.position;
+        //}
         if (ShouldSpawnPrefab(lastPosition)) {
             UpdateEnemies();
         }
@@ -66,11 +68,13 @@ public class EnemyRenderer : MonoBehaviour
 
     public void Initialize()
     {
+        currentScene = SceneManager.GetActiveScene();
         balus = GameObject.FindGameObjectWithTag("Balus");
         sphm = balus.GetComponent<SphereMovement>();
         GameObject objPoolObject = GameObject.Find("ObjectPool");
         objectPool = objPoolObject.GetComponent<ObjectPool>();
-        gameManager = balus.GetComponent<GameManager>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        //Debug.Log(gameManager.isDataDownloaded);
         jsonString = gameManager.isDataDownloaded ? File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json") : Resources.Load<TextAsset>(jsonFilePath).text;
         data = JsonConvert.DeserializeObject<EnemyPositionsData>(jsonString);
         ProcessEnemyPositions(data.positions);
@@ -98,18 +102,42 @@ public class EnemyRenderer : MonoBehaviour
 
     private void ProcessEnemyPositions(List<List<int>> positions)
     {
-        for (int i = 0; i < positions.Count; i++)
-        {
-            List<int> row = positions[i];
-            float z = i * prefabSpacing;
-            for (int j = 0; j < row.Count; j++)
+        if (positions != null) {
+            try {
+            for (int i = (int)lastPosition.z; i < (int)lastPosition.z + 30; i++)
             {
-                int hasPrefab = row[j];
-                float x = j - 2;
-                Vector3 spawnPosition = CalculateSpawnPosition(hasPrefab, x, z);
-                if (ShouldSpawnPrefab(spawnPosition))
+                List<int> row = positions[i];
+                float z = i * prefabSpacing;
+                for (int j = 0; j < row.Count; j++)
                 {
-                    SpawnPrefab(hasPrefab, spawnPosition, i, j, x, z);
+                    int hasPrefab = row[j];
+                    float x = j - 2;
+                    Vector3 spawnPosition = CalculateSpawnPosition(hasPrefab, x, z);
+                    if (ShouldSpawnPrefab(spawnPosition))
+                    {
+                        SpawnPrefab(hasPrefab, spawnPosition, i, j, x, z);
+                    } else {
+                        lastPosition = balus.transform.position;
+                    }
+                }
+            }
+            } catch (System.ArgumentOutOfRangeException e) {
+                for (int i = (int)lastPosition.z; i < positions.Count; i++)
+                {
+                    List<int> row = positions[i];
+                    float z = i * prefabSpacing;
+                    for (int j = 0; j < row.Count; j++)
+                    {
+                        int hasPrefab = row[j];
+                        float x = j - 2;
+                        Vector3 spawnPosition = CalculateSpawnPosition(hasPrefab, x, z);
+                        if (ShouldSpawnPrefab(spawnPosition))
+                        {
+                            SpawnPrefab(hasPrefab, spawnPosition, i, j, x, z);
+                        } else {
+                            lastPosition = balus.transform.position;
+                        }
+                    }
                 }
             }
         }
@@ -118,7 +146,7 @@ public class EnemyRenderer : MonoBehaviour
     private Vector3 CalculateSpawnPosition(int hasPrefab, float x, float z)
     {
         Vector3 spawnPosition = new Vector3(x, 0.55f, z);
-        if (hasPrefab == 4 || hasPrefab == 5 || (hasPrefab >= 10 && hasPrefab <= 15))
+        if (hasPrefab == 4 || hasPrefab == 5 || (hasPrefab >= 10 && hasPrefab <= 15) || hasPrefab == 27)
         {
             spawnPosition = new Vector3(x, 0f, z);
         }
@@ -133,7 +161,8 @@ public class EnemyRenderer : MonoBehaviour
         else if (hasPrefab == 9)
         {
             spawnPosition = new Vector3(x - 1f, 0.2f, z);
-        } else if (hasPrefab == 19 || hasPrefab == 20 || hasPrefab == 21 || hasPrefab == 22) {
+        } else if (hasPrefab == 19 || hasPrefab == 20 || hasPrefab == 21 || hasPrefab == 22 
+        || hasPrefab == 23 || hasPrefab == 24 || hasPrefab == 25 || hasPrefab == 26) {
             spawnPosition = new Vector3(x, 0f, z);
         }
         return spawnPosition;
@@ -141,7 +170,7 @@ public class EnemyRenderer : MonoBehaviour
 
     private bool ShouldSpawnPrefab(Vector3 spawnPosition)
     {
-        return spawnPosition.z - balus.transform.position.z < 25 && !prefabPositions.ContainsKey(spawnPosition);
+        return spawnPosition.z - balus.transform.position.z < 26 && !prefabPositions.ContainsKey(spawnPosition);
     }
 
     private void SpawnPrefab(int hasPrefab, Vector3 spawnPosition, int i, int j, float x, float z)
@@ -152,6 +181,7 @@ public class EnemyRenderer : MonoBehaviour
             if (obstacleGlassObject != null) {
                 obstacleGlassObject.fallCoefficient = 0.125f;
             }
+            if (sphm != null) {
             if (sphm.fallingObstaclesGroup1.Contains(spawnedPrefab)) {
                 sphm.fallingObstaclesGroup1.Remove(spawnedPrefab);
                 sphm.fallingObstaclesGroup1.Clear();
@@ -168,69 +198,12 @@ public class EnemyRenderer : MonoBehaviour
                     sphm.fallingObstacles.Remove(spawnedPrefab);
                 }
             }
-            if (spawnedPrefab.TryGetComponent<RiserAnim>(out RiserAnim riserAnim)) {
-                if (riserAnim.animator == null || riserAnim.animator2 == null) {
+            }
+            if (spawnedPrefab.TryGetComponent<BaseAnim>(out BaseAnim baseAnim)) {
+                if (baseAnim == null) {
                     goto SkipRiserAnim;
                 }
-                riserAnim.ResetAnimation(spawnPosition);
-            } else if (spawnedPrefab.TryGetComponent<CrusherAnim>(out CrusherAnim crusherAnim)) {
-                if (crusherAnim.animator == null || crusherAnim.animator2 == null) {
-                    goto SkipRiserAnim;
-                }
-                crusherAnim.ResetAnimation(spawnPosition);
-            } else if (spawnedPrefab.TryGetComponent<LeftHammerAnim>(out LeftHammerAnim hammerAnim)) {
-                if (hammerAnim.animator == null || hammerAnim.animator2 == null) {
-                    goto SkipRiserAnim;
-                }
-                hammerAnim.ResetAnimation(spawnPosition);
-            } else if (spawnedPrefab.TryGetComponent<RightHammerAnim>(out RightHammerAnim hammerAnim2)) {
-                if (hammerAnim2.animator == null || hammerAnim2.animator2 == null) {
-                    goto SkipRiserAnim;
-                }
-                hammerAnim2.ResetAnimation(spawnPosition);
-            } else if (spawnedPrefab.TryGetComponent<LeftHammerLargeAnim>(out LeftHammerLargeAnim hammerLargeAnim)) {
-                if (hammerLargeAnim.animator == null) {
-                    goto SkipRiserAnim;
-                }
-                hammerLargeAnim.ResetAnimation(spawnPosition);
-            } else if (spawnedPrefab.TryGetComponent<RightHammerLargeAnim>(out RightHammerLargeAnim hammerLargeAnim2)) {
-                if (hammerLargeAnim2.animator == null) {
-                    goto SkipRiserAnim;
-                }
-                hammerLargeAnim2.ResetAnimation(spawnPosition);
-            } else if (spawnedPrefab.TryGetComponent<LargeTreeAnim>(out LargeTreeAnim largeTreeAnim)) {
-                if (largeTreeAnim.animator == null || largeTreeAnim.animator2 == null || largeTreeAnim.animator3 == null || largeTreeAnim.animator4 == null || largeTreeAnim.animator5 == null || largeTreeAnim.animator6 == null || largeTreeAnim.animator7 == null || largeTreeAnim.animator8 == null) {
-                    goto SkipRiserAnim;
-                }
-                largeTreeAnim.ResetAnimation(spawnPosition);
-            } else if (spawnedPrefab.TryGetComponent<MediumTreeAnim>(out MediumTreeAnim mediumTreeAnim)) {
-                if (mediumTreeAnim.animator == null || mediumTreeAnim.animator2 == null || mediumTreeAnim.animator3 == null || mediumTreeAnim.animator4 == null || mediumTreeAnim.animator5 == null) {
-                    goto SkipRiserAnim;
-                }
-                mediumTreeAnim.ResetAnimation(spawnPosition);
-            } else if (spawnedPrefab.TryGetComponent<SmallTreeAnim>(out SmallTreeAnim smallTreeAnim)) {
-                if (smallTreeAnim.animator == null || smallTreeAnim.animator2 == null || smallTreeAnim.animator3 == null || smallTreeAnim.animator4 == null || smallTreeAnim.animator5 == null || smallTreeAnim.animator6 == null || smallTreeAnim.animator7 == null) {
-                    goto SkipRiserAnim;
-                }
-                smallTreeAnim.ResetAnimation(spawnPosition);
-            } else if (spawnedPrefab.TryGetComponent<LaserAnim>(out LaserAnim laserAnim)) {
-                if (laserAnim.animator == null || laserAnim.animator2 == null || laserAnim.animator3 == null) {
-                    goto SkipRiserAnim;
-                }
-                laserAnim.ResetAnimation(spawnPosition);
-                GameObject laserBaseObject = spawnedPrefab.transform.Find("DeceBalus_Laser_Base").gameObject;
-                laserBaseObject.transform.position = new Vector3(spawnPosition.x, laserBaseObject.transform.position.y, spawnPosition.z);
-            } else if (spawnedPrefab.TryGetComponent<FloaterAnim>(out FloaterAnim floaterAnim)) {
-                if (floaterAnim.animator == null || floaterAnim.animator2 == null) {
-                    goto SkipRiserAnim;
-                }
-                floaterAnim.ResetAnimation(spawnPosition);
-                
-            } else if (spawnedPrefab.TryGetComponent<SpotlightAnim>(out SpotlightAnim spotlightAnim)) {
-                if (spotlightAnim.animator == null) {
-                    goto SkipRiserAnim;
-                }
-                spotlightAnim.ResetAnimation(spawnPosition);
+                baseAnim.ResetAnimation(spawnPosition);
             } else if (spawnedPrefab.TryGetComponent<SoundPlayer>(out SoundPlayer soundPlayer)) {
                 GameObject gemBaseObject = spawnedPrefab.transform.GetChild(0).gameObject;
                 gemBaseObject.SetActive(true);
@@ -291,13 +264,39 @@ public class EnemyRenderer : MonoBehaviour
                 if (spawnedPrefab.TryGetComponent<RightRollerAnim>(out RightRollerAnim rr)) {
                     rr.xOffset = x;
                 }
-            } else if (hasPrefab == 19) {
+            } else if (hasPrefab == 19 || hasPrefab == 20 || hasPrefab == 21 || hasPrefab == 22
+            || hasPrefab == 23 || hasPrefab == 24 || hasPrefab == 25 || hasPrefab == 26) {
                 GameObject activeMover = spawnedPrefab.transform.GetChild(0).gameObject;
                 GameObject normalMover = spawnedPrefab.transform.GetChild(1).gameObject;
                 GameObject moverCollision = spawnedPrefab.transform.GetChild(2).gameObject;
                 normalMover.SetActive(true);
                 activeMover.SetActive(false);
                 moverCollision.SetActive(true);
+                if (hasPrefab == 19 || hasPrefab == 20 || hasPrefab == 21 || hasPrefab == 22) {
+                    List<GameObject> movers = GameObject.FindGameObjectsWithTag("MoverCollisionGroup1").ToList();
+                    movers.AddRange(GameObject.FindGameObjectsWithTag("MoverCollisionGroup2").ToList());
+                    movers.AddRange(GameObject.FindGameObjectsWithTag("MoverCollisionGroup3").ToList());
+                    foreach (GameObject mover in movers) {
+                        if (mover.transform.position.x == spawnedPrefab.transform.position.x && mover.transform.position.z == spawnedPrefab.transform.position.z) {
+                            spawnedPrefab.transform.parent = mover.transform;
+                            Domino domino = mover.GetComponent<Domino>();
+                            domino.isGroupLeader = true;
+                            break;
+                        }
+                    }
+                } else if (hasPrefab == 23 || hasPrefab == 24 || hasPrefab == 25 || hasPrefab == 26) {
+                    List<GameObject> movers = GameObject.FindGameObjectsWithTag("MoverAutoCollisionGroup1").ToList();
+                    movers.AddRange(GameObject.FindGameObjectsWithTag("MoverAutoCollisionGroup2").ToList());
+                    movers.AddRange(GameObject.FindGameObjectsWithTag("MoverAutoCollisionGroup3").ToList());
+                    foreach (GameObject mover in movers) {
+                        if (mover.transform.position.x == spawnedPrefab.transform.position.x && mover.transform.position.z == spawnedPrefab.transform.position.z) {
+                            spawnedPrefab.transform.parent = mover.transform;
+                            Domino domino = mover.GetComponent<Domino>();
+                            domino.isGroupLeader = true;
+                            break;
+                        }
+                    }
+                }
             }
             lastPosition = balus.transform.position;
         }
