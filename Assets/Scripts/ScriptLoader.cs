@@ -38,7 +38,8 @@ public class ScriptLoader : MonoBehaviour
 {
     string modFolderPath;
     public List<string> installedModPaths = new List<string>();
-    Lua state = new Lua();
+    //Lua state = new Lua();
+    List<Lua> scriptStates = new List<Lua>();
     public GameManager gameManager;
     private int num_iterations = 0;
     //private CSharpScriptCompiler scriptCompiler = new CSharpScriptCompiler();
@@ -46,12 +47,8 @@ public class ScriptLoader : MonoBehaviour
     Func<IEnumerator, Coroutine> startCoroutine;
     void Start()
     {
-        
         startCoroutine = (coroutine) => StartCoroutine(coroutine); 
         gameManager = GameManager.instance;
-        state["gameManager"] = gameManager;
-        state["ball"] = gameManager.balus;
-        state.LoadCLRPackage();
         if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "Mods"))) {
             Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Mods"));
         }
@@ -132,14 +129,19 @@ public class ScriptLoader : MonoBehaviour
             }
             if (Directory.Exists(ScriptsFolderPath)) {
                 string[] files = Directory.GetFiles(ScriptsFolderPath);
-                state["StartCoroutine"] = startCoroutine;
                 foreach (string file in files) {
                     if (file.EndsWith(".lua")) {
-                        state.DoFile(file);
-                        var initializeFunction = state["Initialize"] as LuaFunction;
+                        Lua newState = new Lua();
+                        newState["gameManager"] = gameManager;
+                        newState["ball"] = gameManager.balus;
+                        newState.LoadCLRPackage();
+                        newState["StartCoroutine"] = startCoroutine;
+                        newState.DoFile(file);
+                        var initializeFunction = newState["Initialize"] as LuaFunction;
                         if (initializeFunction != null) {
                             initializeFunction.Call();
                         }
+                        scriptStates.Add(newState);
                     }
                 }
             }
@@ -151,64 +153,70 @@ public class ScriptLoader : MonoBehaviour
     {
         if (gameManager == null) {
             gameManager = GameManager.instance;
-            state["gameManager"] = gameManager;
+            foreach (Lua state in scriptStates) {
+                state["gameManager"] = gameManager;
+                state["ball"] = gameManager.balus;
+                state["StartCoroutine"] = startCoroutine;
+            }
         }
 
-        if (gameManager.hasFallen) {
-            var onFallenFunction = state["OnFallen"] as LuaFunction;
-            if (onFallenFunction != null) {
-                if (state["number_iterations"] != null) {
-                    double number_iterations = (double)state["number_iterations"];
-                    if ((int)number_iterations == num_iterations) {
-                        gameManager.hasFallen = false;
-                        num_iterations = 0;
+        foreach (Lua state in scriptStates) {
+            if (gameManager.hasFallen) {
+                var onFallenFunction = state["OnFallen"] as LuaFunction;
+                if (onFallenFunction != null) {
+                    if (state["number_iterations"] != null) {
+                        double number_iterations = (double)state["number_iterations"];
+                        if ((int)number_iterations == num_iterations) {
+                            gameManager.hasFallen = false;
+                            num_iterations = 0;
+                        }
+                        onFallenFunction.Call(number_iterations);
+                    } else {
+                        double number_iterations = 1;
+                        if ((int)number_iterations == num_iterations) {
+                            gameManager.hasFallen = false;
+                            num_iterations = 0;
+                        }
+                        onFallenFunction.Call(number_iterations);
                     }
-                    onFallenFunction.Call(number_iterations);
-                } else {
-                    double number_iterations = 1;
-                    if ((int)number_iterations == num_iterations) {
-                        gameManager.hasFallen = false;
-                        num_iterations = 0;
-                    }
-                    onFallenFunction.Call(number_iterations);
+                    num_iterations++;
+                    //gameManager.hasFallen = false;
                 }
-                num_iterations++;
-                //gameManager.hasFallen = false;
             }
-        }
 
-        if (gameManager.hasHitObstacle) {
-            var onObstacleHitFunction = state["OnObstacleHit"] as LuaFunction;
-            if (onObstacleHitFunction != null) {
-                if (state["number_iterations"] != null) {
-                    double number_iterations = (double)state["number_iterations"];
-                    if ((int)number_iterations == num_iterations) {
-                        gameManager.hasHitObstacle = false;
-                        num_iterations = 0;
+            if (gameManager.hasHitObstacle) {
+                var onObstacleHitFunction = state["OnObstacleHit"] as LuaFunction;
+                if (onObstacleHitFunction != null) {
+                    if (state["number_iterations"] != null) {
+                        double number_iterations = (double)state["number_iterations"];
+                        if ((int)number_iterations == num_iterations) {
+                            gameManager.hasHitObstacle = false;
+                            num_iterations = 0;
+                        }
+                        onObstacleHitFunction.Call(number_iterations);
+                    } else {
+                        double number_iterations = 1;
+                        if ((int)number_iterations == num_iterations) {
+                            gameManager.hasHitObstacle = false;
+                            num_iterations = 0;
+                        }
+                        onObstacleHitFunction.Call(number_iterations);
                     }
-                    onObstacleHitFunction.Call(number_iterations);
-                } else {
-                    double number_iterations = 1;
-                    if ((int)number_iterations == num_iterations) {
-                        gameManager.hasHitObstacle = false;
-                        num_iterations = 0;
-                    }
-                    onObstacleHitFunction.Call(number_iterations);
+                    num_iterations++;
                 }
-                num_iterations++;
             }
-        }
 
-        if (gameManager.isGameOver) {
-            var onGameOverFunction = state["OnGameOver"] as LuaFunction;
-            if (onGameOverFunction != null) {
-                onGameOverFunction.Call();
+            if (gameManager.isGameOver) {
+                var onGameOverFunction = state["OnGameOver"] as LuaFunction;
+                if (onGameOverFunction != null) {
+                    onGameOverFunction.Call();
+                }
             }
-        }
 
-        var onUpdateFunction = state["OnUpdate"] as LuaFunction;
-        if (onUpdateFunction != null) {
-            onUpdateFunction.Call();
+            var onUpdateFunction = state["OnUpdate"] as LuaFunction;
+            if (onUpdateFunction != null) {
+                onUpdateFunction.Call();
+            }
         }
     }
 }

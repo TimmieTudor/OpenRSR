@@ -57,9 +57,9 @@ public class LevelEditor : MonoBehaviour
         levelConfig = levelRenderer.GetComponent<LevelConfigurator>();
         manager = GameObject.Find("GameManager").GetComponent<GameManager>();
         if (!manager.isDataDownloaded) {
-            groundJsonString = Resources.Load<TextAsset>("LevelData/Ground1").text;
-            enemyJsonString = Resources.Load<TextAsset>("LevelData/Enemies1").text;
-            themeJsonString = Resources.Load<TextAsset>("LevelData/Themes1").text;
+            groundJsonString = Resources.Load<TextAsset>("LevelData/Ground_valea").text;
+            enemyJsonString = Resources.Load<TextAsset>("LevelData/Enemies_valea").text;
+            themeJsonString = Resources.Load<TextAsset>("LevelData/Themes_valea").text;
         } else {
             groundJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, gre.jsonFilePath + ".json"));
             enemyJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, ere.jsonFilePath + ".json"));

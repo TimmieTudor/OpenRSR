@@ -26,6 +26,11 @@ public class Domino : MonoBehaviour
     public Vector3 direction;
     public List<Domino> dominoGroup = new List<Domino>();
     public bool shouldGroup = true;
+    public SphereMovement sphm;
+
+    void Start() {
+        sphm = GameObject.Find("Balus").GetComponent<SphereMovement>();
+    }
 
     void Update()
     {
@@ -120,7 +125,7 @@ public class Domino : MonoBehaviour
 
     private IEnumerator MoveDomino(Vector3 moveDirection)
     {
-        float moveDuration = 0.01f;
+        float moveDuration = 0.01f / (sphm.speed / 6f);
         float elapsedTime = 0f;
         Vector3 initialPosition = transform.position;
         Vector3 targetPosition = initialPosition + moveDirection;

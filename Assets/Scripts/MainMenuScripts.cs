@@ -99,7 +99,9 @@ public class MainMenuScripts : MonoBehaviour
         rightButton = mainMenuCanvas.transform.Find("RightButton").gameObject;
         leftButton.SetActive(false);
         rightButton.SetActive(false);
-        createLevelPanel = mainMenuCanvas.transform.Find("NewLevelPanel").gameObject;
+        GameObject dialogPopUpCanvas = GameObject.Find("DialogPopUpCanvas");
+        createLevelPanel = dialogPopUpCanvas.transform.Find("NewLevelPanel").gameObject;
+        createLevelPanel.SetActive(false);
         levelNameInputField = createLevelPanel.transform.Find("LevelIDInput").gameObject.GetComponent<TMP_InputField>();
         createLevelButton = createLevelPanel.transform.Find("CreateButton").gameObject;
         titleText = GameObject.Find("TitleImage");

@@ -1,31 +1,13 @@
 {
-    "m_SelectedDeviceId": "127.0.0.1:58526",
+    "m_SelectedDeviceId": "RF8N72PYSMJ",
     "m_SelectedPackage": {
-        "deviceId": "127.0.0.1:58526",
+        "deviceId": "RF8N72PYSMJ",
         "name": "com.TimmieTudor.OpenRSR",
-        "processId": 1943,
+        "processId": 22636,
         "exited": false
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
-        {
-            "deviceId": "RF8N72PYSMJ",
-            "name": "com.ComradeCat.DeceBalus",
-            "processId": 3277,
-            "exited": true
-        },
-        {
-            "deviceId": "RF8N72PYSMJ",
-            "name": "com.ComradeCat.DeceBalus",
-            "processId": 4186,
-            "exited": true
-        },
-        {
-            "deviceId": "RF8N72PYSMJ",
-            "name": "com.ComradeCat.DeceBalus",
-            "processId": 6772,
-            "exited": true
-        },
         {
             "deviceId": "RF8N72PYSMJ",
             "name": "com.ComradeCat.DeceBalus",
@@ -36,18 +18,24 @@
             "deviceId": "RF8N72PYSMJ",
             "name": "com.alphainventor.filemanager",
             "processId": 18542,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "RF8N72PYSMJ",
             "name": "com.ComradeCat.DeceBalus",
             "processId": 8376,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "RF8N72PYSMJ",
             "name": "com.ComradeCat.DeceBalus",
             "processId": 13187,
+            "exited": true
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.TimmieTudor.OpenRSR",
+            "processId": 22636,
             "exited": false
         },
         {
