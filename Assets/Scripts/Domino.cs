@@ -44,7 +44,6 @@ public class Domino : MonoBehaviour
             }
         }
         if (this.direction == Vector3.zero) {
-            Debug.Log(transform.position);
             foreach (var domino in dominoGroup) {
                 if (domino.isGroupLeader && domino.direction != Vector3.zero) {
                     this.direction = domino.direction;
