@@ -379,6 +379,9 @@ public class GroundRenderer : MonoBehaviour
                     if (transform.tag == "Edge") {
                         Destroy(transform.gameObject);
                     }
+                    if (transform.name == "Collision(Clone)") {
+                        Destroy(transform.gameObject);
+                    }
                 }
                 GameObject collisionChild = spawnedPrefab.transform.GetChild(0).gameObject;
                 Domino domino = collisionChild.GetComponent<Domino>();
@@ -401,42 +404,52 @@ public class GroundRenderer : MonoBehaviour
                 HandleAllCases(spawnedPrefab, glassEdgePrefab, spawnPosition, data.positions, 6, i, j, x, z);
             } else if (hasPrefab == 7) {
                 if (spawnedPrefab.TryGetComponent<LeftMovingTileAnim>(out LeftMovingTileAnim leftMovingTileAnim)) {
+                    leftMovingTileAnim.m_Riser = null;
                     leftMovingTileAnim.xOffset = x;
                     leftMovingTileAnim.leftMostXOffset = leftMostXOffset;
+                    leftMovingTileAnim.retries = 0;
                 }
             } else if (hasPrefab == 8) {
                 if (spawnedPrefab.TryGetComponent<RightMovingTileAnim>(out RightMovingTileAnim rightMovingTileAnim)) {
+                    rightMovingTileAnim.m_Riser = null;
                     rightMovingTileAnim.xOffset = x;
                     rightMovingTileAnim.rightMostXOffset = rightMostXOffset;
+                    rightMovingTileAnim.retries = 0;
                 }
             } else if (hasPrefab == 9) {
                 GameObject collisionChild = spawnedPrefab.transform.GetChild(0).gameObject;
                 Domino domino = collisionChild.GetComponent<Domino>();
+                domino.isGroupLeader = false;
                 domino.hasMoved = false;
                 HandleAllCases(spawnedPrefab, moverEdgePrefab, spawnPosition, data.positions, 9, i, j, x, z);
             } else if (hasPrefab == 10) {
                 GameObject collisionChild = spawnedPrefab.transform.GetChild(0).gameObject;
                 Domino domino = collisionChild.GetComponent<Domino>();
+                domino.isGroupLeader = false;
                 domino.hasMoved = false;
                 HandleAllCases(spawnedPrefab, moverEdgePrefab, spawnPosition, data.positions, 10, i, j, x, z);
             } else if (hasPrefab == 11) {
                 GameObject collisionChild = spawnedPrefab.transform.GetChild(0).gameObject;
                 Domino domino = collisionChild.GetComponent<Domino>();
+                domino.isGroupLeader = false;
                 domino.hasMoved = false;
                 HandleAllCases(spawnedPrefab, moverEdgePrefab, spawnPosition, data.positions, 11, i, j, x, z);
             } else if (hasPrefab == 12) {
                 GameObject collisionChild = spawnedPrefab.transform.GetChild(0).gameObject;
                 Domino domino = collisionChild.GetComponent<Domino>();
+                domino.isGroupLeader = false;
                 domino.hasMoved = false;
                 HandleAllCases(spawnedPrefab, moverAutoEdgePrefab, spawnPosition, data.positions, 12, i, j, x, z);
             } else if (hasPrefab == 13) {
                 GameObject collisionChild = spawnedPrefab.transform.GetChild(0).gameObject;
                 Domino domino = collisionChild.GetComponent<Domino>();
+                domino.isGroupLeader = false;
                 domino.hasMoved = false;
                 HandleAllCases(spawnedPrefab, moverAutoEdgePrefab, spawnPosition, data.positions, 13, i, j, x, z);
             } else if (hasPrefab == 14) {
                 GameObject collisionChild = spawnedPrefab.transform.GetChild(0).gameObject;
                 Domino domino = collisionChild.GetComponent<Domino>();
+                domino.isGroupLeader = false;
                 domino.hasMoved = false;
                 HandleAllCases(spawnedPrefab, moverAutoEdgePrefab, spawnPosition, data.positions, 14, i, j, x, z);
             }

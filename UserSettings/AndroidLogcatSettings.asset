@@ -1,41 +1,53 @@
 {
     "m_SelectedDeviceId": "RF8N72PYSMJ",
     "m_SelectedPackage": {
-        "deviceId": "RF8N72PYSMJ",
-        "name": "com.TimmieTudor.OpenRSR",
-        "processId": 22636,
+        "deviceId": "",
+        "name": "",
+        "processId": 0,
         "exited": false
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
         {
             "deviceId": "RF8N72PYSMJ",
-            "name": "com.ComradeCat.DeceBalus",
-            "processId": 7674,
-            "exited": true
-        },
-        {
-            "deviceId": "RF8N72PYSMJ",
-            "name": "com.alphainventor.filemanager",
-            "processId": 18542,
-            "exited": true
-        },
-        {
-            "deviceId": "RF8N72PYSMJ",
-            "name": "com.ComradeCat.DeceBalus",
-            "processId": 8376,
-            "exited": true
-        },
-        {
-            "deviceId": "RF8N72PYSMJ",
-            "name": "com.ComradeCat.DeceBalus",
-            "processId": 13187,
+            "name": "com.TimmieTudor.OpenRSR",
+            "processId": 13247,
             "exited": true
         },
         {
             "deviceId": "RF8N72PYSMJ",
             "name": "com.TimmieTudor.OpenRSR",
-            "processId": 22636,
+            "processId": 8143,
+            "exited": true
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.TimmieTudor.OpenRSR",
+            "processId": 14688,
+            "exited": true
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.google.android.youtube",
+            "processId": 26791,
+            "exited": false
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.TimmieTudor.OpenRSR",
+            "processId": 27290,
+            "exited": true
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.sec.android.app.launcher",
+            "processId": 5991,
+            "exited": false
+        },
+        {
+            "deviceId": "RF8N72PYSMJ",
+            "name": "com.TimmieTudor.OpenRSR",
+            "processId": 15017,
             "exited": false
         },
         {

@@ -46,7 +46,7 @@ public class ObjectPool : MonoBehaviour
 
     public GameObject GetPrefab(GameObject prefab, Vector3 spawnPosition)
     {
-        //Debug.Log(!pooledObjects.ContainsKey(prefab));
+        //Debug.Log(prefab.name + " " + maxPoolSizes[prefab]);
         if (!pooledObjects.ContainsKey(prefab))
         {
             pooledObjects.Add(prefab, new Queue<GameObject>());
@@ -115,6 +115,7 @@ public class ObjectPool : MonoBehaviour
     }
 
     public void InitializePools(List<GameObject> prefabs1, List<GameObject> prefabs2, GeoBufferJson geoBufferJson) {
+        //Debug.Log("test");
         int i = 1;
         while (i < geoBufferJson.ground.Count) {
             GameObject prefab = prefabs1[i];

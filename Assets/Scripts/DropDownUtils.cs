@@ -15,10 +15,12 @@ public class DropDownUtils : MonoBehaviour
         m_Dropdown = GetComponent<TMP_Dropdown>();
         balus = GameObject.Find("Balus");
         m_LevelEditor = balus.GetComponent<LevelEditor>();
-        m_Dropdown.onValueChanged.AddListener(delegate { DropdownValueChanged(m_Dropdown); });
+        if (gameObject.name == "ObjectLayer") {
+            m_Dropdown.onValueChanged.AddListener(delegate { DropdownValueChanged_SetObjectLayer(m_Dropdown); });
+        }
     }
 
-    void DropdownValueChanged(TMP_Dropdown change)
+    void DropdownValueChanged_SetObjectLayer(TMP_Dropdown change)
     {
         m_LevelEditor.SetObjectLayer(change.value);
     }

@@ -9,7 +9,9 @@ public class LeftMovingTileAnim : MonoBehaviour
     public float xOffset = 0f;
     public float leftMostXOffset = 0f;
     private GameObject baseObject;
-    private GameObject m_Riser;
+    public GameObject m_Riser;
+    public int retries = 0;
+    public int maxRetries = 10;
     private GameObject rotorObject;
     
     // Start is called before the first frame update
@@ -33,7 +35,7 @@ public class LeftMovingTileAnim : MonoBehaviour
         } else if (leftMostXOffset == 1f) {
             baseObject.transform.position = new Vector3(-Mathf.Sin(curFrame2 - Mathf.PI / 6f) * 2f + xOffset - 1f, 0f, baseObject.transform.position.z);
         }
-        if (m_Riser == null) {
+        if (m_Riser == null && retries < maxRetries) {
             GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
             foreach (GameObject riser in risers) {
                 if (riser == null) continue;
@@ -45,6 +47,7 @@ public class LeftMovingTileAnim : MonoBehaviour
                     break;
                 }
             }
+            retries++;
         }
         if (m_Riser != null) {
             if (m_Riser.TryGetComponent<BaseAnim>(out BaseAnim baseAnim)) {
@@ -58,7 +61,14 @@ public class LeftMovingTileAnim : MonoBehaviour
                 }
             } else if (m_Riser.TryGetComponent<SoundPlayer>(out SoundPlayer soundPlayer)) {
                 GameObject gemBase = m_Riser.transform.Find("DeceBalus_Gem_Base").gameObject;
+                if (gemBase != null) {
                 gemBase.transform.position = new Vector3(baseObject.transform.position.x, gemBase.transform.position.y, gemBase.transform.position.z);
+                return;
+                }
+                GameObject crownBase = m_Riser.transform.Find("DeceBalus_Crown_Base").gameObject;
+                if (crownBase != null) {
+                crownBase.transform.position = new Vector3(baseObject.transform.position.x, crownBase.transform.position.y, crownBase.transform.position.z);
+                }
             }
         }
     }

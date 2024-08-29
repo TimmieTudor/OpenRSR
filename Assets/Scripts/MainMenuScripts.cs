@@ -4,6 +4,7 @@ using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.IO;
+using System.Globalization;
 using UnityEngine.UI;
 using TMPro;
 using SimpleFileBrowser;
@@ -26,7 +27,7 @@ public enum AvgType {
     // minimum
     min,
     // akin to the generalized mean with p=-10
-    mihnea,
+    softmin,
     // harmonic mean
     harmonic,
     // geometric mean
@@ -36,7 +37,7 @@ public enum AvgType {
     // quadratic mean
     quadratic,
     // akin to the generalized mean with p=10
-    maxea,
+    softmax,
     // maximum
     max
 }
@@ -52,6 +53,22 @@ public class MenuLevelJson {
     public float level_difficulty_easy;
     public float level_difficulty_hard;
     public string level_id;
+    public List<string> level_variations = new List<string>();
+}
+
+[System.Serializable]
+public class MenuLevelJsonWithVariations {
+    public Dictionary<string, string> display_title = new Dictionary<string, string>();
+    public Dictionary<string, int> display_gems = new Dictionary<string, int>();
+    public Dictionary<string, int> display_crowns = new Dictionary<string, int>();
+    public Dictionary<string, bool> display_author = new Dictionary<string, bool>();
+    public Dictionary<string, bool> display_progress = new Dictionary<string, bool>();
+    public Dictionary<string, int> display_background = new Dictionary<string, int>();
+    public Dictionary<string, float> level_difficulty_easy = new Dictionary<string, float>();
+    public Dictionary<string, float> level_difficulty_hard = new Dictionary<string, float>();
+    public string level_id;
+    public List<string> level_variations = new List<string>();
+    public string default_variation = "default";
 }
 
 [System.Serializable]
@@ -62,7 +79,7 @@ public class MenuDataJson {
     public SortOrder sortOrder = SortOrder.ascending;
     [JsonConverter(typeof(StringEnumConverter))]
     public AvgType avgType = AvgType.arithmetic;
-    public List<MenuLevelJson> level_list = new List<MenuLevelJson>();
+    public List<MenuLevelJsonWithVariations> level_list = new List<MenuLevelJsonWithVariations>();
 }
 
 public class MainMenuScripts : MonoBehaviour
@@ -84,7 +101,10 @@ public class MainMenuScripts : MonoBehaviour
     private GameObject createLevelPanel;
     private TMP_InputField levelNameInputField;
     private GameObject createLevelButton;
-    private int menuIdx = 0;
+    public int menuIdx = 0;
+    public string currentLevelId = "";
+    public string currentVariation = "default";
+    public int currentVariationIdx = 0;
     private bool isMovingLeft = false;
     private bool isMovingRight = false;
     private int levelCount = 1;
@@ -109,14 +129,14 @@ public class MainMenuScripts : MonoBehaviour
         levelItem = levelUIComponent.transform.Find("LevelItem").gameObject;
         menuData = JsonConvert.DeserializeObject<MenuDataJson>(File.ReadAllText(Path.Combine(Application.persistentDataPath, "MenuData/MenuData.json")));
         CreateLevelObjects();
-        foreach (MenuLevelJson level in menuData.level_list) {
+        foreach (MenuLevelJsonWithVariations level in menuData.level_list) {
             GameObject levelCoverObject = GameObject.Find($"Level_{level.level_id}_Cover_Button");
             levelCoverObject.GetComponent<Button>().onClick.AddListener(() => {
                 gameManager.LoadLevel(level.level_id);
                 mainMenuCanvas.SetActive(false);
             });
             GameObject levelTitleObject = GameObject.Find($"Level_{level.level_id}_Title");
-            levelTitleObject.GetComponent<TextMeshProUGUI>().text = level.display_title;
+            levelTitleObject.GetComponent<TextMeshProUGUI>().text = level.display_title[level.default_variation];
             GameObject levelCoverObjectImage = GameObject.Find($"Level_{level.level_id}_Cover");
             try {
                 byte[] levelCoverBytes = File.ReadAllBytes(Path.Combine(Application.persistentDataPath, $"WorldShow/World_{level.level_id}.png"));
@@ -127,14 +147,45 @@ public class MainMenuScripts : MonoBehaviour
             } catch (System.Exception e) {
                 levelCoverObjectImage.GetComponent<Image>().sprite = Sprite.Create(Resources.Load<Texture2D>("WorldShow/default_world"), new Rect(0, 0, 256, 512), new Vector2(0.5f, 0.5f), 100f);
             }
-
             GameObject levelPercentObject = GameObject.Find($"Level_{level.level_id}_Percent");
             levelPercentObject.GetComponent<TextMeshProUGUI>().text = "0%";
             GameObject levelGemCountObject = GameObject.Find($"Level_{level.level_id}_Gems");
-            levelGemCountObject.GetComponent<TextMeshProUGUI>().text = $"0/{level.display_gems.ToString()}";
+            levelGemCountObject.GetComponent<TextMeshProUGUI>().text = $"0/{level.display_gems[level.default_variation].ToString()}";
+            GameObject levelCrownsObject = GameObject.Find($"Level_{level.level_id}_Crowns");
+            switch (level.display_crowns[level.default_variation]) {
+                case 1:
+                    GameObject oneCrownObject = levelCrownsObject.transform.GetChild(0).gameObject;
+                    oneCrownObject.SetActive(true);
+                    break;
+                case 2:
+                    GameObject twoCrownsObject = levelCrownsObject.transform.GetChild(1).gameObject;
+                    twoCrownsObject.SetActive(true);
+                    break;
+                case 3:
+                    GameObject threeCrownsObject = levelCrownsObject.transform.GetChild(2).gameObject;
+                    threeCrownsObject.SetActive(true);
+                    break;
+                default:
+                    break;
+            }
+            GameObject levelVariationsObject = GameObject.Find($"Level_{level.level_id}_Variations");
+            int defaultVariationIdx = level.level_variations.IndexOf(level.default_variation);
+            if (level.level_variations.Count <= 1) {
+                levelVariationsObject.SetActive(false);
+            } else {
+                TextMeshProUGUI variationName = levelVariationsObject.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>();
+                TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                variationName.text = textInfo.ToTitleCase(level.level_variations[defaultVariationIdx]);
+            }
+            GameObject rightVariationObject = levelVariationsObject.transform.GetChild(1).gameObject;
+            rightVariationObject.GetComponent<Button>().onClick.AddListener(NextVariation);
+            GameObject leftVariationObject = levelVariationsObject.transform.GetChild(2).gameObject;
+            leftVariationObject.GetComponent<Button>().onClick.AddListener(PreviousVariation);
         }
+        currentVariationIdx = menuData.level_list[-menuIdx].level_variations.IndexOf(menuData.level_list[-menuIdx].default_variation);
+        currentVariation = menuData.level_list[-menuIdx].level_variations[currentVariationIdx];
         levelCount = menuData.level_list.Count;
-        Debug.Log(levelCount);
+        //Debug.Log(levelCount);
         GameObject importLevelItem = Instantiate(levelItem, new Vector3(levelItem.transform.localPosition.x, 0f, 0f), Quaternion.identity, levelUIComponent.transform);
         importLevelItem.transform.localPosition = new Vector3(levelItem.transform.localPosition.x + 800f * (levelCount + 2), 0f, 0f);
         importLevelItem.transform.localRotation = Quaternion.identity;
@@ -184,7 +235,7 @@ public class MainMenuScripts : MonoBehaviour
 
     public void CreateLevelObjects() {
         for (int i = 0; i < menuData.level_list.Count; i++) {
-            MenuLevelJson level = menuData.level_list[i];
+            MenuLevelJsonWithVariations level = menuData.level_list[i];
             GameObject mhn_levelItem = Instantiate(levelItem, new Vector3(levelItem.transform.localPosition.x, 0f, 0f), Quaternion.identity, levelUIComponent.transform);
             mhn_levelItem.transform.localPosition = new Vector3(levelItem.transform.localPosition.x + 800f * (i + 1 + 1), 0f, 0f);
             mhn_levelItem.transform.localRotation = Quaternion.identity;
@@ -198,6 +249,10 @@ public class MainMenuScripts : MonoBehaviour
             mhn_LevelPercentage.name = $"Level_{level.level_id}_Percent";
             GameObject mhn_LevelGems = mhn_levelItem.transform.GetChild(3).gameObject;
             mhn_LevelGems.name = $"Level_{level.level_id}_Gems";
+            GameObject mhn_LevelCrowns = mhn_levelItem.transform.GetChild(5).gameObject;
+            mhn_LevelCrowns.name = $"Level_{level.level_id}_Crowns";
+            GameObject mhn_LevelVariations = mhn_levelItem.transform.GetChild(6).gameObject;
+            mhn_LevelVariations.name = $"Level_{level.level_id}_Variations";
         }
     }
 
@@ -241,11 +296,11 @@ public class MainMenuScripts : MonoBehaviour
         return Mathf.Sqrt(sum / values.Length);
     }
 
-    public float Maxea(float[] values) {
+    public float Softmax(float[] values) {
         return GeneralizedMean(values, 10f);
     }
 
-    public float Mihnea(float[] values) {
+    public float Softmin(float[] values) {
         return GeneralizedMean(values, -10f);
     }
 
@@ -307,6 +362,8 @@ public class MainMenuScripts : MonoBehaviour
             t += 0.02f;
             if (t >= 0.98f) { 
                 levelUIComponent.transform.localPosition = new Vector3(0f, 0f, 0f);
+                currentLevelId = menuData.level_list[-menuIdx].level_id;
+                currentVariation = menuData.level_list[-menuIdx].default_variation;
                 if (isInTitleScreen) {
                     isInTitleScreen = false;
                 }
@@ -323,8 +380,12 @@ public class MainMenuScripts : MonoBehaviour
         if (t >= 0.98f) { 
             levelUIComponent.transform.localPosition = new Vector3(800f * (float)(menuIdx - 1), 0f, 0f);
             menuIdx--;
+            if (-menuIdx < menuData.level_list.Count) {
+                currentLevelId = menuData.level_list[-menuIdx].level_id;
+                currentVariation = menuData.level_list[-menuIdx].default_variation;
+            }
             try {
-                gameManager.themeChanger2.UpdateTheme(menuData.level_list[-menuIdx].display_background);
+                gameManager.themeChanger2.UpdateTheme(menuData.level_list[-menuIdx].display_background[currentVariation]);
             } catch (System.Exception e) {
                 gameManager.themeChanger2.UpdateTheme(0);
             }
@@ -340,13 +401,134 @@ public class MainMenuScripts : MonoBehaviour
         if (t >= 0.98f) {
             levelUIComponent.transform.localPosition = new Vector3(800f * (float)(menuIdx + 1), 0f, 0f);
             menuIdx++;
+            if (-menuIdx >= 0) {
+                currentLevelId = menuData.level_list[-menuIdx].level_id;
+                currentVariation = menuData.level_list[-menuIdx].default_variation;
+            }
             try {
-                gameManager.themeChanger2.UpdateTheme(menuData.level_list[-menuIdx].display_background);
+                gameManager.themeChanger2.UpdateTheme(menuData.level_list[-menuIdx].display_background[currentVariation]);
             } catch (System.Exception e) {
                 gameManager.themeChanger2.UpdateTheme(0);
             }
             t = 0f;
             isMovingLeft = false;
+        }
+    }
+
+    public void NextVariation() {
+        try {
+            currentVariationIdx++;
+            currentVariation = menuData.level_list[-menuIdx].level_variations[currentVariationIdx];
+            MenuLevelJsonWithVariations level = menuData.level_list[-menuIdx];
+            GameObject levelCoverObject = GameObject.Find($"Level_{level.level_id}_Cover_Button");
+            levelCoverObject.GetComponent<Button>().onClick.RemoveAllListeners();
+            levelCoverObject.GetComponent<Button>().onClick.AddListener(() => {
+                if (currentVariation == "default") {
+                    gameManager.LoadLevel(level.level_id);
+                } else {
+                    gameManager.LoadLevel(level.level_id + "_" + currentVariation);
+                }
+                mainMenuCanvas.SetActive(false);
+            });
+            GameObject levelTitleObject = GameObject.Find($"Level_{level.level_id}_Title");
+            levelTitleObject.GetComponent<TextMeshProUGUI>().text = level.display_title[currentVariation];
+            GameObject levelPercentObject = GameObject.Find($"Level_{level.level_id}_Percent");
+            levelPercentObject.GetComponent<TextMeshProUGUI>().text = "0%";
+            GameObject levelGemCountObject = GameObject.Find($"Level_{level.level_id}_Gems");
+            levelGemCountObject.GetComponent<TextMeshProUGUI>().text = $"0/{level.display_gems[currentVariation].ToString()}";
+            GameObject levelCrownsObject = GameObject.Find($"Level_{level.level_id}_Crowns");
+            switch (level.display_crowns[currentVariation]) {
+                case 1:
+                    GameObject oneCrownObject = levelCrownsObject.transform.GetChild(0).gameObject;
+                    oneCrownObject.SetActive(true);
+                    break;
+                case 2:
+                    GameObject twoCrownsObject = levelCrownsObject.transform.GetChild(1).gameObject;
+                    twoCrownsObject.SetActive(true);
+                    break;
+                case 3:
+                    GameObject threeCrownsObject = levelCrownsObject.transform.GetChild(2).gameObject;
+                    threeCrownsObject.SetActive(true);
+                    break;
+                default:
+                    GameObject oneCrownObject2 = levelCrownsObject.transform.GetChild(0).gameObject;
+                    GameObject twoCrownsObject2 = levelCrownsObject.transform.GetChild(1).gameObject;
+                    GameObject threeCrownsObject2 = levelCrownsObject.transform.GetChild(2).gameObject;
+                    oneCrownObject2.SetActive(false);
+                    twoCrownsObject2.SetActive(false);
+                    threeCrownsObject2.SetActive(false);
+                    break;
+            }
+            GameObject levelVariationsObject = GameObject.Find($"Level_{level.level_id}_Variations");
+            if (level.level_variations.Count <= 1) {
+                levelVariationsObject.SetActive(false);
+            } else {
+                TextMeshProUGUI variationName = levelVariationsObject.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>();
+                TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                variationName.text = textInfo.ToTitleCase(level.level_variations[currentVariationIdx]);
+            }
+            gameManager.themeChanger2.UpdateTheme(menuData.level_list[-menuIdx].display_background[currentVariation]);
+        } catch (System.Exception e) {
+            Debug.LogError(e);
+        }
+    }
+
+    public void PreviousVariation() {
+        try {
+            currentVariationIdx--;
+            currentVariation = menuData.level_list[-menuIdx].level_variations[currentVariationIdx];
+            //Debug.Log(currentVariation);
+            MenuLevelJsonWithVariations level = menuData.level_list[-menuIdx];
+            GameObject levelCoverObject = GameObject.Find($"Level_{level.level_id}_Cover_Button");
+            levelCoverObject.GetComponent<Button>().onClick.RemoveAllListeners();
+            levelCoverObject.GetComponent<Button>().onClick.AddListener(() => {
+                if (currentVariation == "default") {
+                    gameManager.LoadLevel(level.level_id);
+                } else {
+                    gameManager.LoadLevel(level.level_id + "_" + currentVariation);
+                }
+                mainMenuCanvas.SetActive(false);
+            });
+            GameObject levelTitleObject = GameObject.Find($"Level_{level.level_id}_Title");
+            levelTitleObject.GetComponent<TextMeshProUGUI>().text = level.display_title[currentVariation];
+            GameObject levelPercentObject = GameObject.Find($"Level_{level.level_id}_Percent");
+            levelPercentObject.GetComponent<TextMeshProUGUI>().text = "0%";
+            GameObject levelGemCountObject = GameObject.Find($"Level_{level.level_id}_Gems");
+            levelGemCountObject.GetComponent<TextMeshProUGUI>().text = $"0/{level.display_gems[currentVariation].ToString()}";
+            GameObject levelCrownsObject = GameObject.Find($"Level_{level.level_id}_Crowns");
+            switch (level.display_crowns[currentVariation]) {
+                case 1:
+                    GameObject oneCrownObject = levelCrownsObject.transform.GetChild(0).gameObject;
+                    oneCrownObject.SetActive(true);
+                    break;
+                case 2:
+                    GameObject twoCrownsObject = levelCrownsObject.transform.GetChild(1).gameObject;
+                    twoCrownsObject.SetActive(true);
+                    break;
+                case 3:
+                    GameObject threeCrownsObject = levelCrownsObject.transform.GetChild(2).gameObject;
+                    threeCrownsObject.SetActive(true);
+                    break;
+                default:
+                    GameObject oneCrownObject2 = levelCrownsObject.transform.GetChild(0).gameObject;
+                    GameObject twoCrownsObject2 = levelCrownsObject.transform.GetChild(1).gameObject;
+                    GameObject threeCrownsObject2 = levelCrownsObject.transform.GetChild(2).gameObject;
+                    oneCrownObject2.SetActive(false);
+                    twoCrownsObject2.SetActive(false);
+                    threeCrownsObject2.SetActive(false);
+                    break;
+            }
+            GameObject levelVariationsObject = GameObject.Find($"Level_{level.level_id}_Variations");
+            if (level.level_variations.Count <= 1) {
+                levelVariationsObject.SetActive(false);
+            } else {
+                TextMeshProUGUI variationName = levelVariationsObject.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>();
+                TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                variationName.text = textInfo.ToTitleCase(level.level_variations[currentVariationIdx]);
+            }
+            gameManager.themeChanger2.UpdateTheme(menuData.level_list[-menuIdx].display_background[currentVariation]);
+        } catch (System.Exception e) {
+            Debug.LogError(e);
         }
     }
 }

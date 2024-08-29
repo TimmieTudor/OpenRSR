@@ -43,6 +43,15 @@ public class Domino : MonoBehaviour
                 domino.direction = direction;
             }
         }
+        if (this.direction == Vector3.zero) {
+            Debug.Log(transform.position);
+            foreach (var domino in dominoGroup) {
+                if (domino.isGroupLeader && domino.direction != Vector3.zero) {
+                    this.direction = domino.direction;
+                    break;
+                }
+            }
+        }
     }
 
     private void UpdateDominoGrouping()
@@ -61,10 +70,6 @@ public class Domino : MonoBehaviour
         if (shouldGroup) {
             GroupAdjacentDominos();
         }
-    }
-
-    public void SetPreProcessedDominoGroup(List<List<int>> preProcessedDominoGroup) {
-        // Implementation needed
     }
 
     public void SetDirection()
@@ -125,7 +130,7 @@ public class Domino : MonoBehaviour
 
     private IEnumerator MoveDomino(Vector3 moveDirection)
     {
-        float moveDuration = 0.01f / (sphm.speed / 6f);
+        float moveDuration = 0.015f / (sphm.speed / 6f);
         float elapsedTime = 0f;
         Vector3 initialPosition = transform.position;
         Vector3 targetPosition = initialPosition + moveDirection;
@@ -133,31 +138,52 @@ public class Domino : MonoBehaviour
         GameObject parent = transform.parent.gameObject;
         GameObject m_riser = FindRiserAtPosition(initialPosition);
 
-        var arrows = FindArrows();
-        ActivateArrow(arrows, transform.position);
-
         Vector3 riserPosition = m_riser?.transform.position ?? Vector3.zero;
         Vector3 targetRiserPosition = riserPosition + moveDirection;
 
+        var arrows = FindArrows();
+        ActivateArrow(arrows, initialPosition);
+
         while (elapsedTime < moveDuration)
         {
-            parent.transform.position = Vector3.Lerp(initialPosition, targetPosition, elapsedTime / moveDuration);
-            if (riserPosition != Vector3.zero) {
-                m_riser.transform.position = Vector3.Lerp(riserPosition, targetRiserPosition, elapsedTime / moveDuration);
+            float t = elapsedTime / moveDuration;
+            parent.transform.position = Vector3.Lerp(initialPosition, targetPosition, t);
+
+            if (m_riser != null)
+            {
+                m_riser.transform.position = Vector3.Lerp(riserPosition, targetRiserPosition, t);
             }
+
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
         parent.transform.position = targetPosition;
-        if (riserPosition != Vector3.zero) {
+
+        if (Mathf.Abs(GameObject.Find("Balus").transform.position.z - targetPosition.z) < 1f)
+        {
+            GameObject spawnedDomino = Instantiate(transform.gameObject, initialPosition, Quaternion.identity, parent.transform);
+
+            // Destroy riser in spawned domino if it exists
+            for (int i = spawnedDomino.transform.childCount - 1; i >= 0; i--)
+            {
+                Transform child = spawnedDomino.transform.GetChild(i);
+                if (child.CompareTag("Riser"))
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+        }
+
+        if (m_riser != null)
+        {
             m_riser.transform.position = targetRiserPosition;
         }
 
         UpdateRiserFrames(m_riser, targetPosition);
-
         TriggerAdjacentDominos();
     }
+
 
     private GameObject FindRiserAtPosition(Vector3 position)
     {
@@ -209,16 +235,16 @@ public class Domino : MonoBehaviour
 
         while (dominosToProcess.Count > 0)
         {
-            var currentDomino = dominosToProcess.Pop();
+            Domino currentDomino = dominosToProcess.Pop();
 
-            if (!visitedDominos.Contains(currentDomino))
+            if (visitedDominos.Add(currentDomino))
             {
-                visitedDominos.Add(currentDomino);
+                //visitedDominos.Add(currentDomino);
                 var hitColliders = Physics.OverlapSphere(currentDomino.transform.position, 1f);
 
                 foreach (var hitCollider in hitColliders)
                 {
-                    var adjacentDomino = hitCollider.GetComponent<Domino>();
+                    Domino adjacentDomino = hitCollider.GetComponent<Domino>();
                     if (adjacentDomino != null &&
                         adjacentDomino.dominoType == currentDomino.dominoType &&
                         adjacentDomino.dominoSubtype == currentDomino.dominoSubtype &&

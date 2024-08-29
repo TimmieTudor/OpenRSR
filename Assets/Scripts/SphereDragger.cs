@@ -36,7 +36,9 @@ public class SphereDragger : MonoBehaviour
 
             // Update the x position of the sphere based on the mouse position
             float xPos = maxOffset * normalizedX * Screen.width / Screen.height;
-            rb.MovePosition(new Vector3(xPos, transform.position.y, transform.position.z));
+            transform.Translate(new Vector3(xPos - transform.position.x, 0f, 0f), Space.World);
+            rb.position = transform.position;
+            //rb.MovePosition(new Vector3(xPos, transform.position.y, transform.position.z));
         }
     }
 }

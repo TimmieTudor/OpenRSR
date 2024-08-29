@@ -200,14 +200,14 @@ public class EnemyRenderer : MonoBehaviour
             }
             }
             if (spawnedPrefab.TryGetComponent<BaseAnim>(out BaseAnim baseAnim)) {
-                if (baseAnim == null) {
-                    goto SkipRiserAnim;
-                }
+                //if (baseAnim == null) {
+                    //goto SkipRiserAnim;
+                //}
                 baseAnim.ResetAnimation(spawnPosition);
             } else if (spawnedPrefab.TryGetComponent<SoundPlayer>(out SoundPlayer soundPlayer)) {
                 GameObject gemBaseObject = spawnedPrefab.transform.GetChild(0).gameObject;
                 gemBaseObject.SetActive(true);
-                if (gemBaseObject.transform.position.x - spawnedPrefab.transform.position.x > 0) {
+                if (gemBaseObject.transform.position.x - spawnedPrefab.transform.position.x != 0) {
                     gemBaseObject.transform.position = new Vector3(spawnedPrefab.transform.position.x, gemBaseObject.transform.position.y, gemBaseObject.transform.position.z);
                 }
                 soundPlayer.SeekToZero();
@@ -278,7 +278,7 @@ public class EnemyRenderer : MonoBehaviour
                     movers.AddRange(GameObject.FindGameObjectsWithTag("MoverCollisionGroup3").ToList());
                     foreach (GameObject mover in movers) {
                         if (mover.transform.position.x == spawnedPrefab.transform.position.x && mover.transform.position.z == spawnedPrefab.transform.position.z) {
-                            spawnedPrefab.transform.parent = mover.transform;
+                            //spawnedPrefab.transform.parent = mover.transform;
                             Domino domino = mover.GetComponent<Domino>();
                             domino.isGroupLeader = true;
                             break;
@@ -290,7 +290,7 @@ public class EnemyRenderer : MonoBehaviour
                     movers.AddRange(GameObject.FindGameObjectsWithTag("MoverAutoCollisionGroup3").ToList());
                     foreach (GameObject mover in movers) {
                         if (mover.transform.position.x == spawnedPrefab.transform.position.x && mover.transform.position.z == spawnedPrefab.transform.position.z) {
-                            spawnedPrefab.transform.parent = mover.transform;
+                            //spawnedPrefab.transform.parent = mover.transform;
                             Domino domino = mover.GetComponent<Domino>();
                             domino.isGroupLeader = true;
                             break;

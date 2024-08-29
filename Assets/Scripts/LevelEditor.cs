@@ -37,7 +37,7 @@ public class LevelEditor : MonoBehaviour
     private string themeJsonString;
     private PositionsData gdata;
     private EnemyPositionsData edata;
-    private LevelThemeData ltdata;
+    private LevelEventData ledata;
     public int objectLayer = 0;
     public int objectID = 0;
     public GameObject tilesPanel;
@@ -67,7 +67,7 @@ public class LevelEditor : MonoBehaviour
         }
         gdata = JsonConvert.DeserializeObject<PositionsData>(groundJsonString);
         edata = JsonConvert.DeserializeObject<EnemyPositionsData>(enemyJsonString);
-        ltdata = JsonConvert.DeserializeObject<LevelThemeData>(themeJsonString);
+        ledata = JsonConvert.DeserializeObject<LevelEventData>(themeJsonString);
         themeText = GameObject.Find("DeceBalus_Theme_Text");
     }
 
@@ -123,6 +123,9 @@ public class LevelEditor : MonoBehaviour
         ObstaclePoses.Add(new Vector3(-110f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-112f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-114f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-116f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-118f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-124f, 0f, 0f));
         foreach (GameObject tile in normalTiles) {
             if (tile.transform.position == normalTilePos) {
                 continue;
@@ -205,6 +208,7 @@ public class LevelEditor : MonoBehaviour
 
     // This is what replaced Mihnea with Workspace
     public void editorTransition() {
+        if (!isInEditor) {
         gre.enabled = false;
         ere.enabled = false;
         manager.enabled = false;
@@ -220,12 +224,12 @@ public class LevelEditor : MonoBehaviour
         m_camera.transform.position = camPos;
         m_camera.transform.rotation = q;
         ClearEverything();
+        themeChanger.UpdateData();
         gre.UpdateData();
         ere.UpdateData();
-        themeChanger.UpdateData();
         gdata = gre.GetData();
         edata = ere.GetData();
-        ltdata = themeChanger.GetData();
+        ledata = themeChanger.GetData();
         List<List<int>> gpositions = gdata.positions;
         List<List<int>> epositions = edata.positions;
         for (int i = 0; i < gpositions.Count; i++) {
@@ -508,20 +512,101 @@ public class LevelEditor : MonoBehaviour
                 }
             }
         }
-        List<float> themeZPositions = ltdata.themeZPositions;
+        List<float> themeZPositions = new List<float>();
+        List<int> themeIds = new List<int>();
         Quaternion themetextRotation = Quaternion.Euler(90f, 0f, 0f);
-        for (int i = 0; i < themeZPositions.Count; i++) {
-            GameObject[] themes = GameObject.FindGameObjectsWithTag("Theme");
-            foreach (GameObject theme in themes) {
-                if (theme.transform.position == new Vector3(-1.4f, 0.1f, themeZPositions[i] - 0.4f)) {
-                    Destroy(theme);
+        //Debug.Log(ledata.level_events.Count);
+        foreach (BaseEvent level_event in ledata.level_events) {
+            //Debug.Log(level_event.event_type);
+            if (level_event.event_type == "theme_change") {
+                GameObject[] themes = GameObject.FindGameObjectsWithTag("Theme");
+                float z = level_event.z_position;
+                foreach (GameObject theme in themes) {
+                    if (theme.transform.position == new Vector3(-1.4f, 0.1f, z - 0.4f)) {
+                        Destroy(theme);
+                    }
                 }
+                Vector3 spawnPosition = new Vector3(-1.4f, 0.1f, z - 0.4f);
+                GameObject spawnedPrefab = Instantiate(themeText, spawnPosition, themetextRotation);
+                ThemeEditor te = spawnedPrefab.GetComponent<ThemeEditor>();
+                //Debug.Log(themeIds[i]);
+                te.themeID = Convert.ToInt32(level_event.event_fields["theme_id"]);
+                te.event_type = level_event.event_type;
+                TMP_Dropdown eventDropdownDropdown = te.eventDropdownDropdown;
+                eventDropdownDropdown.value = 0;
+            } else if (level_event.event_type == "filter_change") {
+                GameObject[] themes = GameObject.FindGameObjectsWithTag("Theme");
+                float z = level_event.z_position;
+                foreach (GameObject theme in themes) {
+                    if (theme.transform.position == new Vector3(-1.4f, 0.1f, z - 0.4f)) {
+                        Destroy(theme);
+                    }
+                }
+                Vector3 spawnPosition = new Vector3(-1.4f, 0.1f, z - 0.4f);
+                GameObject spawnedPrefab = Instantiate(themeText, spawnPosition, themetextRotation);
+                ThemeEditor te = spawnedPrefab.GetComponent<ThemeEditor>();
+                te.event_type = level_event.event_type;
+                te.filter_type = level_event.event_fields["filter_type"].ToString();
+                TMP_Dropdown filterDropdownDropdown = te.filterDropdownDropdown;
+                te.endAt = Convert.ToInt32(level_event.event_fields["end"]);
+                switch (level_event.event_fields["filter_type"].ToString()) {
+                    case "grayscale":
+                        filterDropdownDropdown.value = 0;
+                        te.hue = Convert.ToInt32(level_event.event_fields["hue"]);
+                        te.saturation = Convert.ToInt32(level_event.event_fields["saturation"]);
+                        te.value = Convert.ToInt32(level_event.event_fields["value"]);
+                        te.hueEnd = Convert.ToInt32(level_event.event_fields["hue_end"]);
+                        te.saturationEnd = Convert.ToInt32(level_event.event_fields["saturation_end"]);
+                        te.valueEnd = Convert.ToInt32(level_event.event_fields["value_end"]);
+                        break;
+                    case "chromatic":
+                        filterDropdownDropdown.value = 1;
+                        te.xOffset = Convert.ToInt32(level_event.event_fields["x_offset"]);
+                        te.yOffset = Convert.ToInt32(level_event.event_fields["y_offset"]);
+                        te.xOffsetEnd = Convert.ToInt32(level_event.event_fields["x_offset_end"]);
+                        te.yOffsetEnd = Convert.ToInt32(level_event.event_fields["y_offset_end"]);
+                        break;
+                    case "negative":
+                        filterDropdownDropdown.value = 2;
+                        te.intensity = Convert.ToInt32(level_event.event_fields["intensity"]);
+                        te.intensityEnd = Convert.ToInt32(level_event.event_fields["intensity_end"]);
+                        break;
+                    case "glitch":
+                        filterDropdownDropdown.value = 3;
+                        te.stability = Convert.ToInt32(level_event.event_fields["stability"]);
+                        te.stabilityEnd = Convert.ToInt32(level_event.event_fields["stability_end"]);
+                        break;
+                    case "scan_lines":
+                        filterDropdownDropdown.value = 4;
+                        te.intensity = Convert.ToInt32(level_event.event_fields["intensity"]);
+                        te.intensityEnd = Convert.ToInt32(level_event.event_fields["intensity_end"]);
+                        break;
+                    case "hue_shift":
+                        filterDropdownDropdown.value = 5;
+                        te.shiftOffset = Convert.ToInt32(level_event.event_fields["shift_offset"]);
+                        te.shiftOffsetEnd = Convert.ToInt32(level_event.event_fields["shift_offset_end"]);
+                        break;
+                }
+                TMP_Dropdown eventDropdownDropdown = te.eventDropdownDropdown;
+                eventDropdownDropdown.value = 1;
+            } else if (level_event.event_type == "speed_change") {
+                GameObject[] themes = GameObject.FindGameObjectsWithTag("Theme");
+                float z = level_event.z_position;
+                foreach (GameObject theme in themes) {
+                    if (theme.transform.position == new Vector3(-1.4f, 0.1f, z - 0.4f)) {
+                        Destroy(theme);
+                    }
+                }
+                Vector3 spawnPosition = new Vector3(-1.4f, 0.1f, z - 0.4f);
+                GameObject spawnedPrefab = Instantiate(themeText, spawnPosition, themetextRotation);
+                ThemeEditor te = spawnedPrefab.GetComponent<ThemeEditor>();
+                te.duration = Convert.ToInt32(level_event.event_fields["duration"]);
+                Debug.Log(level_event.event_fields["multiplier"].GetType());
+                te.multiplier = Convert.ToSingle(level_event.event_fields["multiplier"]);
+                te.event_type = level_event.event_type;
+                TMP_Dropdown eventDropdownDropdown = te.eventDropdownDropdown;
+                eventDropdownDropdown.value = 2;
             }
-            float z = themeZPositions[i];
-            Vector3 spawnPosition = new Vector3(-1.4f, 0.1f, z - 0.4f);
-            GameObject spawnedPrefab = Instantiate(themeText, spawnPosition, themetextRotation);
-            ThemeEditor te = spawnedPrefab.GetComponent<ThemeEditor>();
-            te.themeID = ltdata.themeIds[i];
         }
 
         for (int i = 0; i < gridSize; i++) {
@@ -533,6 +618,7 @@ public class LevelEditor : MonoBehaviour
             }
         }
         isInEditor = true;
+    }
     }
 
     public void saveLevelData() {
@@ -556,22 +642,105 @@ public class LevelEditor : MonoBehaviour
         string enemyJsonString = JsonConvert.SerializeObject(edata);
         List<int> m_themeIDs = new List<int>();
         List<float> m_themeZPositions = new List<float>();
-        Debug.Log("Theme IDs: " + m_themeIDs.Count);
         GameObject[] m_themes = GameObject.FindGameObjectsWithTag("Theme");
         Array.Sort(m_themes, new GameObjectComparer());
         Vector3 m_themePos = new Vector3(-37f, 0f, 0f);
+        List<BaseEvent> newLevelEvents = new List<BaseEvent>();
         foreach (GameObject m_theme in m_themes) {
             if (m_theme.transform.position == m_themePos) {
                 continue;
             }
             ThemeEditor te = m_theme.GetComponent<ThemeEditor>();
-            m_themeIDs.Add(te.themeID);
-            m_themeZPositions.Add(m_theme.transform.position.z + 0.4f);
+            if (te.event_type == "theme_change") {
+                // this code is retained for backwards compatibility
+                m_themeIDs.Add(te.themeID);
+                m_themeZPositions.Add(m_theme.transform.position.z + 0.4f);
+            } else if (te.event_type == "filter_change") {
+                if (te.filter_type == "grayscale") {
+                    newLevelEvents.Add(new BaseEvent() { 
+                        event_type = "filter_change", 
+                        z_position = m_theme.transform.position.z + 0.4f, 
+                        event_fields = new Dictionary<string, object>() { 
+                            { "filter_type", "grayscale" }, 
+                            { "hue" , te.hue }, 
+                            { "saturation" , te.saturation }, 
+                            { "value" , te.value }, 
+                            { "hue_end" , te.hueEnd },
+                            { "saturation_end" , te.saturationEnd },
+                            { "value_end" , te.valueEnd },
+                            { "end", te.endAt } 
+                        }
+                    });
+                } else if (te.filter_type == "chromatic") {
+                    newLevelEvents.Add(new BaseEvent() { 
+                        event_type = "filter_change", 
+                        z_position = m_theme.transform.position.z + 0.4f, 
+                        event_fields = new Dictionary<string, object>() { 
+                            { "filter_type", "chromatic" }, 
+                            { "x_offset" , te.xOffset }, 
+                            { "y_offset" , te.yOffset }, 
+                            { "x_offset_end" , te.xOffsetEnd },
+                            { "y_offset_end" , te.yOffsetEnd },
+                            { "end", te.endAt } 
+                        } 
+                    });
+                } else if (te.filter_type == "negative") {
+                    newLevelEvents.Add(new BaseEvent() { 
+                        event_type = "filter_change", 
+                        z_position = m_theme.transform.position.z + 0.4f, 
+                        event_fields = new Dictionary<string, object>() { 
+                            { "filter_type", "negative" }, 
+                            { "intensity" , te.intensity }, 
+                            { "intensity_end" , te.intensityEnd },
+                            { "end", te.endAt } 
+                        } 
+                    });
+                } else if (te.filter_type == "glitch") {
+                    newLevelEvents.Add(new BaseEvent() { 
+                        event_type = "filter_change", 
+                        z_position = m_theme.transform.position.z + 0.4f, 
+                        event_fields = new Dictionary<string, object>() { 
+                            { "filter_type", "glitch" }, 
+                            { "stability" , te.stability }, 
+                            { "stability_end" , te.stabilityEnd },
+                            { "end", te.endAt } 
+                        } 
+                    });
+                } else if (te.filter_type == "scan_lines") {
+                    newLevelEvents.Add(new BaseEvent() { 
+                        event_type = "filter_change", 
+                        z_position = m_theme.transform.position.z + 0.4f, 
+                        event_fields = new Dictionary<string, object>() { 
+                            { "filter_type", "scan_lines" }, 
+                            { "intensity" , te.intensity },
+                            { "intensity_end" , te.intensityEnd }, 
+                            { "end", te.endAt } 
+                        } 
+                    });
+                } else if (te.filter_type == "hue_shift") {
+                    newLevelEvents.Add(new BaseEvent() { 
+                        event_type = "filter_change", 
+                        z_position = m_theme.transform.position.z + 0.4f, 
+                        event_fields = new Dictionary<string, object>() { 
+                            { "filter_type", "hue_shift" }, 
+                            { "shift_offset" , te.shiftOffset },
+                            { "shift_offset_end" , te.shiftOffsetEnd }, 
+                            { "end", te.endAt } 
+                        } 
+                    });
+                }
+            } else if (te.event_type == "speed_change") {
+                newLevelEvents.Add(new BaseEvent() { event_type = "speed_change", z_position = m_theme.transform.position.z + 0.4f, event_fields = new Dictionary<string, object>() { { "duration", te.duration }, { "multiplier", te.multiplier } } });
+            }
             Destroy(m_theme);
         }
-        ltdata.themeIds = m_themeIDs;
-        ltdata.themeZPositions = m_themeZPositions;
-        string themeJsonString = JsonConvert.SerializeObject(ltdata);
+        Debug.Log("Theme IDs: " + m_themeIDs.Count);
+        for (int i = 0; i < m_themeIDs.Count; i++) {
+            newLevelEvents.Add(new BaseEvent() { event_type = "theme_change", z_position = m_themeZPositions[i], event_fields = new Dictionary<string, object>() { { "theme_id", m_themeIDs[i] } } });
+        }
+        newLevelEvents.Sort(new BaseEventComparer());
+        ledata.level_events = newLevelEvents;
+        string themeJsonString = JsonConvert.SerializeObject(ledata);
         LevelConfigJson m_config = levelConfig.SaveConfig();
         string configJsonString = JsonConvert.SerializeObject(m_config);
         string SaveFileFolder = Application.persistentDataPath;
@@ -1091,31 +1260,30 @@ public class LevelEditor : MonoBehaviour
                     //Debug.Log(ltdata.themeZPositions.Count);
                     //Debug.Log(k);
                     if (!themeAlreadyRemoved) {
-                        ltdata.themeZPositions.RemoveAt(k-1);
-                        ltdata.themeIds.RemoveAt(k-1);
+                        ledata.level_events.RemoveAt(k-1);
                     }
                 }
                 if (objectID == 1 && i >= 0 && j >= 0 && j < 5) {
                     bool themeAlreadyExists = false;
                     GameObject[] m_themes = GameObject.FindGameObjectsWithTag("Theme");
+                    Array.Sort(m_themes, new GameObjectComparer());
                     GameObject currentTheme = null;
                     foreach (GameObject m_theme in m_themes) {
-                        Debug.Log(m_theme.transform.position);
                         if (m_theme.transform.position == new Vector3(-1.4f, 0.1f, i - 0.4f)) {
+                            Debug.Log(m_theme.transform.position);
                             themeAlreadyExists = true;
                             currentTheme = m_theme;
                             break;
                         }
                     }
                     if (!themeAlreadyExists) {
-                        ltdata.themeZPositions.Add(i);
-                        ltdata.themeIds.Add(0);
+                        ledata.level_events.Add(new BaseEvent() { event_type = "theme_change", z_position = i, event_fields = new Dictionary<string, object>() { { "theme_id", 0 } } });
                         currentTheme = Instantiate(themeText, new Vector3(-1.4f, 0.1f, i - 0.4f), Quaternion.Euler(90f, 0f, 0f));
                         ThemeEditor te = currentTheme.GetComponent<ThemeEditor>();
                         te.themeID = 0;
                     } else {
                         ThemeEditor te = currentTheme.GetComponent<ThemeEditor>();
-                        te.OpenEditThemePanel();
+                        te.OpenEditThemePanel(i - 0.4f);
                     }
                 }
             }
@@ -1134,10 +1302,15 @@ public class LevelEditor : MonoBehaviour
         }
         if (isInEditor) {
             GameObject[] mhn_themes = GameObject.FindGameObjectsWithTag("Theme");
+            Array.Sort(mhn_themes, new GameObjectComparer());
             for (int i = 1; i < mhn_themes.Length; i++) {
                 if (mhn_themes[i].transform.position.z < m_camera.transform.position.z && m_camera.transform.position.z > mhn_themes[i-1].transform.position.z) {
                     ThemeEditor te = mhn_themes[i].GetComponent<ThemeEditor>();
-                    themeChanger2.UpdateTheme(te.themeID);
+                    if (te.event_type == "theme_change") {
+                        if (themeChanger2.themeID != te.themeID) {
+                            themeChanger2.UpdateTheme(te.themeID);
+                        }
+                    }
                 }
             }
         }
@@ -1148,5 +1321,12 @@ public class GameObjectComparer : IComparer {
 
     public int Compare(object x, object y) {
         return (x as GameObject).transform.position.z.CompareTo((y as GameObject).transform.position.z);
+    }
+}
+
+public class BaseEventComparer : IComparer<BaseEvent> {
+
+    public int Compare(BaseEvent x, BaseEvent y) {
+        return (x as BaseEvent).z_position.CompareTo((y as BaseEvent).z_position);
     }
 }
