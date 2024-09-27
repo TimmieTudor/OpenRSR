@@ -45,6 +45,7 @@ TagManager:
   - MoverAutoCollisionGroup3
   - MoverAutoArrowCollision
   - CrownCollision
+  - Reference
   layers:
   - Default
   - TransparentFX

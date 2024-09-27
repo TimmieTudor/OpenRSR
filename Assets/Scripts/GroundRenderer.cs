@@ -27,6 +27,7 @@ public class GroundRenderer : MonoBehaviour
     private List<GameObject> spawnedPrefabs = new List<GameObject>();
     private List<int> spawnedPrefabIDs = new List<int>();
     private GameObject balus;
+    public GameObject reference;
     private Dictionary<Vector3, GameObject> prefabPositions = new Dictionary<Vector3, GameObject>();
     private GameManager gameManager;
     public string jsonString;
@@ -40,6 +41,7 @@ public class GroundRenderer : MonoBehaviour
     private SphereMovement sphm;
     private GameObject endObject;
     private Scene currentScene;
+    private List<GameObject> references = new List<GameObject>();
     IEnumerator UpdateCache() {
         while (true)
         {
@@ -382,6 +384,25 @@ public class GroundRenderer : MonoBehaviour
                     if (transform.name == "Collision(Clone)") {
                         Destroy(transform.gameObject);
                     }
+                }
+                GameObject referenceExists = GameObject.FindGameObjectsWithTag("Reference")
+                         .FirstOrDefault(riser => riser.transform.position.x == spawnPosition.x &&
+                                                  riser.transform.position.z == spawnPosition.z);
+                if (!referenceExists) {
+                GameObject newReference = Instantiate(reference, new Vector3(x, 0f, z), Quaternion.identity);
+                references.Add(newReference);
+                spawnedPrefab.transform.parent = newReference.transform;
+                } else {
+                    spawnedPrefab.transform.parent = referenceExists.transform;
+                }
+                for (int k = 1; k < references.Count; k++) {
+                    if (Mathf.Abs(references[k].transform.position.z - references[k-1].transform.position.z) 
+                    + Mathf.Abs(references[k].transform.position.x - references[k-1].transform.position.x) == 1f) {
+                        foreach (Transform transform in references[k-1].transform) {
+                            transform.parent = references[k].transform;
+                        }
+                    }
+                    references.RemoveAt(k-1);
                 }
                 GameObject collisionChild = spawnedPrefab.transform.GetChild(0).gameObject;
                 Domino domino = collisionChild.GetComponent<Domino>();

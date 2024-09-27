@@ -61,6 +61,8 @@ public class ScriptLoader : MonoBehaviour
         foreach (string modPath in installedModPaths) {
             string ScriptsFolderPath = Path.Combine(modPath, "Scripts");
             string MeshFolderPath = Path.Combine(modPath, "Meshes");
+            string LevelDataFolderPath = Path.Combine(modPath, "LevelData");
+            string _AppendFolderPath = Path.Combine(modPath, "_Append");
             if (Directory.Exists(MeshFolderPath)) {
                 string[] files = Directory.GetFiles(MeshFolderPath);
                 foreach (string file in files) {
@@ -142,6 +144,41 @@ public class ScriptLoader : MonoBehaviour
                             initializeFunction.Call();
                         }
                         scriptStates.Add(newState);
+                    }
+                }
+            }
+            if (Directory.Exists(LevelDataFolderPath)) {
+                gameManager.levelRenderer.levelFilePaths.Add(modPath);
+                gameManager.levelConfig.levelFilePaths.Add(modPath);
+                gameManager.themeChanger.levelFilePaths.Add(modPath);
+            }
+            if (Directory.Exists(_AppendFolderPath)) {
+                string AppendMenuDataFolderPath = Path.Combine(_AppendFolderPath, "MenuData");
+                if (Directory.Exists(AppendMenuDataFolderPath)) {
+                    string[] appendFiles = Directory.GetFiles(AppendMenuDataFolderPath);
+                    string menuDataJsonFile = appendFiles.FirstOrDefault(x => x.EndsWith("MenuData.json"));
+                    if (menuDataJsonFile != null) {
+                        string jsonString = File.ReadAllText(menuDataJsonFile);
+                        AppendMenuDataJson menuData = JsonConvert.DeserializeObject<AppendMenuDataJson>(jsonString);
+                        MainMenuScripts.instance.menuData.level_list.AddRange(menuData.level_list);
+                    }
+                }
+            }
+        }
+    }
+
+    public void AppendMenuData() {
+        foreach (string modPath in installedModPaths) {
+            string _AppendFolderPath = Path.Combine(modPath, "_Append");
+            if (Directory.Exists(_AppendFolderPath)) {
+                string AppendMenuDataFolderPath = Path.Combine(_AppendFolderPath, "MenuData");
+                if (Directory.Exists(AppendMenuDataFolderPath)) {
+                    string[] appendFiles = Directory.GetFiles(AppendMenuDataFolderPath);
+                    string menuDataJsonFile = appendFiles.FirstOrDefault(x => x.EndsWith("MenuData.json"));
+                    if (menuDataJsonFile != null) {
+                        string jsonString = File.ReadAllText(menuDataJsonFile);
+                        AppendMenuDataJson menuData = JsonConvert.DeserializeObject<AppendMenuDataJson>(jsonString);
+                        MainMenuScripts.instance.menuData.level_list.AddRange(menuData.level_list);
                     }
                 }
             }

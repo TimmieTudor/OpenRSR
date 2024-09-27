@@ -500,7 +500,7 @@ public class SphereMovement : MonoBehaviour
         }
     }
 
-    bool CheckIfObjectIsNotAboveAnyOtherObject()
+    public bool CheckIfObjectIsNotAboveAnyOtherObject()
     {
         // Cast a ray downward from the object's position
         Ray ray = new Ray(transform.position, Vector3.down);

@@ -82,6 +82,11 @@ public class MenuDataJson {
     public List<MenuLevelJsonWithVariations> level_list = new List<MenuLevelJsonWithVariations>();
 }
 
+[System.Serializable]
+public class AppendMenuDataJson {
+    public List<MenuLevelJsonWithVariations> level_list = new List<MenuLevelJsonWithVariations>();
+}
+
 public class MainMenuScripts : MonoBehaviour
 {
     private GameManager gameManager;
@@ -100,6 +105,7 @@ public class MainMenuScripts : MonoBehaviour
     private GameObject rightButton;
     private GameObject createLevelPanel;
     private TMP_InputField levelNameInputField;
+    private TMP_Dropdown modPathDropdown;
     private GameObject createLevelButton;
     public int menuIdx = 0;
     public string currentLevelId = "";
@@ -109,11 +115,20 @@ public class MainMenuScripts : MonoBehaviour
     private bool isMovingRight = false;
     private int levelCount = 1;
     public static MainMenuScripts instance;
+    public bool isInitialized = false;
+    private ScriptLoader scriptLoader;
     // Start is called before the first frame update
+    void Awake() {
+        instance = this;
+    }
     void Start()
     {
+        
+    }
+
+    public void Initialize() {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        instance = this;
+        //instance = this;
         mainMenuCanvas = GameObject.Find("MainMenu");
         leftButton = mainMenuCanvas.transform.Find("LeftButton").gameObject;
         rightButton = mainMenuCanvas.transform.Find("RightButton").gameObject;
@@ -123,11 +138,14 @@ public class MainMenuScripts : MonoBehaviour
         createLevelPanel = dialogPopUpCanvas.transform.Find("NewLevelPanel").gameObject;
         createLevelPanel.SetActive(false);
         levelNameInputField = createLevelPanel.transform.Find("LevelIDInput").gameObject.GetComponent<TMP_InputField>();
+        modPathDropdown = createLevelPanel.transform.Find("ModPathDropdown").gameObject.GetComponent<TMP_Dropdown>();
         createLevelButton = createLevelPanel.transform.Find("CreateButton").gameObject;
         titleText = GameObject.Find("TitleImage");
         levelUIComponent = GameObject.Find("LevelUI");
         levelItem = levelUIComponent.transform.Find("LevelItem").gameObject;
         menuData = JsonConvert.DeserializeObject<MenuDataJson>(File.ReadAllText(Path.Combine(Application.persistentDataPath, "MenuData/MenuData.json")));
+        scriptLoader = GameObject.Find("ModManager").GetComponent<ScriptLoader>();
+        scriptLoader.AppendMenuData();
         CreateLevelObjects();
         foreach (MenuLevelJsonWithVariations level in menuData.level_list) {
             GameObject levelCoverObject = GameObject.Find($"Level_{level.level_id}_Cover_Button");
@@ -214,6 +232,7 @@ public class MainMenuScripts : MonoBehaviour
         newLevelPercentage.GetComponent<TextMeshProUGUI>().text = "?%";
         GameObject newLevelGems = newLevelItem.transform.GetChild(3).gameObject;
         newLevelGems.GetComponent<TextMeshProUGUI>().text = "?/?";
+        isInitialized = true;
     }
 
     public void ResetMenu() {
@@ -228,6 +247,17 @@ public class MainMenuScripts : MonoBehaviour
 
     public void ShowCreateLevelPanel() {
         createLevelPanel.SetActive(true);
+        
+        if (modPathDropdown.options.Count == 0) {
+            modPathDropdown.options.Add(new TMP_Dropdown.OptionData("null"));
+            foreach (string modPath in scriptLoader.installedModPaths) {
+                string substringToRemove = Application.persistentDataPath + "/Mods/";
+                if (modPath.StartsWith(substringToRemove)) {
+                    modPathDropdown.options.Add(new TMP_Dropdown.OptionData(modPath.Substring(substringToRemove.Length)));
+                }
+                //modPathDropdown.options.Add(new TMP_Dropdown.OptionData(modPath));
+            }
+        }
     }
     public void CloseCreateLevelPanel() {
         createLevelPanel.SetActive(false);
@@ -307,15 +337,17 @@ public class MainMenuScripts : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (gameManager.isInMainMenu) {
-            DetectClick();
-        } else {
-            if (isMovingCamera && isInTitleScreen) {
-                MoveCamera(new Vector3(5f, 2.25f, -2f));
-            } else if (isMovingLeft) {
-                MoveMenuLeft();
-            } else if (isMovingRight) {
-                MoveMenuRight();
+        if (gameManager != null) {
+            if (gameManager.isInMainMenu) {
+                DetectClick();
+            } else {
+                if (isMovingCamera && isInTitleScreen) {
+                    MoveCamera(new Vector3(5f, 2.25f, -2f));
+                } else if (isMovingLeft) {
+                    MoveMenuLeft();
+                } else if (isMovingRight) {
+                    MoveMenuRight();
+                }
             }
         }
     }
@@ -349,7 +381,7 @@ public class MainMenuScripts : MonoBehaviour
     }
 
     public void CreateNewLevel() {
-        gameManager.CreateNewLevel(levelNameInputField.text);
+        gameManager.CreateNewLevel(levelNameInputField.text, modPathDropdown.captionText.text);
         mainMenuCanvas.SetActive(false);
         levelCount++;
         CloseCreateLevelPanel();

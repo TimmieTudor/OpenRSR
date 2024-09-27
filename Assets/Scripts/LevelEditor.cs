@@ -21,6 +21,7 @@ public class LevelEditor : MonoBehaviour
     public GameObject grid;
     private string realPercent;
     public EnemyRenderer ere;
+    public LevelRenderer levelRenderer;
     public int gridSize = 10;
     public bool isInEditor = false;
     private bool isPopupOpen = false;
@@ -29,14 +30,16 @@ public class LevelEditor : MonoBehaviour
     private SphereMovement sphm;
     private SphereDragger sphd;
     private ThemeChanger themeChanger2;
-    private GameObject levelRenderer;
+    private GameObject levelRendererObject;
     private Rigidbody rb;
     private GameManager manager;
     private string groundJsonString;
     private string enemyJsonString;
+    private string levelJsonString;
     private string themeJsonString;
     private PositionsData gdata;
     private EnemyPositionsData edata;
+    private NewLevelJson ldata;
     private LevelEventData ledata;
     public int objectLayer = 0;
     public int objectID = 0;
@@ -48,25 +51,28 @@ public class LevelEditor : MonoBehaviour
     void Start()
     {
         balus = GameObject.FindGameObjectWithTag("Balus");
-        levelRenderer = GameObject.Find("LevelRenderer");
+        levelRendererObject = GameObject.Find("LevelRenderer");
         rb = GetComponent<Rigidbody>();
         sphd = GetComponent<SphereDragger>();
-        themeChanger = levelRenderer.GetComponent<LevelThemeChanger>();
+        themeChanger = levelRendererObject.GetComponent<LevelThemeChanger>();
         sphm = GetComponent<SphereMovement>();
-        themeChanger2 = levelRenderer.GetComponent<ThemeChanger>();
-        levelConfig = levelRenderer.GetComponent<LevelConfigurator>();
+        themeChanger2 = levelRendererObject.GetComponent<ThemeChanger>();
+        levelConfig = levelRendererObject.GetComponent<LevelConfigurator>();
         manager = GameObject.Find("GameManager").GetComponent<GameManager>();
         if (!manager.isDataDownloaded) {
-            groundJsonString = Resources.Load<TextAsset>("LevelData/Ground_valea").text;
-            enemyJsonString = Resources.Load<TextAsset>("LevelData/Enemies_valea").text;
+            //groundJsonString = Resources.Load<TextAsset>("LevelData/Ground_valea").text;
+            //enemyJsonString = Resources.Load<TextAsset>("LevelData/Enemies_valea").text;
+            levelJsonString = Resources.Load<TextAsset>("LevelData/Level_valea").text;
             themeJsonString = Resources.Load<TextAsset>("LevelData/Themes_valea").text;
         } else {
-            groundJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, gre.jsonFilePath + ".json"));
-            enemyJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, ere.jsonFilePath + ".json"));
+            //groundJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, gre.jsonFilePath + ".json"));
+            //enemyJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, ere.jsonFilePath + ".json"));
+            levelJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, levelRenderer.jsonFilePath + ".json"));
             themeJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, themeChanger.jsonFilePath + ".json"));
         }
-        gdata = JsonConvert.DeserializeObject<PositionsData>(groundJsonString);
-        edata = JsonConvert.DeserializeObject<EnemyPositionsData>(enemyJsonString);
+        //gdata = JsonConvert.DeserializeObject<PositionsData>(groundJsonString);
+        //edata = JsonConvert.DeserializeObject<EnemyPositionsData>(enemyJsonString);
+        ldata = JsonConvert.DeserializeObject<NewLevelJson>(levelJsonString);
         ledata = JsonConvert.DeserializeObject<LevelEventData>(themeJsonString);
         themeText = GameObject.Find("DeceBalus_Theme_Text");
     }
@@ -103,8 +109,8 @@ public class LevelEditor : MonoBehaviour
         ObstaclePoses.Add(new Vector3(-42f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-51f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-54f, 0f, 0f));
-        ObstaclePoses.Add(new Vector3(-56f, 0.2f, 0f));
-        ObstaclePoses.Add(new Vector3(-60f, 0.2f, 0f));
+        ObstaclePoses.Add(new Vector3(-56f, 0f, 0f));
+        ObstaclePoses.Add(new Vector3(-60f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-64f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-66f, 0f, 0f));
         ObstaclePoses.Add(new Vector3(-68f, 0f, 0f));
@@ -209,8 +215,9 @@ public class LevelEditor : MonoBehaviour
     // This is what replaced Mihnea with Workspace
     public void editorTransition() {
         if (!isInEditor) {
-        gre.enabled = false;
-        ere.enabled = false;
+        //gre.enabled = false;
+        //ere.enabled = false;
+        levelRenderer.enabled = false;
         manager.enabled = false;
         GFreeze.enabled = false;
         gamePlayCanvas.SetActive(false);
@@ -225,20 +232,22 @@ public class LevelEditor : MonoBehaviour
         m_camera.transform.rotation = q;
         ClearEverything();
         themeChanger.UpdateData();
-        gre.UpdateData();
-        ere.UpdateData();
-        gdata = gre.GetData();
-        edata = ere.GetData();
+        //gre.UpdateData();
+        //ere.UpdateData();
+        levelRenderer.UpdateData();
+        //gdata = gre.GetData();
+        //edata = ere.GetData();
+        ldata = levelRenderer.GetData();
         ledata = themeChanger.GetData();
-        List<List<int>> gpositions = gdata.positions;
-        List<List<int>> epositions = edata.positions;
+        List<List<int>> gpositions = ldata.tiles;
+        List<List<int>> epositions = ldata.enemies;
         for (int i = 0; i < gpositions.Count; i++) {
             for (int j = 0; j < gpositions[i].Count; j++) {
                 int hasPrefab = gpositions[i][j];
                 float x = j - 2;
-                float z = i * gre.prefabSpacing;
+                float z = i;
                 Vector3 spawnPosition = new Vector3(x, 0f, z);
-                GameObject spawnedPrefab = Instantiate(gre.prefabs[hasPrefab], spawnPosition, Quaternion.identity);
+                GameObject spawnedPrefab = Instantiate(levelRenderer.tileSets[hasPrefab], spawnPosition, Quaternion.identity);
                 if (hasPrefab == 4) {
                     GameObject canvasObject = new GameObject("Text_Canvas");
                     Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -403,7 +412,7 @@ public class LevelEditor : MonoBehaviour
             for (int j = 0; j < epositions[i].Count; j++) {
                 int hasPrefab = epositions[i][j];
                 float x = j - 2;
-                float z = i * ere.prefabSpacing;
+                float z = i;
                 Vector3 spawnPosition = new Vector3(x, 0.55f, z);
                 if (hasPrefab == 4 || hasPrefab == 5 || (hasPrefab >= 10 && hasPrefab <= 15) || hasPrefab == 27) {
                     spawnPosition = new Vector3(x, 0f, z);
@@ -416,7 +425,7 @@ public class LevelEditor : MonoBehaviour
                 } else {
                     spawnPosition = new Vector3(x, 0.55f, z);
                 }
-                GameObject spawnedPrefab = Instantiate(ere.prefabs[hasPrefab], spawnPosition, Quaternion.identity);
+                GameObject spawnedPrefab = Instantiate(levelRenderer.enemySets[hasPrefab], spawnPosition, Quaternion.identity);
                 
                 if (hasPrefab == 3) {
                     GameObject canvasObject = new GameObject("Text_Canvas");
@@ -439,10 +448,10 @@ public class LevelEditor : MonoBehaviour
                     || gpositions[i][j] == 4
                     || gpositions[i][j] == 5
                     || gpositions[i][j] == 6) {
-                        GameObject rotor = Instantiate(ere.glassRotor, new Vector3(x, 0f, z), Quaternion.identity);
+                        GameObject rotor = Instantiate(levelRenderer.glassRotor, new Vector3(x, 0f, z), Quaternion.identity);
                         rotor.transform.SetParent(spawnedPrefab.transform);
                     } else {
-                        GameObject rotor = Instantiate(ere.groundRotor, new Vector3(x, 0f, z), Quaternion.identity);
+                        GameObject rotor = Instantiate(levelRenderer.groundRotor, new Vector3(x, 0f, z), Quaternion.identity);
                         rotor.transform.SetParent(spawnedPrefab.transform);
                     }
                 } else if (hasPrefab == 8) {
@@ -450,10 +459,10 @@ public class LevelEditor : MonoBehaviour
                     || gpositions[i][j] == 4
                     || gpositions[i][j] == 5
                     || gpositions[i][j] == 6) {
-                        GameObject rotor = Instantiate(ere.glassRotor, new Vector3(x + 1f, 0f, z), Quaternion.identity);
+                        GameObject rotor = Instantiate(levelRenderer.glassRotor, new Vector3(x + 1f, 0f, z), Quaternion.identity);
                         rotor.transform.SetParent(spawnedPrefab.transform);
                     } else {
-                        GameObject rotor = Instantiate(ere.groundRotor, new Vector3(x + 1f, 0f, z), Quaternion.identity);
+                        GameObject rotor = Instantiate(levelRenderer.groundRotor, new Vector3(x + 1f, 0f, z), Quaternion.identity);
                         rotor.transform.SetParent(spawnedPrefab.transform);
                     }
                 } else if (hasPrefab == 9) {
@@ -461,10 +470,10 @@ public class LevelEditor : MonoBehaviour
                     || gpositions[i][j] == 4
                     || gpositions[i][j] == 5
                     || gpositions[i][j] == 6) {
-                        GameObject rotor = Instantiate(ere.glassRotor, new Vector3(x - 1f, 0f, z), Quaternion.identity);
+                        GameObject rotor = Instantiate(levelRenderer.glassRotor, new Vector3(x - 1f, 0f, z), Quaternion.identity);
                         rotor.transform.SetParent(spawnedPrefab.transform);
                     } else {
-                        GameObject rotor = Instantiate(ere.groundRotor, new Vector3(x - 1f, 0f, z), Quaternion.identity);
+                        GameObject rotor = Instantiate(levelRenderer.groundRotor, new Vector3(x - 1f, 0f, z), Quaternion.identity);
                         rotor.transform.SetParent(spawnedPrefab.transform);
                     }
                 } else if (hasPrefab == 16) {
@@ -612,7 +621,7 @@ public class LevelEditor : MonoBehaviour
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < 5; j++) {
                 float x = j - 2;
-                float z = i * gre.prefabSpacing;
+                float z = i;
                 Vector3 spawnPosition = new Vector3(x, 0f, z);
                 GameObject spawnedPrefab = Instantiate(grid, spawnPosition, Quaternion.identity);
             }
@@ -622,24 +631,25 @@ public class LevelEditor : MonoBehaviour
     }
 
     public void saveLevelData() {
-        for (int i = gdata.positions.Count - 1; i >= 0; i--) {
+        for (int i = ldata.tiles.Count - 1; i >= 0; i--) {
             List<bool> isZero = new List<bool>();
-            for (int j = gdata.positions[i].Count - 1; j >= 0; j--) {
-                if (gdata.positions[i][j] == 0) {
+            for (int j = ldata.tiles[i].Count - 1; j >= 0; j--) {
+                if (ldata.tiles[i][j] == 0) {
                     isZero.Add(true);
                 } else {
                     isZero.Add(false);
                 }
             }
             if (isZero.All(x => x == true)) {
-                gdata.positions.RemoveAt(i);
-                edata.positions.RemoveAt(i);
+                ldata.tiles.RemoveAt(i);
+                ldata.enemies.RemoveAt(i);
             } else {
                 break;
             }
         }
-        string groundJsonString = JsonConvert.SerializeObject(gdata);
-        string enemyJsonString = JsonConvert.SerializeObject(edata);
+        //string groundJsonString = JsonConvert.SerializeObject(gdata);
+        //string enemyJsonString = JsonConvert.SerializeObject(edata);
+        string levelJsonString = JsonConvert.SerializeObject(ldata);
         List<int> m_themeIDs = new List<int>();
         List<float> m_themeZPositions = new List<float>();
         GameObject[] m_themes = GameObject.FindGameObjectsWithTag("Theme");
@@ -743,18 +753,21 @@ public class LevelEditor : MonoBehaviour
         string themeJsonString = JsonConvert.SerializeObject(ledata);
         LevelConfigJson m_config = levelConfig.SaveConfig();
         string configJsonString = JsonConvert.SerializeObject(m_config);
-        string SaveFileFolder = Application.persistentDataPath;
-        File.WriteAllText(Path.Combine(SaveFileFolder, gre.jsonFilePath + ".json"), groundJsonString);
-        File.WriteAllText(Path.Combine(SaveFileFolder, ere.jsonFilePath + ".json"), enemyJsonString);
+        string SaveFileFolder = levelRenderer.levelFilePaths.FirstOrDefault(x => File.Exists(x + "/" + levelRenderer.jsonFilePath + ".json"));
+        //File.WriteAllText(Path.Combine(SaveFileFolder, gre.jsonFilePath + ".json"), groundJsonString);
+        //File.WriteAllText(Path.Combine(SaveFileFolder, ere.jsonFilePath + ".json"), enemyJsonString);
+        File.WriteAllText(Path.Combine(SaveFileFolder, levelRenderer.jsonFilePath + ".json"), levelJsonString);
         File.WriteAllText(Path.Combine(SaveFileFolder, levelConfig.jsonFilePath + ".json"), configJsonString);
         File.WriteAllText(Path.Combine(SaveFileFolder, themeChanger.jsonFilePath + ".json"), themeJsonString);
         Quaternion defaultCameraRotation = Quaternion.Euler(40f, 0f, 0f);
         m_camera.transform.rotation = defaultCameraRotation;
-        gre.enabled = true;
-        ere.enabled = true;
+        //gre.enabled = true;
+        //ere.enabled = true;
+        levelRenderer.enabled = true;
         themeChanger.enabled = true;
-        gre.UpdateData();
-        ere.UpdateData();
+        //gre.UpdateData();
+        //ere.UpdateData();
+        levelRenderer.UpdateData();
         themeChanger.UpdateData();
         AudioPlayer audioPlayer = GetComponent<AudioPlayer>();
         audioPlayer.audioPath = levelConfig.musicPath;
@@ -812,7 +825,7 @@ public class LevelEditor : MonoBehaviour
 
     private void UpdateLevelData(int i, int j) {
         float x = j - 2;
-        float z = i * gre.prefabSpacing;
+        float z = i;
         GameObject[] normalTiles = GameObject.FindGameObjectsWithTag("NormalTile");
         GameObject[] jumpTiles = GameObject.FindGameObjectsWithTag("JumpTile");
         GameObject[] glassTiles = GameObject.FindGameObjectsWithTag("GlassTile");
@@ -899,8 +912,8 @@ public class LevelEditor : MonoBehaviour
                     break;
                 }
             }
-            int hasPrefab = gdata.positions[i][j];
-            GameObject spawnedPrefab = Instantiate(gre.prefabs[hasPrefab], new Vector3(x, 0f, z), Quaternion.identity);
+            int hasPrefab = ldata.tiles[i][j];
+            GameObject spawnedPrefab = Instantiate(levelRenderer.tileSets[hasPrefab], new Vector3(x, 0f, z), Quaternion.identity);
             if (hasPrefab == 4) {
                 GameObject canvasObject = new GameObject("Text_Canvas");
                 Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -1008,38 +1021,38 @@ public class LevelEditor : MonoBehaviour
                 canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                 canvasObject.transform.position = new Vector3(x, 1f, z);
             } else if (hasPrefab == 10 || hasPrefab == 13) {
-                    GameObject canvasObject = new GameObject("Text_Canvas");
-                    Canvas canvas = canvasObject.AddComponent<Canvas>();
-                    GameObject textObject = new GameObject("Text");
-                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
-                    textComponent.text = "2";
-                    textComponent.alignment = TextAlignmentOptions.Center;
-                    canvas.renderMode = RenderMode.WorldSpace;
-                    textComponent.fontStyle = FontStyles.Bold;
-                    textComponent.fontSize = 0.4f;
-                    canvasObject.transform.SetParent(spawnedPrefab.transform);
-                    textObject.transform.SetParent(canvasObject.transform);
-                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
-                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
-                    canvasObject.transform.position = new Vector3(x, 1f, z);
-                } else if (hasPrefab == 11 || hasPrefab == 14) {
-                    GameObject canvasObject = new GameObject("Text_Canvas");
-                    Canvas canvas = canvasObject.AddComponent<Canvas>();
-                    GameObject textObject = new GameObject("Text");
-                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
-                    textComponent.text = "3";
-                    textComponent.alignment = TextAlignmentOptions.Center;
-                    canvas.renderMode = RenderMode.WorldSpace;
-                    textComponent.fontStyle = FontStyles.Bold;
-                    textComponent.fontSize = 0.4f;
-                    canvasObject.transform.SetParent(spawnedPrefab.transform);
-                    textObject.transform.SetParent(canvasObject.transform);
-                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
-                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
-                    canvasObject.transform.position = new Vector3(x, 1f, z);
-                }
+                GameObject canvasObject = new GameObject("Text_Canvas");
+                Canvas canvas = canvasObject.AddComponent<Canvas>();
+                GameObject textObject = new GameObject("Text");
+                TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                textComponent.text = "2";
+                textComponent.alignment = TextAlignmentOptions.Center;
+                canvas.renderMode = RenderMode.WorldSpace;
+                textComponent.fontStyle = FontStyles.Bold;
+                textComponent.fontSize = 0.4f;
+                canvasObject.transform.SetParent(spawnedPrefab.transform);
+                textObject.transform.SetParent(canvasObject.transform);
+                RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                canvasObject.transform.position = new Vector3(x, 1f, z);
+            } else if (hasPrefab == 11 || hasPrefab == 14) {
+                GameObject canvasObject = new GameObject("Text_Canvas");
+                Canvas canvas = canvasObject.AddComponent<Canvas>();
+                GameObject textObject = new GameObject("Text");
+                TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                textComponent.text = "3";
+                textComponent.alignment = TextAlignmentOptions.Center;
+                canvas.renderMode = RenderMode.WorldSpace;
+                textComponent.fontStyle = FontStyles.Bold;
+                textComponent.fontSize = 0.4f;
+                canvasObject.transform.SetParent(spawnedPrefab.transform);
+                textObject.transform.SetParent(canvasObject.transform);
+                RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                canvasObject.transform.position = new Vector3(x, 1f, z);
+            }
             /*
             if (gdata.positions[i][j] == 1) {
                 Instantiate(gre.prefab, new Vector3(x, 0f, z), Quaternion.identity);
@@ -1058,7 +1071,7 @@ public class LevelEditor : MonoBehaviour
                     break;
                 }
             }
-            int hasPrefab = edata.positions[i][j];
+            int hasPrefab = ldata.enemies[i][j];
             Vector3 spawnPosition = new Vector3(x, 0.55f, z);
             if (hasPrefab == 4 || hasPrefab == 5 || (hasPrefab >= 10 && hasPrefab <= 15) || hasPrefab == 27) {
                 spawnPosition = new Vector3(x, 0f, z);
@@ -1069,7 +1082,7 @@ public class LevelEditor : MonoBehaviour
             } else if (hasPrefab == 9) {
                 spawnPosition = new Vector3(x - 1f, 0.2f, z);
             }
-            GameObject spawnedPrefab = Instantiate(ere.prefabs[hasPrefab], spawnPosition, Quaternion.identity);
+            GameObject spawnedPrefab = Instantiate(levelRenderer.enemySets[hasPrefab], spawnPosition, Quaternion.identity);
             if (hasPrefab == 3) {
                 GameObject canvasObject = new GameObject("Text_Canvas");
                 Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -1087,39 +1100,39 @@ public class LevelEditor : MonoBehaviour
                 canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                 canvasObject.transform.position = new Vector3(x, 2f, z);
             } else if (hasPrefab == 6 || hasPrefab == 7 || hasPrefab == 15) {
-                List<List<int>> gpositions = gdata.positions;
+                List<List<int>> gpositions = ldata.tiles;
                 if (gpositions[i][j] == 3
                 || gpositions[i][j] == 4
                 || gpositions[i][j] == 5
                 || gpositions[i][j] == 6) {
-                    GameObject rotor = Instantiate(ere.glassRotor, new Vector3(x, 0f, z), Quaternion.identity);
+                    GameObject rotor = Instantiate(levelRenderer.glassRotor, new Vector3(x, 0f, z), Quaternion.identity);
                     rotor.transform.SetParent(spawnedPrefab.transform);
                 } else {
-                    GameObject rotor = Instantiate(ere.groundRotor, new Vector3(x, 0f, z), Quaternion.identity);
+                    GameObject rotor = Instantiate(levelRenderer.groundRotor, new Vector3(x, 0f, z), Quaternion.identity);
                     rotor.transform.SetParent(spawnedPrefab.transform);
                 }
             } else if (hasPrefab == 8) {
-                List<List<int>> gpositions = gdata.positions;
+                List<List<int>> gpositions = ldata.tiles;
                 if (gpositions[i][j] == 3
                 || gpositions[i][j] == 4
                 || gpositions[i][j] == 5
                 || gpositions[i][j] == 6) {
-                    GameObject rotor = Instantiate(ere.glassRotor, new Vector3(x + 1f, 0f, z), Quaternion.identity);
+                    GameObject rotor = Instantiate(levelRenderer.glassRotor, new Vector3(x + 1f, 0f, z), Quaternion.identity);
                     rotor.transform.SetParent(spawnedPrefab.transform);
                 } else {
-                    GameObject rotor = Instantiate(ere.groundRotor, new Vector3(x + 1f, 0f, z), Quaternion.identity);
+                    GameObject rotor = Instantiate(levelRenderer.groundRotor, new Vector3(x + 1f, 0f, z), Quaternion.identity);
                     rotor.transform.SetParent(spawnedPrefab.transform);
                 }
             } else if (hasPrefab == 9) {
-                List<List<int>> gpositions = gdata.positions;
+                List<List<int>> gpositions = ldata.tiles;
                 if (gpositions[i][j] == 3
                 || gpositions[i][j] == 4
                 || gpositions[i][j] == 5
                 || gpositions[i][j] == 6) {
-                    GameObject rotor = Instantiate(ere.glassRotor, new Vector3(x - 1f, 0f, z), Quaternion.identity);
+                    GameObject rotor = Instantiate(levelRenderer.glassRotor, new Vector3(x - 1f, 0f, z), Quaternion.identity);
                     rotor.transform.SetParent(spawnedPrefab.transform);
                 } else {
-                    GameObject rotor = Instantiate(ere.groundRotor, new Vector3(x - 1f, 0f, z), Quaternion.identity);
+                    GameObject rotor = Instantiate(levelRenderer.groundRotor, new Vector3(x - 1f, 0f, z), Quaternion.identity);
                     rotor.transform.SetParent(spawnedPrefab.transform);
                 }
             } else if (hasPrefab == 16) {
@@ -1205,7 +1218,7 @@ public class LevelEditor : MonoBehaviour
         if (m_camera.transform.position.z + 6.9f >= gridSize && isInEditor) {
             for (int i = 0; i < 5; i++) {
                 float x = i - 2;
-                float z = gridSize * gre.prefabSpacing;
+                float z = gridSize;
                 Vector3 spawnPosition = new Vector3(x, 0f, z);
                 GameObject spawnedPrefab = Instantiate(grid, spawnPosition, Quaternion.identity);
             }
@@ -1220,25 +1233,25 @@ public class LevelEditor : MonoBehaviour
             int j = (int)worldPos.x + 2;
             //Debug.Log(i + " " + j);
             if (objectLayer == 0) {
-                if (i >= gdata.positions.Count) {
-                    for (int k = 0; k <= i - gdata.positions.Count; k++) {
-                        gdata.positions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
-                        edata.positions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
+                if (i >= ldata.tiles.Count) {
+                    for (int k = 0; k <= i - ldata.tiles.Count; k++) {
+                        ldata.tiles.Add(new List<int>(){ 0, 0, 0, 0, 0 });
+                        ldata.enemies.Add(new List<int>(){ 0, 0, 0, 0, 0 });
                     }
                 }
-                if (i >= 0 && i < gdata.positions.Count && j >= 0 && j < 5) {
-                    gdata.positions[i][j] = objectID;
+                if (i >= 0 && i < ldata.tiles.Count && j >= 0 && j < 5) {
+                    ldata.tiles[i][j] = objectID;
                     UpdateLevelData(i, j);
                 }
             } else if (objectLayer == 1) {
-                if (i >= edata.positions.Count) {
-                    for (int k = 0; k <= i - gdata.positions.Count; k++) {
-                        gdata.positions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
-                        edata.positions.Add(new List<int>(){ 0, 0, 0, 0, 0 });
+                if (i >= ldata.enemies.Count) {
+                    for (int k = 0; k <= i - ldata.enemies.Count; k++) {
+                        ldata.tiles.Add(new List<int>(){ 0, 0, 0, 0, 0 });
+                        ldata.enemies.Add(new List<int>(){ 0, 0, 0, 0, 0 });
                     }
                 }
-                if (i >= 0 && i < edata.positions.Count && j >= 0 && j < 5) {
-                    edata.positions[i][j] = objectID;
+                if (i >= 0 && i < ldata.enemies.Count && j >= 0 && j < 5) {
+                    ldata.enemies[i][j] = objectID;
                     UpdateLevelData(i, j);
                 }
             } else if (objectLayer == 2) {
@@ -1300,6 +1313,7 @@ public class LevelEditor : MonoBehaviour
             obstaclesPanel.SetActive(false);
             themesPanel.SetActive(true);
         }
+        //Debug.Log(isInEditor);
         if (isInEditor) {
             GameObject[] mhn_themes = GameObject.FindGameObjectsWithTag("Theme");
             Array.Sort(mhn_themes, new GameObjectComparer());

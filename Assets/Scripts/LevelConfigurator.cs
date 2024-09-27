@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -53,7 +54,7 @@ public class LevelConfigurator : MonoBehaviour
     Slider levelSpeedSlider;
     Toggle startPortalToggle;
     public GameObject startPortalObject2;
-    
+    public List<string> levelFilePaths = new List<string>();
     // Start is called before the first frame update
     void Start()
     {
@@ -61,11 +62,15 @@ public class LevelConfigurator : MonoBehaviour
         rb = balus.GetComponent<Rigidbody>();
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         if (gameManager.isDataDownloaded) {
-            jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
-            Debug.Log("Data downloaded");
+            levelFilePaths.Add(Application.persistentDataPath);
+            string correctFilePath = levelFilePaths.FirstOrDefault(x => File.Exists(x + "/" + jsonFilePath + ".json"));
+            if (correctFilePath == null) {
+                Debug.LogError("File not found");
+                return;
+            }
+            jsonString = File.ReadAllText(correctFilePath + "/" + jsonFilePath + ".json");
         } else {
             jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
-            Debug.Log("Data not downloaded");
         }
         LevelConfigJson config = JsonConvert.DeserializeObject<LevelConfigJson>(jsonString);
         levelName = config.level_name;
@@ -82,11 +87,14 @@ public class LevelConfigurator : MonoBehaviour
 
     public void LoadLevelConfig() {
         if (gameManager.isDataDownloaded) {
-            jsonString = File.ReadAllText(Application.persistentDataPath + "/" + jsonFilePath + ".json");
-            //Debug.Log("Data downloaded");
+            string correctFilePath = levelFilePaths.FirstOrDefault(x => File.Exists(x + "/" + jsonFilePath + ".json"));
+            if (correctFilePath == null) {
+                Debug.LogError("File not found");
+                return;
+            }
+            jsonString = File.ReadAllText(correctFilePath + "/" + jsonFilePath + ".json");
         } else {
             jsonString = Resources.Load<TextAsset>(jsonFilePath).text;
-            //Debug.Log("Data not downloaded");
         }
         LevelConfigJson config = JsonConvert.DeserializeObject<LevelConfigJson>(jsonString);
         levelName = config.level_name;

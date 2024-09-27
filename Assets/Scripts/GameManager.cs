@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour
     public GameObject gameOverPanel;
     public GameObject gamePlayCanvas;
     public GameObject settingsPanel;
+    public GameObject loadingPanel;
+    public List<AnimationCurve> curves = new List<AnimationCurve>();
     public GroundRenderer gre;
     public GameFreeze GFreeze;
     public CameraFollow CFollow;
@@ -25,12 +27,13 @@ public class GameManager : MonoBehaviour
     private TextMeshProUGUI percentTextMesh;
     private string realPercent;
     public EnemyRenderer ere;
-    private LevelThemeChanger themeChanger;
+    public LevelRenderer levelRenderer;
+    public LevelThemeChanger themeChanger;
     public SphereMovement sphm;
     public NonSphereMovement nsm;
     private SphereDragger sphd;
     public ThemeChanger themeChanger2;
-    private GameObject levelRenderer;
+    private GameObject levelRendererObject;
     public LevelConfigurator levelConfig;
     public LevelEditor levelEdit;
     public bool isGameOver = false;
@@ -45,10 +48,13 @@ public class GameManager : MonoBehaviour
     private ObjectPool objectPool;
     private GeoBufferJson geoBufferJson;
     private GameObject mainMenuNormalTile;
+    public MainMenuScripts mainMenuScripts;
     public int num_collectedGems = 0;
     public int num_collectedCrowns = 0;
     private int totalGemCount = 0;
     private int totalCrownCount = 0;
+    public int downloadCount = 0;
+    public int totalDownloadsRequired = 0;
     private List<GameObject> collectedGems = new List<GameObject>();
     private GameObject levelEditButton;
     private GameObject levelEndObject;
@@ -67,6 +73,7 @@ public class GameManager : MonoBehaviour
     public Scene currentScene;
     public Dictionary<string, FrameAnim> anims = new Dictionary<string, FrameAnim>();
     public Dictionary<string, List<FrameAnim>> animGroups = new Dictionary<string, List<FrameAnim>>();
+    private Coroutine downloadCoroutine;
     IEnumerator UpdateCache()
     {
         while (true)
@@ -83,28 +90,23 @@ public class GameManager : MonoBehaviour
     }
 
     public bool IsDataDownloaded() {
-        return File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Ground_valea.json")) 
-        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_valea.json")) 
+        return File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_valea.json")) 
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_valea.json")) 
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_valea.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_valea.json"))
-        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Ground_aperta.json")) 
-        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_aperta.json")) 
+        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_aperta.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_aperta.json")) 
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_aperta.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_aperta.json"))
-        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Ground_gardenea_older.json"))
-        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_gardenea_older.json"))
+        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_gardenea_older.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_gardenea_older.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_gardenea_older.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_gardenea_older.json"))
-        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Ground_gardenea_old.json"))
-        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_gardenea_old.json"))
+        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_gardenea_old.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_gardenea_old.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_gardenea_old.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_gardenea_old.json"))
-        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Ground_gardenea_new.json"))
-        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_gardenea_new.json"))
+        && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_gardenea_new.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_gardenea_new.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_gardenea_new.json"))
         && File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_gardenea_new.json"))
@@ -142,20 +144,22 @@ public class GameManager : MonoBehaviour
         percentTextLabel = GameObject.Find("Percent");
         percentTextMesh = percentTextLabel.GetComponent<TextMeshProUGUI>();
         balus = GameObject.FindGameObjectWithTag("Balus");
-        levelRenderer = GameObject.Find("LevelRenderer");
-        GFreeze = levelRenderer.GetComponent<GameFreeze>();
+        mainMenuScripts = balus.GetComponent<MainMenuScripts>();
+        levelRendererObject = GameObject.Find("LevelRenderer");
+        levelRenderer = levelRendererObject.GetComponent<LevelRenderer>();
+        GFreeze = levelRendererObject.GetComponent<GameFreeze>();
         GameObject objPoolObj = GameObject.Find("ObjectPool");
         objectPool = objPoolObj.GetComponent<ObjectPool>();
         rb = balus.GetComponent<Rigidbody>();
         sphd = balus.GetComponent<SphereDragger>();
-        themeChanger = levelRenderer.GetComponent<LevelThemeChanger>();
+        themeChanger = levelRendererObject.GetComponent<LevelThemeChanger>();
         currentScene = SceneManager.GetActiveScene();
         if (currentScene.name == "DebugScene") {
             nsm = GetComponent<NonSphereMovement>();
         }
         sphm = balus.GetComponent<SphereMovement>();
-        themeChanger2 = levelRenderer.GetComponent<ThemeChanger>();
-        levelConfig = levelRenderer.GetComponent<LevelConfigurator>();
+        themeChanger2 = levelRendererObject.GetComponent<ThemeChanger>();
+        levelConfig = levelRendererObject.GetComponent<LevelConfigurator>();
         audioPlayer = balus.GetComponent<AudioPlayer>();
         if (sphm != null) {
         sphm.speed = levelConfig.levelSpeed;
@@ -196,8 +200,9 @@ public class GameManager : MonoBehaviour
             CFollow.enabled = false;
             Camera.main.transform.position = new Vector3(0f, 2.25f, -2f);
             GFreeze.enabled = false;
-            gre.enabled = false;
-            ere.enabled = false;
+            //gre.enabled = false;
+            //ere.enabled = false;
+            levelRenderer.enabled = false;
             themeChanger.enabled = false;
             if (sphm != null) {
             sphm.enabled = false;
@@ -215,24 +220,76 @@ public class GameManager : MonoBehaviour
             Camera.main.transform.position = new Vector3(0f, 2.25f, -2f);
             GFreeze.enabled = false;
             rb.useGravity = false;
-            gre.enabled = false;
-            ere.enabled = false;
+            //gre.enabled = false;
+            //ere.enabled = false;
+            levelRenderer.enabled = false;
             themeChanger.enabled = false;
             sphm.enabled = false;
             sphd.enabled = false;
             themeChanger2.enabled = false;
-            LoadData();
+            if (totalDownloadsRequired == 0) {
+                totalDownloadsRequired = ConvertBoolToInt(!Directory.Exists(Path.Combine(Application.persistentDataPath, "LevelData")))
+                + ConvertBoolToInt(!Directory.Exists(Path.Combine(Application.persistentDataPath, "ThemeData")))
+                + ConvertBoolToInt(!Directory.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds")))
+                + ConvertBoolToInt(!Directory.Exists(Path.Combine(Application.persistentDataPath, "Music")))
+                + ConvertBoolToInt(!Directory.Exists(Path.Combine(Application.persistentDataPath, "WorldShow")))
+                + ConvertBoolToInt(!Directory.Exists(Path.Combine(Application.persistentDataPath, "MenuData")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "ThemeData/ThemeData.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_valea.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_valea.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_valea.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_valea.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_aperta.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_aperta.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_aperta.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_aperta.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_gardenea_older.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_gardenea_older.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_gardenea_older.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_gardenea_older.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_gardenea_old.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_gardenea_old.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_gardenea_old.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_gardenea_old.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_gardenea_new.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_gardenea_new.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_gardenea_new.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_gardenea_new.json")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background1.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Enemy1.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "General1.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background2.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Enemy2.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "General2.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background3.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Enemy3.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "General3.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background4.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Enemy4.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "General4.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background5.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Enemy5.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "General5.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background6.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Enemy6.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "General6.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music1.mp3")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music2.mp3")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music3.mp3")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "WorldShow/World_valea.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "WorldShow/World_aperta.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "WorldShow/World_gardenea.png")))
+                + ConvertBoolToInt(!File.Exists(Path.Combine(Application.persistentDataPath, "MenuData/MenuData.json")));
+            }
+            if (downloadCoroutine == null) {
+            downloadCoroutine = StartCoroutine(LoadData());
+            }
             gamePlayCanvas.SetActive(false);
             themeChanger.enabled = true;
             themeChanger2.enabled = true;
-            themeChanger2.UpdateTheme(themeChanger.themeID);
-            string jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
-            geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(jsonString);
-            objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
-            isDataDownloadedCache = false;
-            isDataDownloaded = true;
+            themeChanger2.UpdateTheme(0);
         }
-        mainMenuNormalTile = Instantiate(gre.prefabs[1], new Vector3(0f, 0f, rb.position.z), Quaternion.identity);
+        mainMenuNormalTile = Instantiate(levelRenderer.tileSets[1], new Vector3(0f, 0f, rb.position.z), Quaternion.identity);
         //Debug.Log(anims.Count);
     }
 
@@ -247,23 +304,24 @@ public class GameManager : MonoBehaviour
         audioPlayer.SeekToZero();
         if (sphm != null) sphm.ClearFallingObstacles();
         objectPool.ClearAllPools();
-        gre.ClearPrefabPositions();
-        ere.ClearPrefabPositions();
+        //gre.ClearPrefabPositions();
+        //ere.ClearPrefabPositions();
         GFreeze.enabled = false;
-        gre.enabled = false;
-        ere.enabled = false;
+        //gre.enabled = false;
+        //ere.enabled = false;
+        levelRenderer.enabled = false;
         themeChanger.enabled = false;
         sphm.enabled = false;
         sphd.enabled = false;
         themeChanger2.enabled = true;
-        string jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
-        geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(jsonString);
-        objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
+        //string jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
+        //geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(jsonString);
+        //objectPool.InitializePools(levelRenderer.tileSets, levelRenderer.enemySets, geoBufferJson);
         gamePlayCanvas.SetActive(false);
         levelEdit.ClearEverything();
         balus.transform.position = new Vector3(0f, 0.5f, 0f);
         rb.position = new Vector3(0f, 0.5f, 0f);
-        mainMenuNormalTile = Instantiate(gre.prefabs[1], new Vector3(0f, 0f, rb.position.z), Quaternion.identity);
+        mainMenuNormalTile = Instantiate(levelRenderer.tileSets[1], new Vector3(0f, 0f, rb.position.z), Quaternion.identity);
         MainMenuScripts.instance.ResetMenu();
         mainMenuCanvas.SetActive(true);
         SetIsInMainMenu(true);
@@ -318,8 +376,9 @@ public class GameManager : MonoBehaviour
         
         if (isDataDownloaded && !isGameOver && !isGamePaused)
         {
-            gre.enabled = true;
-            ere.enabled = true;
+            //gre.enabled = true;
+            //ere.enabled = true;
+            levelRenderer.enabled = true;
             themeChanger.enabled = true;
             if (currentScene.name == "DebugScene") {
                 //sphm.enabled = false;
@@ -330,20 +389,25 @@ public class GameManager : MonoBehaviour
             isGamePaused = GFreeze.gamePaused;
             //sphd.enabled = true;
             themeChanger2.enabled = true;
-        } else if (isDataDownloaded && isGamePaused) {
+        } else if (isDataDownloaded && isGamePaused && !mainMenuScripts.isInitialized) {
+            themeChanger.enabled = true;
+            themeChanger2.enabled = true;
+            mainMenuScripts.Initialize();
         }
         else
         {
-            gre.enabled = false;
-            ere.enabled = false;
-            themeChanger.enabled = false;
+            //gre.enabled = false;
+            //ere.enabled = false;
+            levelRenderer.enabled = false;
+            //themeChanger.enabled = false;
             sphm.enabled = false;
             sphd.enabled = false;
-            themeChanger2.enabled = false;
+            //themeChanger2.enabled = false;
         }
         if (isGameOver) {
-            gre.enabled = false;
-            ere.enabled = false;
+            //gre.enabled = false;
+            //ere.enabled = false;
+            levelRenderer.enabled = false;
             themeChanger.enabled = false;
             sphm.enabled = false;
             sphd.enabled = false;
@@ -355,7 +419,7 @@ public class GameManager : MonoBehaviour
             //sphm.speed = levelConfig.levelSpeed;
         }
 
-        float balusPercent = (balus.transform.position.z / (float)gre.positionsCount) * 100f;
+        float balusPercent = (balus.transform.position.z / (float)levelRenderer.positionsCount) * 100f;
         balusPercent = Mathf.Clamp(balusPercent, 0f, 100f);
         realPercent = Math.Round(balusPercent).ToString() + "%";
         percentTextMesh.SetText(realPercent);
@@ -394,7 +458,7 @@ public class GameManager : MonoBehaviour
             }
             crown1stChild.SetActive(false);
         } else if (other.gameObject.CompareTag("MoverArrowCollision") && !isGameOver) {
-            List<GameObject> movers = GameObject.FindGameObjectsWithTag("MoverCollisionGroup1").ToList();
+            /*List<GameObject> movers = GameObject.FindGameObjectsWithTag("MoverCollisionGroup1").ToList();
             movers.AddRange(GameObject.FindGameObjectsWithTag("MoverCollisionGroup2"));
             movers.AddRange(GameObject.FindGameObjectsWithTag("MoverCollisionGroup3"));
             foreach (GameObject mover in movers) {
@@ -404,7 +468,35 @@ public class GameManager : MonoBehaviour
                         domino.TriggerManualDomino();
                     }
                 }
+            }*/
+
+            // TODO: Remove this once the mover dominoes are fixed
+            int collisionX = (int)other.transform.position.x + 2;
+            int collisionZ = (int)other.transform.position.z;
+            int xDirection = 0;
+            int zDirection = 0;
+            GameObject moverArrowNormal = other.transform.parent.GetChild(1).gameObject;
+            switch (moverArrowNormal.transform.rotation.eulerAngles.y) {
+                case 0f:
+                    xDirection = 0;
+                    zDirection = 1;
+                    break;
+                case 90f:
+                    xDirection = 1;
+                    zDirection = 0;
+                    break;
+                case 180f:
+                    xDirection = 0;
+                    zDirection = -1;
+                    break;
+                case 270f:
+                    xDirection = -1;
+                    zDirection = 0;
+                    break;
             }
+            //Debug.Log("X: " + xDirection + " Z: " + zDirection);
+            //Debug.Log(levelRenderer.levelVisuals[collisionZ][collisionX].Tile?.GetComponentInParent<ManagerDynamicGroups>() == null);
+            levelRenderer.levelVisuals[collisionZ][collisionX+1].Tile?.GetComponentInParent<ManagerDynamicGroups>()?.TriggerGroup(xDirection, zDirection, collisionZ, collisionX+1);
         } else if (other.gameObject.CompareTag("LevelEnd") && !isGameOver) {
             rb.position = new Vector3(rb.position.x, 0.5f, rb.position.z - 0.1f);
             sphm.isNotFalling = true;
@@ -418,30 +510,34 @@ public class GameManager : MonoBehaviour
     }
 
     public void LoadLevel(string level) {
-        gre.jsonFilePath = "LevelData/Ground_" + level;
-        ere.jsonFilePath = "LevelData/Enemies_" + level;
+        //gre.jsonFilePath = "LevelData/Ground_" + level;
+        //ere.jsonFilePath = "LevelData/Enemies_" + level;
+        levelRenderer.jsonFilePath = "LevelData/Level_" + level;
         themeChanger.jsonFilePath = "LevelData/Themes_" + level;
         levelConfig.jsonFilePath = "LevelData/Config_" + level;
         levelConfig.LoadLevelConfig();
         geoBufferJsonFilePath = "LevelData/GeoBuffer_" + level + ".json";
-        string geoBufferJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
+        //string geoBufferJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
         //Debug.Log(geoBufferJsonString);
-        geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(geoBufferJsonString);
-        objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
+        //geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(geoBufferJsonString);
+        //objectPool.InitializePools(levelRenderer.tileSets, levelRenderer.enemySets, geoBufferJson);
         audioPlayer.audioPath = levelConfig.musicPath;
         audioPlayer.UpdateAudioClip();
         themeChanger.UpdateData();
         themeChanger.normalSpeed = levelConfig.levelSpeed;
         CFollow.enabled = true;
-        gre.enabled = true;
-        ere.enabled = true;
-        ere.Initialize();
-        gre.Initialize();
-        totalGemCount = ere.CountEnemies(18);
-        totalCrownCount = ere.CountEnemies(28);
+        //gre.enabled = true;
+        //ere.enabled = true;
+        levelRenderer.enabled = true;
+        //ere.Initialize();
+        //gre.Initialize();
+        levelRenderer.Initialize();
+        totalGemCount = levelRenderer.CountEnemies(18);
+        totalCrownCount = levelRenderer.CountEnemies(28);
         num_collectedGems = 0;
         num_collectedCrowns = 0;
         themeChanger.enabled = true;
+        themeChanger.themeID = 0;
         if (sphm != null) {
             sphm.speed = levelConfig.levelSpeed;
             sphm.enabled = false;
@@ -466,29 +562,33 @@ public class GameManager : MonoBehaviour
     }
 
     public void LoadLevelInEditor(string level) {
-        gre.jsonFilePath = "LevelData/Ground_" + level;
-        ere.jsonFilePath = "LevelData/Enemies_" + level;
+        //gre.jsonFilePath = "LevelData/Ground_" + level;
+        //ere.jsonFilePath = "LevelData/Enemies_" + level;
+        levelRenderer.jsonFilePath = "LevelData/Level_" + level;
         themeChanger.jsonFilePath = "LevelData/Themes_" + level;
         levelConfig.jsonFilePath = "LevelData/Config_" + level;
         levelConfig.LoadLevelConfig();
         geoBufferJsonFilePath = "LevelData/GeoBuffer_" + level + ".json";
-        string geoBufferJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
-        geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(geoBufferJsonString);
-        objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
+        //string geoBufferJsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
+        //geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(geoBufferJsonString);
+        //objectPool.InitializePools(levelRenderer.tileSets, levelRenderer.enemySets, geoBufferJson);
         audioPlayer.audioPath = levelConfig.musicPath;
         audioPlayer.UpdateAudioClip();
         themeChanger.UpdateData();
         themeChanger.normalSpeed = levelConfig.levelSpeed;
         CFollow.enabled = true;
-        gre.enabled = true;
-        ere.enabled = true;
-        ere.Initialize();
-        gre.Initialize();
-        totalGemCount = ere.CountEnemies(18);
-        totalCrownCount = ere.CountEnemies(28);
+        //gre.enabled = true;
+        //ere.enabled = true;
+        levelRenderer.enabled = true;
+        //ere.Initialize();
+        //gre.Initialize();
+        levelRenderer.Initialize();
+        totalGemCount = levelRenderer.CountEnemies(18);
+        totalCrownCount = levelRenderer.CountEnemies(28);
         num_collectedGems = 0;
         num_collectedCrowns = 0;
         themeChanger.enabled = true;
+        themeChanger.themeID = 0;
         if (sphm != null) {
             sphm.speed = levelConfig.levelSpeed;
             sphm.enabled = false;
@@ -511,22 +611,37 @@ public class GameManager : MonoBehaviour
         levelEdit.editorTransition();
     }
 
-    public void CreateNewLevel(string levelID) {
-        StreamWriter configWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"Config_{levelID}.json"));
-        configWriter.Write(@"{""level_name"":""Unnamed Level"",""level_author"":""Anonymous"",""level_speed"":7.55,""start_pos"":0,""music_path"":""Music/Music1"",""worldshow_path"":null,""start_portal"":false}");
-        configWriter.Close();
-        StreamWriter groundWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"Ground_{levelID}.json"));
-        groundWriter.Write(@"{""positions"":[[0,0,0,0,0]]}");
-        groundWriter.Close();
-        StreamWriter enemiesWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"Enemies_{levelID}.json"));
-        enemiesWriter.Write(@"{""positions"":[[0,0,0,0,0]]}");
-        enemiesWriter.Close();
-        StreamWriter themeWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"Themes_{levelID}.json"));
-        themeWriter.Write(@"{""level_events"":[{""z_position"":0.0,""event_type"":""theme_change"",""event_fields"":{""theme_id"":0}}]}");
-        themeWriter.Close();
-        StreamWriter geoBufferWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"GeoBuffer_{levelID}.json"));
-        geoBufferWriter.Write(@"{""ground"":[210,210,210,210,210,210,210,210,210,210,210,210,210,210,210],""enemies"":[200,210,210,210,210,210,195,195,195,195,210,210,195,210,210,210,210,210,20,125,125,125,125,125,125,125,125,170]}");
-        geoBufferWriter.Close();
+    public void CreateNewLevel(string levelID, string modPath = null) {
+        if (modPath == null || modPath == "null") {
+            StreamWriter configWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"Config_{levelID}.json"));
+            configWriter.Write(@"{""level_name"":""Unnamed Level"",""level_author"":""Anonymous"",""level_speed"":7.55,""start_pos"":0,""music_path"":""Music/Music1"",""worldshow_path"":null,""start_portal"":false}");
+            configWriter.Close();
+            StreamWriter levelWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"Level_{levelID}.json"));
+            levelWriter.Write(@"{""tiles"":[[0,0,0,0,0]],""enemies"":[[0,0,0,0,0]]}");
+            levelWriter.Close();
+            StreamWriter themeWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"Themes_{levelID}.json"));
+            themeWriter.Write(@"{""level_events"":[{""z_position"":0.0,""event_type"":""theme_change"",""event_fields"":{""theme_id"":0}}]}");
+            themeWriter.Close();
+            StreamWriter geoBufferWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData", $"GeoBuffer_{levelID}.json"));
+            geoBufferWriter.Write(@"{""ground"":[210,210,210,210,210,210,210,210,210,210,210,210,210,210,210],""enemies"":[200,210,210,210,210,210,195,195,195,195,210,210,195,210,210,210,210,210,20,125,125,125,125,125,125,125,125,170]}");
+            geoBufferWriter.Close();
+        } else {
+            if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "Mods", modPath))) {
+                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Mods", modPath, "LevelData"));
+            }
+            StreamWriter configWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "Mods", modPath, "LevelData", $"Config_{levelID}.json"));
+            configWriter.Write(@"{""level_name"":""Unnamed Level"",""level_author"":""Anonymous"",""level_speed"":7.55,""start_pos"":0,""music_path"":""Music/Music1"",""worldshow_path"":null,""start_portal"":false}");
+            configWriter.Close();
+            StreamWriter levelWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "Mods", modPath, "LevelData", $"Level_{levelID}.json"));
+            levelWriter.Write(@"{""tiles"":[[0,0,0,0,0]],""enemies"":[[0,0,0,0,0]]}");
+            levelWriter.Close();
+            StreamWriter themeWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "Mods", modPath, "LevelData", $"Themes_{levelID}.json"));
+            themeWriter.Write(@"{""level_events"":[{""z_position"":0.0,""event_type"":""theme_change"",""event_fields"":{""theme_id"":0}}]}");
+            themeWriter.Close();
+            StreamWriter geoBufferWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "Mods", modPath, "LevelData", $"GeoBuffer_{levelID}.json"));
+            geoBufferWriter.Write(@"{""ground"":[210,210,210,210,210,210,210,210,210,210,210,210,210,210,210],""enemies"":[200,210,210,210,210,210,195,195,195,195,210,210,195,210,210,210,210,210,20,125,125,125,125,125,125,125,125,170]}");
+            geoBufferWriter.Close();
+        }
         LoadLevelInEditor(levelID);
     }
 
@@ -739,12 +854,12 @@ public class GameManager : MonoBehaviour
         if (!balus.activeSelf) {
             balus.SetActive(true);
         }
-        objectPool.ClearAllPools();
+        //objectPool.ClearAllPools();
         num_collectedGems = 0;
         num_collectedCrowns = 0;
-        string jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
-        geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(jsonString);
-        objectPool.InitializePools(gre.prefabs, ere.prefabs, geoBufferJson);
+        //string jsonString = File.ReadAllText(Path.Combine(Application.persistentDataPath, geoBufferJsonFilePath));
+        //geoBufferJson = JsonConvert.DeserializeObject<GeoBufferJson>(jsonString);
+        //objectPool.InitializePools(levelRenderer.tileSets, levelRenderer.enemySets, geoBufferJson);
         BaseObject[] baseObjects = FindObjectsByType<BaseObject>(FindObjectsSortMode.None);
         foreach (BaseObject baseObject in baseObjects) {
             baseObject.ResetAnimation(baseObject.transform.position);
@@ -755,22 +870,26 @@ public class GameManager : MonoBehaviour
         //sphm.enabled = false;
         //sphd.enabled = false;
         //CFollow.enabled = false;
-        gre.enabled = false;
-        ere.enabled = false;
+        //gre.enabled = false;
+        //ere.enabled = false;
+        levelRenderer.enabled = false;
         gamePlayCanvas.SetActive(true);
         gameOverPanel.SetActive(false);
         Vector3 balusPos = levelConfig.startPortal ? new Vector3(0f, 0.5f, levelConfig.startPos) : new Vector3(0f, 0.5f, levelConfig.startPos);
-        gre.enabled = true;
-        ere.enabled = true;
+        //gre.enabled = true;
+        //ere.enabled = true;
+        levelRenderer.enabled = true;
+        levelRenderer.creationStep = 29;
         themeChanger.enabled = true;
         themeChanger.themeID = 0;
         themeChanger2.enabled = true;
         themeChanger2.UpdateTheme(themeChanger.themeID);
         levelEdit.ClearEverything();
-        gre.ClearPrefabPositions();
-        ere.ClearPrefabPositions();
-        totalGemCount = ere.CountEnemies(18);
-        totalCrownCount = ere.CountEnemies(28);
+        levelRenderer.Initialize();
+        //gre.ClearPrefabPositions();
+        //ere.ClearPrefabPositions();
+        totalGemCount = levelRenderer.CountEnemies(18);
+        totalCrownCount = levelRenderer.CountEnemies(28);
         GFreeze.enabled = true;
         //Time.timeScale = 1f;
         sphd.enabled = true;
@@ -786,6 +905,8 @@ public class GameManager : MonoBehaviour
         GFreeze.PauseGame();
         levelConfig.LoadLevelConfig();
         FilterManager.filterManager.DisableAll();
+        GameObject endObject = GameObject.Find("End");
+        endObject.transform.position = new Vector3(-90f, 0f, 0f);
         //rb.velocity = Vector3.zero;
         //rb.isKinematic = false;
         //rb.position = new Vector3(0f, 0.5f, 0f);
@@ -813,307 +934,443 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void LoadData()
+    public int ConvertBoolToInt(bool b) {
+        return b ? 1 : 0;
+    }
+
+    private IEnumerator LoadData()
     {
-        
-        TextAsset ground1 = Resources.Load<TextAsset>("LevelData/Ground_valea");
-        TextAsset enemies1 = Resources.Load<TextAsset>("LevelData/Enemies_valea");
+        TextAsset route1 = Resources.Load<TextAsset>("LevelData/Level_valea");
         TextAsset theme1 = Resources.Load<TextAsset>("LevelData/Themes_valea");
         TextAsset theme2 = Resources.Load<TextAsset>("ThemeData/ThemeData");
         TextAsset config1 = Resources.Load<TextAsset>("LevelData/Config_valea");
         TextAsset geoBuffer1 = Resources.Load<TextAsset>("LevelData/GeoBuffer_valea");
-        TextAsset ground2 = Resources.Load<TextAsset>("LevelData/Ground_aperta");
-        TextAsset enemies2 = Resources.Load<TextAsset>("LevelData/Enemies_aperta");
+        TextAsset route2 = Resources.Load<TextAsset>("LevelData/Level_aperta");
         TextAsset theme3 = Resources.Load<TextAsset>("LevelData/Themes_aperta");
         TextAsset config2 = Resources.Load<TextAsset>("LevelData/Config_aperta");
         TextAsset geoBuffer2 = Resources.Load<TextAsset>("LevelData/GeoBuffer_aperta");
-        TextAsset ground3_1 = Resources.Load<TextAsset>("LevelData/Ground_gardenea_older");
-        TextAsset enemies3_1 = Resources.Load<TextAsset>("LevelData/Enemies_gardenea_older");
+        TextAsset route3_1 = Resources.Load<TextAsset>("LevelData/Level_gardenea_older");
         TextAsset theme4_1 = Resources.Load<TextAsset>("LevelData/Themes_gardenea_older");
         TextAsset config3_1 = Resources.Load<TextAsset>("LevelData/Config_gardenea_older");
         TextAsset geoBuffer3_1 = Resources.Load<TextAsset>("LevelData/GeoBuffer_gardenea_older");
-        TextAsset ground3_2 = Resources.Load<TextAsset>("LevelData/Ground_gardenea_old");
-        TextAsset enemies3_2 = Resources.Load<TextAsset>("LevelData/Enemies_gardenea_old");
+        TextAsset route3_2 = Resources.Load<TextAsset>("LevelData/Level_gardenea_old");
         TextAsset theme4_2 = Resources.Load<TextAsset>("LevelData/Themes_gardenea_old");
         TextAsset config3_2 = Resources.Load<TextAsset>("LevelData/Config_gardenea_old");
         TextAsset geoBuffer3_2 = Resources.Load<TextAsset>("LevelData/GeoBuffer_gardenea_old");
-        TextAsset ground3_3 = Resources.Load<TextAsset>("LevelData/Ground_gardenea_new");
-        TextAsset enemies3_3 = Resources.Load<TextAsset>("LevelData/Enemies_gardenea_new");
+        TextAsset route3_3 = Resources.Load<TextAsset>("LevelData/Level_gardenea_new");
         TextAsset theme4_3 = Resources.Load<TextAsset>("LevelData/Themes_gardenea_new");
         TextAsset config3_3 = Resources.Load<TextAsset>("LevelData/Config_gardenea_new");
         TextAsset geoBuffer3_3 = Resources.Load<TextAsset>("LevelData/GeoBuffer_gardenea_new");
+        if (!loadingPanel.activeSelf) {
+        loadingPanel.SetActive(true);
+        }
+        Image progressImage = loadingPanel.transform.GetChild(2).GetComponent<Image>();
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
         if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "LevelData"))) {
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "LevelData"));
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "ThemeData"))) {
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "ThemeData"));
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds"))) {
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Backgrounds"));
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "Music"))) {
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Music"));
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "WorldShow"))) {
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "WorldShow"));
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "MenuData"))) {
         Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "MenuData"));
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
-        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Ground_valea.json"))) {
-        StreamWriter groundWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Ground_valea.json"));
-        groundWriter.Write(ground1.text);
-        groundWriter.Close();
-        }
-        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_valea.json"))) {
-        StreamWriter enemiesWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_valea.json"));
-        enemiesWriter.Write(enemies1.text);
-        enemiesWriter.Close();
+        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_valea.json"))) {
+        StreamWriter routeWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Level_valea.json"));
+        routeWriter.Write(route1.text);
+        routeWriter.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_valea.json"))) {
         StreamWriter themeWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Themes_valea.json"));
         themeWriter.Write(theme1.text);
         themeWriter.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "ThemeData/ThemeData.json"))) {
         StreamWriter theme2Writer = new StreamWriter(Path.Combine(Application.persistentDataPath, "ThemeData/ThemeData.json"));
         theme2Writer.Write(theme2.text);
         theme2Writer.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_valea.json"))) {
         StreamWriter configWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Config_valea.json"));
         configWriter.Write(config1.text);
         configWriter.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_valea.json"))) {
         StreamWriter geoBufferWriter = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_valea.json"));
         geoBufferWriter.Write(geoBuffer1.text);
         geoBufferWriter.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
-        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Ground_aperta.json"))) {
-        StreamWriter groundWriter2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Ground_aperta.json"));
-        groundWriter2.Write(ground2.text);
-        groundWriter2.Close();
-        }
-        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_aperta.json"))) {
-        StreamWriter enemiesWriter2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_aperta.json"));
-        enemiesWriter2.Write(enemies2.text);
-        enemiesWriter2.Close();
+        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_aperta.json"))) {
+        StreamWriter routeWriter2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Level_aperta.json"));
+        routeWriter2.Write(route2.text);
+        routeWriter2.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_aperta.json"))) {
         StreamWriter themeWriter2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Themes_aperta.json"));
         themeWriter2.Write(theme3.text);
         themeWriter2.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_aperta.json"))) {
         StreamWriter configWriter2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Config_aperta.json"));
         configWriter2.Write(config2.text);
         configWriter2.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_aperta.json"))) {
         StreamWriter geoBufferWriter2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_aperta.json"));
         geoBufferWriter2.Write(geoBuffer2.text);
         geoBufferWriter2.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
-        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Ground_gardenea_older.json"))) {
-        StreamWriter groundWriter3_1 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Ground_gardenea_older.json"));
-        groundWriter3_1.Write(ground3_1.text);
-        groundWriter3_1.Close();
-        }
-        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_gardenea_older.json"))) {
-        StreamWriter enemiesWriter3_1 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_gardenea_older.json"));
-        enemiesWriter3_1.Write(enemies3_1.text);
-        enemiesWriter3_1.Close();
+        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_gardenea_older.json"))) {
+        StreamWriter routeWriter3_1 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Level_gardenea_older.json"));
+        routeWriter3_1.Write(route3_1.text);
+        routeWriter3_1.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_gardenea_older.json"))) {
         StreamWriter themeWriter3_1 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Themes_gardenea_older.json"));
         themeWriter3_1.Write(theme4_1.text);
         themeWriter3_1.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_gardenea_older.json"))) {
         StreamWriter configWriter3_1 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Config_gardenea_older.json"));
         configWriter3_1.Write(config3_1.text);
         configWriter3_1.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_gardenea_older.json"))) {
         StreamWriter geoBufferWriter3_1 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_gardenea_older.json"));
         geoBufferWriter3_1.Write(geoBuffer3_1.text);
         geoBufferWriter3_1.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
-        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Ground_gardenea_old.json"))) {
-        StreamWriter groundWriter3_2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Ground_gardenea_old.json"));
-        groundWriter3_2.Write(ground3_2.text);
-        groundWriter3_2.Close();
-        }
-        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_gardenea_old.json"))) {
-        StreamWriter enemiesWriter3_2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_gardenea_old.json"));
-        enemiesWriter3_2.Write(enemies3_2.text);
-        enemiesWriter3_2.Close();
+        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_gardenea_old.json"))) {
+        StreamWriter routeWriter3_2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Level_gardenea_old.json"));
+        routeWriter3_2.Write(route3_2.text);
+        routeWriter3_2.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_gardenea_old.json"))) {
         StreamWriter themeWriter3_2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Themes_gardenea_old.json"));
         themeWriter3_2.Write(theme4_2.text);
         themeWriter3_2.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_gardenea_old.json"))) {
         StreamWriter configWriter3_2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Config_gardenea_old.json"));
         configWriter3_2.Write(config3_2.text);
         configWriter3_2.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_gardenea_old.json"))) {
         StreamWriter geoBufferWriter3_2 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_gardenea_old.json"));
         geoBufferWriter3_2.Write(geoBuffer3_2.text);
         geoBufferWriter3_2.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
-        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Ground_gardenea_new.json"))) {
-        StreamWriter groundWriter3_3 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Ground_gardenea_new.json"));
-        groundWriter3_3.Write(ground3_3.text);
-        groundWriter3_3.Close();
-        }
-        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_gardenea_new.json"))) {
-        StreamWriter enemiesWriter3_3 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Enemies_gardenea_new.json"));
-        enemiesWriter3_3.Write(enemies3_3.text);
-        enemiesWriter3_3.Close();
+        if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Level_gardenea_new.json"))) {
+        StreamWriter routeWriter3_3 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Level_gardenea_new.json"));
+        routeWriter3_3.Write(route3_3.text);
+        routeWriter3_3.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Themes_gardenea_new.json"))) {
         StreamWriter themeWriter3_3 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Themes_gardenea_new.json"));
         themeWriter3_3.Write(theme4_3.text);
         themeWriter3_3.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/Config_gardenea_new.json"))) {
         StreamWriter configWriter3_3 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/Config_gardenea_new.json"));
         configWriter3_3.Write(config3_3.text);
         configWriter3_3.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_gardenea_new.json"))) {
         StreamWriter geoBufferWriter3_3 = new StreamWriter(Path.Combine(Application.persistentDataPath, "LevelData/GeoBuffer_gardenea_new.json"));
         geoBufferWriter3_3.Write(geoBuffer3_3.text);
         geoBufferWriter3_3.Close();
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background1.png"))) {
         Texture2D background1 = Resources.Load<Texture2D>("Backgrounds/Background1");
         byte[] data = background1.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Backgrounds/Background1.png"), data);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Enemy1.png"))) {
         Texture2D enemy1 = Resources.Load<Texture2D>("Enemy1");
         byte[] enemyData = enemy1.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Enemy1.png"), enemyData);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "General1.png"))) {
         Texture2D general1 = Resources.Load<Texture2D>("General1");
         byte[] generalData = general1.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "General1.png"), generalData);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background2.png"))) {
         Texture2D background2 = Resources.Load<Texture2D>("Backgrounds/Background2");
         byte[] data2 = background2.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Backgrounds/Background2.png"), data2);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Enemy2.png"))) {
         Texture2D enemy2 = Resources.Load<Texture2D>("Enemy2");
         byte[] enemyData2 = enemy2.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Enemy2.png"), enemyData2);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "General2.png"))) {
         Texture2D general2 = Resources.Load<Texture2D>("General2");
         byte[] generalData2 = general2.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "General2.png"), generalData2);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background3.png"))) {
         Texture2D background3 = Resources.Load<Texture2D>("Backgrounds/Background3");
         byte[] data3 = background3.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Backgrounds/Background3.png"), data3);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Enemy3.png"))) {
         Texture2D enemy3 = Resources.Load<Texture2D>("Enemy3");
         byte[] enemyData3 = enemy3.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Enemy3.png"), enemyData3);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "General3.png"))) {
         Texture2D general3 = Resources.Load<Texture2D>("General3");
         byte[] generalData3 = general3.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "General3.png"), generalData3);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background4.png"))) {
         Texture2D background4 = Resources.Load<Texture2D>("Backgrounds/Background4");
         byte[] data4 = background4.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Backgrounds/Background4.png"), data4);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Enemy4.png"))) {
         Texture2D enemy4 = Resources.Load<Texture2D>("Enemy4");
         byte[] enemyData4 = enemy4.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Enemy4.png"), enemyData4);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "General4.png"))) {
         Texture2D general4 = Resources.Load<Texture2D>("General4");
         byte[] generalData4 = general4.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "General4.png"), generalData4);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background5.png"))) {
         Texture2D background5 = Resources.Load<Texture2D>("Backgrounds/Background5");
         byte[] data5 = background5.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Backgrounds/Background5.png"), data5);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Enemy5.png"))) {
         Texture2D enemy5 = Resources.Load<Texture2D>("Enemy5");
         byte[] enemyData5 = enemy5.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Enemy5.png"), enemyData5);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "General5.png"))) {
         Texture2D general5 = Resources.Load<Texture2D>("General5");
         byte[] generalData5 = general5.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "General5.png"), generalData5);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Backgrounds/Background6.png"))) {
         Texture2D background6 = Resources.Load<Texture2D>("Backgrounds/Background6");
         byte[] data6 = background6.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Backgrounds/Background6.png"), data6);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Enemy6.png"))) {
         Texture2D enemy6 = Resources.Load<Texture2D>("Enemy6");
         byte[] enemyData6 = enemy6.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Enemy6.png"), enemyData6);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "General6.png"))) {
         Texture2D general6 = Resources.Load<Texture2D>("General6");
         byte[] generalData6 = general6.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "General6.png"), generalData6);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music1.mp3"))) {
         AudioClip music1 = Resources.Load<AudioClip>("Music/Music1");
         byte[] mp3 = WavToMp3.ConvertWavToMp3(music1, 128);
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Music/Music1.mp3"), mp3);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music2.mp3"))) {
         AudioClip music2 = Resources.Load<AudioClip>("Music/Music2");
         byte[] mp32 = WavToMp3.ConvertWavToMp3(music2, 128);
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Music/Music2.mp3"), mp32);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "Music/Music3.mp3"))) {
         AudioClip music3 = Resources.Load<AudioClip>("Music/Music3");
         byte[] mp33 = WavToMp3.ConvertWavToMp3(music3, 128);
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "Music/Music3.mp3"), mp33);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "WorldShow/World_valea.png"))) {
         Texture2D worldShow1 = Resources.Load<Texture2D>("WorldShow/World_valea");
         byte[] worldShowData = worldShow1.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "WorldShow/World_valea.png"), worldShowData);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "WorldShow/World_aperta.png"))) {
         Texture2D worldShow2 = Resources.Load<Texture2D>("WorldShow/World_aperta");
         byte[] worldShowData2 = worldShow2.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "WorldShow/World_aperta.png"), worldShowData2);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "WorldShow/World_gardenea.png"))) {
         Texture2D worldShow3 = Resources.Load<Texture2D>("WorldShow/World_gardenea");
         byte[] worldShowData3 = worldShow3.EncodeToPNG();
         File.WriteAllBytes(Path.Combine(Application.persistentDataPath, "WorldShow/World_gardenea.png"), worldShowData3);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         if (!File.Exists(Path.Combine(Application.persistentDataPath, "MenuData/MenuData.json"))) {
         string menuDataJson = Resources.Load<TextAsset>("MenuData/MenuData").text;
         File.WriteAllText(Path.Combine(Application.persistentDataPath, "MenuData/MenuData.json"), menuDataJson);
+        downloadCount++;
+        progressImage.fillAmount = downloadCount / totalDownloadsRequired;
+        yield return null;
         }
         isDataDownloaded = true;
+        loadingPanel.SetActive(false);
+        yield return null;
     }
 }

@@ -12,7 +12,7 @@ public class RightMovingTileAnim : MonoBehaviour
     public GameObject m_Riser;
     public int retries = 0;
     public int maxRetries = 10;
-    private GameObject rotorObject;
+    public GameObject rotorObject;
     
     // Start is called before the first frame update
     void Start()
