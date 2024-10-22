@@ -202,6 +202,7 @@ public class GameManager : MonoBehaviour
             GFreeze.enabled = false;
             //gre.enabled = false;
             //ere.enabled = false;
+            levelRenderer.levelFilePaths.Add(Application.persistentDataPath);
             levelRenderer.enabled = false;
             themeChanger.enabled = false;
             if (sphm != null) {
@@ -222,6 +223,7 @@ public class GameManager : MonoBehaviour
             rb.useGravity = false;
             //gre.enabled = false;
             //ere.enabled = false;
+            levelRenderer.levelFilePaths.Add(Application.persistentDataPath);
             levelRenderer.enabled = false;
             themeChanger.enabled = false;
             sphm.enabled = false;

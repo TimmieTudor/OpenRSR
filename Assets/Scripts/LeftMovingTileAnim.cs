@@ -35,7 +35,7 @@ public class LeftMovingTileAnim : MonoBehaviour
         } else if (leftMostXOffset == 1f) {
             baseObject.transform.position = new Vector3(-Mathf.Sin(curFrame2 - Mathf.PI / 6f) * 2f + xOffset - 1f, 0f, baseObject.transform.position.z);
         }
-        if (m_Riser == null && retries < maxRetries) {
+        /*if (m_Riser == null && retries < maxRetries) {
             GameObject[] risers = GameObject.FindGameObjectsWithTag("Riser");
             foreach (GameObject riser in risers) {
                 if (riser == null) continue;
@@ -48,7 +48,7 @@ public class LeftMovingTileAnim : MonoBehaviour
                 }
             }
             retries++;
-        }
+        }*/
         if (m_Riser != null) {
             if (m_Riser.TryGetComponent<BaseAnim>(out BaseAnim baseAnim)) {
                 if (rotorObject != null) {

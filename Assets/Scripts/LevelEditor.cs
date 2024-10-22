@@ -354,6 +354,15 @@ public class LevelEditor : MonoBehaviour
                     canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                     canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                     canvasObject.transform.position = new Vector3(x, 1f, z);
+                    GameObject moverEdge = hasPrefab == 9 ? levelRenderer.moverEdge : levelRenderer.moverAutoEdge;
+                    GameObject moverEdge1 = Instantiate(moverEdge, new Vector3(x + 0.45f, 0f, z), Quaternion.Euler(0f, 90f, 0f));
+                    GameObject moverEdge2 = Instantiate(moverEdge, new Vector3(x - 0.45f, 0f, z), Quaternion.Euler(0f, 90f, 0f));
+                    GameObject moverEdge3 = Instantiate(moverEdge, new Vector3(x, 0f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                    GameObject moverEdge4 = Instantiate(moverEdge, new Vector3(x, 0f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                    moverEdge1.transform.parent = spawnedPrefab.transform;
+                    moverEdge2.transform.parent = spawnedPrefab.transform;
+                    moverEdge3.transform.parent = spawnedPrefab.transform;
+                    moverEdge4.transform.parent = spawnedPrefab.transform;
                 } else if (hasPrefab == 10 || hasPrefab == 13) {
                     GameObject canvasObject = new GameObject("Text_Canvas");
                     Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -370,6 +379,15 @@ public class LevelEditor : MonoBehaviour
                     canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                     canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                     canvasObject.transform.position = new Vector3(x, 1f, z);
+                    GameObject moverEdge = hasPrefab == 10 ? levelRenderer.moverEdge : levelRenderer.moverAutoEdge;
+                    GameObject moverEdge1 = Instantiate(moverEdge, new Vector3(x + 0.45f, 0f, z), Quaternion.Euler(0f, 90f, 0f));
+                    GameObject moverEdge2 = Instantiate(moverEdge, new Vector3(x - 0.45f, 0f, z), Quaternion.Euler(0f, 90f, 0f));
+                    GameObject moverEdge3 = Instantiate(moverEdge, new Vector3(x, 0f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                    GameObject moverEdge4 = Instantiate(moverEdge, new Vector3(x, 0f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                    moverEdge1.transform.parent = spawnedPrefab.transform;
+                    moverEdge2.transform.parent = spawnedPrefab.transform;
+                    moverEdge3.transform.parent = spawnedPrefab.transform;
+                    moverEdge4.transform.parent = spawnedPrefab.transform;
                 } else if (hasPrefab == 11 || hasPrefab == 14) {
                     GameObject canvasObject = new GameObject("Text_Canvas");
                     Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -386,6 +404,15 @@ public class LevelEditor : MonoBehaviour
                     canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                     canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                     canvasObject.transform.position = new Vector3(x, 1f, z);
+                    GameObject moverEdge = hasPrefab == 11 ? levelRenderer.moverEdge : levelRenderer.moverAutoEdge;
+                    GameObject moverEdge1 = Instantiate(moverEdge, new Vector3(x + 0.45f, 0f, z), Quaternion.Euler(0f, 90f, 0f));
+                    GameObject moverEdge2 = Instantiate(moverEdge, new Vector3(x - 0.45f, 0f, z), Quaternion.Euler(0f, 90f, 0f));
+                    GameObject moverEdge3 = Instantiate(moverEdge, new Vector3(x, 0f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                    GameObject moverEdge4 = Instantiate(moverEdge, new Vector3(x, 0f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                    moverEdge1.transform.parent = spawnedPrefab.transform;
+                    moverEdge2.transform.parent = spawnedPrefab.transform;
+                    moverEdge3.transform.parent = spawnedPrefab.transform;
+                    moverEdge4.transform.parent = spawnedPrefab.transform;
                 }
                 // Obsolete code. Will remove later
                 /*
@@ -518,6 +545,38 @@ public class LevelEditor : MonoBehaviour
                         canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                         canvasObject.transform.position = new Vector3(x, 1f, z);
                     }
+                } else if (hasPrefab == 33) {
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "1";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 2f, z);
+                } else if (hasPrefab == 34) {
+                    GameObject canvasObject = new GameObject("Text_Canvas");
+                    Canvas canvas = canvasObject.AddComponent<Canvas>();
+                    GameObject textObject = new GameObject("Text");
+                    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                    textComponent.text = "2";
+                    textComponent.alignment = TextAlignmentOptions.Center;
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    textComponent.fontStyle = FontStyles.Bold;
+                    textComponent.fontSize = 0.4f;
+                    canvasObject.transform.SetParent(spawnedPrefab.transform);
+                    textObject.transform.SetParent(canvasObject.transform);
+                    RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                    canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                    canvasObject.transform.position = new Vector3(x, 2f, z);
                 }
             }
         }
@@ -1020,6 +1079,15 @@ public class LevelEditor : MonoBehaviour
                 canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                 canvasObject.transform.position = new Vector3(x, 1f, z);
+                GameObject moverEdge = hasPrefab == 9 ? levelRenderer.moverEdge : levelRenderer.moverAutoEdge;
+                GameObject moverEdge1 = Instantiate(moverEdge, new Vector3(x + 0.45f, 0f, z), Quaternion.Euler(0f, 90f, 0f));
+                GameObject moverEdge2 = Instantiate(moverEdge, new Vector3(x - 0.45f, 0f, z), Quaternion.Euler(0f, 90f, 0f));
+                GameObject moverEdge3 = Instantiate(moverEdge, new Vector3(x, 0f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                GameObject moverEdge4 = Instantiate(moverEdge, new Vector3(x, 0f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                moverEdge1.transform.parent = spawnedPrefab.transform;
+                moverEdge2.transform.parent = spawnedPrefab.transform;
+                moverEdge3.transform.parent = spawnedPrefab.transform;
+                moverEdge4.transform.parent = spawnedPrefab.transform;
             } else if (hasPrefab == 10 || hasPrefab == 13) {
                 GameObject canvasObject = new GameObject("Text_Canvas");
                 Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -1036,6 +1104,15 @@ public class LevelEditor : MonoBehaviour
                 canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                 canvasObject.transform.position = new Vector3(x, 1f, z);
+                GameObject moverEdge = hasPrefab == 10 ? levelRenderer.moverEdge : levelRenderer.moverAutoEdge;
+                GameObject moverEdge1 = Instantiate(moverEdge, new Vector3(x + 0.45f, 0f, z), Quaternion.Euler(0f, 90f, 0f));
+                GameObject moverEdge2 = Instantiate(moverEdge, new Vector3(x - 0.45f, 0f, z), Quaternion.Euler(0f, 90f, 0f));
+                GameObject moverEdge3 = Instantiate(moverEdge, new Vector3(x, 0f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                GameObject moverEdge4 = Instantiate(moverEdge, new Vector3(x, 0f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                moverEdge1.transform.parent = spawnedPrefab.transform;
+                moverEdge2.transform.parent = spawnedPrefab.transform;
+                moverEdge3.transform.parent = spawnedPrefab.transform;
+                moverEdge4.transform.parent = spawnedPrefab.transform;
             } else if (hasPrefab == 11 || hasPrefab == 14) {
                 GameObject canvasObject = new GameObject("Text_Canvas");
                 Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -1052,6 +1129,15 @@ public class LevelEditor : MonoBehaviour
                 canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                 canvasObject.transform.position = new Vector3(x, 1f, z);
+                GameObject moverEdge = hasPrefab == 11 ? levelRenderer.moverEdge : levelRenderer.moverAutoEdge;
+                GameObject moverEdge1 = Instantiate(moverEdge, new Vector3(x + 0.45f, 0f, z), Quaternion.Euler(0f, 90f, 0f));
+                GameObject moverEdge2 = Instantiate(moverEdge, new Vector3(x - 0.45f, 0f, z), Quaternion.Euler(0f, 90f, 0f));
+                GameObject moverEdge3 = Instantiate(moverEdge, new Vector3(x, 0f, z + 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                GameObject moverEdge4 = Instantiate(moverEdge, new Vector3(x, 0f, z - 0.45f), Quaternion.Euler(0f, 0f, 0f));
+                moverEdge1.transform.parent = spawnedPrefab.transform;
+                moverEdge2.transform.parent = spawnedPrefab.transform;
+                moverEdge3.transform.parent = spawnedPrefab.transform;
+                moverEdge4.transform.parent = spawnedPrefab.transform;
             }
             /*
             if (gdata.positions[i][j] == 1) {
@@ -1177,6 +1263,38 @@ public class LevelEditor : MonoBehaviour
                     canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
                     canvasObject.transform.position = new Vector3(x, 1f, z);
                 }
+            } else if (hasPrefab == 33) {
+                GameObject canvasObject = new GameObject("Text_Canvas");
+                Canvas canvas = canvasObject.AddComponent<Canvas>();
+                GameObject textObject = new GameObject("Text");
+                TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                textComponent.text = "1";
+                textComponent.alignment = TextAlignmentOptions.Center;
+                canvas.renderMode = RenderMode.WorldSpace;
+                textComponent.fontStyle = FontStyles.Bold;
+                textComponent.fontSize = 0.4f;
+                canvasObject.transform.SetParent(spawnedPrefab.transform);
+                textObject.transform.SetParent(canvasObject.transform);
+                RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                canvasObject.transform.position = new Vector3(x, 2f, z);
+            } else if (hasPrefab == 34) {
+                GameObject canvasObject = new GameObject("Text_Canvas");
+                Canvas canvas = canvasObject.AddComponent<Canvas>();
+                GameObject textObject = new GameObject("Text");
+                TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+                textComponent.text = "2";
+                textComponent.alignment = TextAlignmentOptions.Center;
+                canvas.renderMode = RenderMode.WorldSpace;
+                textComponent.fontStyle = FontStyles.Bold;
+                textComponent.fontSize = 0.4f;
+                canvasObject.transform.SetParent(spawnedPrefab.transform);
+                textObject.transform.SetParent(canvasObject.transform);
+                RectTransform canvasRectTransform = canvasObject.GetComponent<RectTransform>();
+                canvasObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                canvasRectTransform.sizeDelta = new Vector2(1.2f, 1.2f);
+                canvasObject.transform.position = new Vector3(x, 2f, z);
             }
         }
     }

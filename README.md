@@ -1,5 +1,5 @@
 # README
-The source code of my game named OpenRSR. Might not be up to date
+Rolling Sky fangame engine made with Unity3D
 
 ## What is this?
 This is an open-source recreation of the game "Rolling Sky Remake". I started making this after being frustrated by 
@@ -12,7 +12,7 @@ You can download the game, but it's full of bugs and still unfinished, so I don'
 
 ## How to build an APK for this unfinished game?
 1. Clone this repository by running:
- ```git clone https://github.com/ComradeCat1/OpenRSR.git```
+ ```git clone https://github.com/TimmieTudor/OpenRSR.git```
 2. Download Unity 2023.1.18f1 with Android Build Tools if you haven't
 3. Open the cloned repository in Unity 2023.1.18f1 (I switched to this very new version because I couldn't build the game for Android because of some errors)
 4. Go to Build Settings, and make sure the platform is set to "Android"
@@ -35,6 +35,6 @@ You can download the game, but it's full of bugs and still unfinished, so I don'
 - [x] Improve the touch input for mobile devices
 - [x] Fix the jump script code entirely
 - [x] Add animations to obstacles
-- [ ] Add movers
+- [x] Add movers
 - [ ] Add the option to import a level without having to move the level files manually
 - [ ] Add an in-game theme editor, to make it easier to create custom themes

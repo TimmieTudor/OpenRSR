@@ -46,6 +46,10 @@ public class LevelRenderer : MonoBehaviour
     public GameObject glassEdge;
     public GameObject moverEdge;
     public GameObject moverAutoEdge;
+    public GameObject smallCollision;
+    public GameObject tallCollision;
+    public GameObject airCollision;
+    public GameObject baseBlock;
     public List<string> levelFilePaths = new List<string>();
     // Start is called before the first frame update
     void Start()
@@ -298,6 +302,29 @@ public class LevelRenderer : MonoBehaviour
                     }
                     managerDynamicGroups.moverActivator = spawnEnemy.GetComponent<MoverVisual>();
                 }
+            }
+            if (enemyID == 33) {
+                GameObject instantiatedCollision = Instantiate(smallCollision, new Vector3(x - 2f, 0.55f, z), Quaternion.identity);
+                instantiatedCollision.transform.parent = spawnEnemy.transform;
+                GameObject instantiatedBlock = Instantiate(baseBlock, new Vector3(x - 2f, 0f, z), Quaternion.identity);
+                instantiatedBlock.transform.parent = spawnEnemy.transform;
+                BlockAnim blockAnim = instantiatedBlock.GetComponent<BlockAnim>();
+                blockAnim.yOffset = 0f;
+                blockAnim.dyOffset = 1f;
+            }
+            if (enemyID == 34) {
+                GameObject instantiatedCollision = Instantiate(smallCollision, new Vector3(x - 2f, 0.55f, z), Quaternion.identity);
+                instantiatedCollision.transform.parent = spawnEnemy.transform;
+                GameObject instantiatedBlock = Instantiate(baseBlock, new Vector3(x - 2f, 0f, z), Quaternion.identity);
+                instantiatedBlock.transform.parent = spawnEnemy.transform;
+                BlockAnim blockAnim = instantiatedBlock.GetComponent<BlockAnim>();
+                blockAnim.yOffset = -1f;
+                blockAnim.dyOffset = 2f;
+                GameObject instantiatedBlock2 = Instantiate(baseBlock, new Vector3(x - 2f, 0f, z), Quaternion.identity);
+                instantiatedBlock2.transform.parent = spawnEnemy.transform;
+                BlockAnim blockAnim2 = instantiatedBlock2.GetComponent<BlockAnim>();
+                blockAnim2.yOffset = 0f;
+                blockAnim2.dyOffset = 2f;
             }
         }
     }
